@@ -1,16 +1,18 @@
-source "https://rubygems.org"
+# frozen_string_literal: true
 
-gem "rails", "~> 8.0.2"
-gem "pg", "~> 1.1"
-gem "puma", ">= 5.0"
-gem "jbuilder"
-gem "solid_cache"
-gem "bootsnap", require: false
-gem "rack-cors"
+source 'https://rubygems.org'
+
+gem 'bootsnap', require: false
+gem 'jbuilder'
+gem 'pg', '~> 1.1'
+gem 'puma', '>= 5.0'
+gem 'rack-cors'
+gem 'rails', '~> 8.0.2'
+gem 'solid_cache'
 
 group :development, :test do
-  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
-  gem "brakeman", require: false
+  gem 'brakeman', require: false
+  gem 'debug', platforms: %i[mri windows], require: 'debug/prelude'
   gem 'rubocop', require: false
   gem 'rubocop-factory_bot', require: false
   gem 'rubocop-performance', require: false
