@@ -1,0 +1,4 @@
+.eslintrc.json
+next.config.mjs
+tailwind.config.ts
+tsconfig.json
