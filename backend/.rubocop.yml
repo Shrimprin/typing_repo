@@ -1,0 +1,45 @@
+plugins:
+  - rubocop-factory_bot
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rspec
+  - rubocop-rspec_rails
+
+AllCops:
+  Exclude:
+    - "bin/*"
+    - "config/**/*"
+    - "db/**/*"
+    - "tmp/**/*"
+
+  # 新ルールは有効
+  NewCops: enable
+
+# メソッドの行数をチェック
+Metrics/MethodLength:
+  Max: 30
+
+# クラスの行数をチェック
+Metrics/ClassLength:
+  Enabled: 200
+
+# 日本語でのコメントを許可
+Style/AsciiComments:
+  Enabled: false
+
+# クラスやモジュール定義前に、それらの説明書きがあるかをチェック（無効）
+Style/Documentation:
+  Enabled: false
+
+# 文字列に値が代入されて変わっていないかチェック
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+# テストファイルのtypeを設定する（書かないとルーティングのヘルパーメソッドが読み込まれない）
+RSpecRails/InferredSpecType:
+  Enabled: false
+
+# 複数のexpectを許可
+RSpec/MultipleExpectations:
+  Enabled: false
