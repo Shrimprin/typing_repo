@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "fix": "prettier --write . && eslint . --fix",
+    "lint": "prettier --check . && eslint .",
     "test": "jest",
     "test:coverage": "jest --coverage"
   },
