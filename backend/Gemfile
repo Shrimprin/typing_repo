@@ -3,6 +3,7 @@
 source 'https://rubygems.org'
 
 gem 'bootsnap', require: false
+gem 'closure_tree'
 gem 'dotenv-rails'
 gem 'jbuilder'
 gem 'pg', '~> 1.1'
