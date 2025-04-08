@@ -10,9 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_08_113008) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_08_113426) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "file_items", force: :cascade do |t|
+    t.bigint "repository_id", null: false
+    t.string "name", null: false
+    t.integer "type", null: false
+    t.text "content"
+    t.integer "status", null: false
+    t.integer "parent_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["repository_id"], name: "index_file_items_on_repository_id"
+  end
 
   create_table "repositories", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -34,5 +46,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_113008) do
     t.index ["github_id"], name: "index_users_on_github_id", unique: true
   end
 
+  add_foreign_key "file_items", "repositories"
   add_foreign_key "repositories", "users"
 end
