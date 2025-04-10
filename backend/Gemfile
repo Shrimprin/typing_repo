@@ -2,10 +2,10 @@
 
 source 'https://rubygems.org'
 
+gem 'alba'
 gem 'bootsnap', require: false
 gem 'closure_tree'
 gem 'dotenv-rails'
-gem 'jbuilder'
 gem 'pg', '~> 1.1'
 gem 'puma', '>= 5.0'
 gem 'rack-cors'

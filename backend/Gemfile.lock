@@ -72,6 +72,7 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
+    alba (3.6.0)
     ast (2.4.3)
     base64 (0.2.0)
     benchmark (0.4.0)
@@ -115,9 +116,6 @@ GEM
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    jbuilder (2.13.0)
-      actionview (>= 5.0.0)
-      activesupport (>= 5.0.0)
     json (2.10.2)
     language_server-protocol (3.17.0.4)
     lint_roller (1.1.0)
@@ -310,6 +308,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  alba
   bootsnap
   brakeman
   closure_tree
@@ -317,7 +316,6 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails
   faker
-  jbuilder
   pg (~> 1.1)
   puma (>= 5.0)
   rack-cors
