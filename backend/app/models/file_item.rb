@@ -13,7 +13,7 @@ class FileItem < ApplicationRecord
 
   enum :type, {
     file: 0,
-    directory: 1
+    dir: 1
   }
 
   enum :status, {
