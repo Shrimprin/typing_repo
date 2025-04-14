@@ -7,6 +7,9 @@ import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { axiosPost } from '@/utils/axios';
 
 type FormValues = {
@@ -22,20 +25,19 @@ const schema = z.object({
 });
 
 export default function NewRepositoryPage() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<FormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      url: '',
+    },
   });
   const [error, setError] = useState<string | null>(null);
   // const router = useRouter(); // TODO: リダイレクト実装時に使う
   // const { data: session } = useSession(); TODO: ログイン実装時に使う
 
-  const onSubmit: SubmitHandler<FormValues> = async (data: FormValues) => {
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
     // const accessToken = session?.user?.accessToken; // TODO: ログイン実装時に使う
-    const accessToken = process.env.NEXT_PUBLIC_ACCESS_TOKEN; // TODO: ログイン実装までは仮実装
+    const accessToken = 'token_1234567890'; // TODO: 仮
     const url = '/api/repositories';
     const postData = {
       repository: { url: data.url },
@@ -54,18 +56,29 @@ export default function NewRepositoryPage() {
   };
 
   return (
-    <div>
-      <h1>リポジトリを追加</h1>
-      <p>タイピングしたいGitHubリポジトリのURLを入力してください。</p>
-      <h2>GitHubリポジトリのURL</h2>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <input type="text" {...register('url')} placeholder="GitHubリポジトリのURLを入力してください。" />
-        {errors.url && <span style={{ color: 'red' }}>{errors.url.message}</span>}
-        <button type="submit" disabled={isSubmitting}>
-          追加
-        </button>
-      </form>
-      {error && <div style={{ color: 'red' }}>{error}</div>}
+    <div className="mx-auto max-w-md p-4">
+      <h1 className="mb-4 text-xl font-bold">リポジトリを追加</h1>
+      <p className="mb-4 text-sm text-gray-500">タイピングしたいGitHubリポジトリのURLを入力してください。</p>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="url"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>GitHubリポジトリのURL</FormLabel>
+                <FormControl>
+                  <Input placeholder="https://github.com/username/repository" {...field} />
+                </FormControl>
+                <FormMessage>{form.formState.errors.url?.message || error}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            追加
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 }
