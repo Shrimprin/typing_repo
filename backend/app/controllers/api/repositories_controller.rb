@@ -3,7 +3,6 @@
 module Api
   class RepositoriesController < ApplicationController
     def create
-      client = Octokit::Client.new(access_token: params[:access_token])
       url = repository_params[:url]
       if invalid_url?(url)
         render json: { error: '無効なURLです。' }, status: :unprocessable_entity
@@ -13,6 +12,7 @@ module Api
       repository_url = URI(url).path[1..]
 
       begin
+        client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
         repository_info = client.repository(repository_url)
         repository_name = repository_info.name
         latest_commit = client.commits(repository_url).first
@@ -26,6 +26,10 @@ module Api
         end
       rescue Octokit::NotFound
         render json: { error: 'リポジトリが存在しません。' }, status: :not_found
+      rescue Octokit::TooManyRequests
+        render json: { error: 'APIリクエストが多すぎます。少し時間をおいてから再度実行してください。' }, status: :too_many_requests
+      rescue Octokit::Unauthorized
+        render json: { error: 'アクセストークンが無効です。' }, status: :unauthorized
       rescue StandardError
         render json: { error: 'リポジトリ情報の取得中にエラーが発生しました。' }, status: :internal_server_error
       end
