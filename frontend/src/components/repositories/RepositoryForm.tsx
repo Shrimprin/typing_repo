@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
@@ -32,7 +33,7 @@ export default function RepositoryForm() {
     },
   });
   const [error, setError] = useState<string | null>(null);
-  // const router = useRouter(); // TODO: リダイレクト実装時に使う
+  const router = useRouter();
   // const { data: session } = useSession(); TODO: ログイン実装時に使う
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
@@ -44,8 +45,7 @@ export default function RepositoryForm() {
     };
     try {
       const res = await axiosPost(url, accessToken, postData);
-      // router.push(`/repositories/${res.data.id}`); // TODO: リダイレクト実装時に使う
-      console.log(res.data); // TODO: 仮
+      router.push(`/repositories/${res.data.repository.id}`);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         setError(error.response.data.error);
