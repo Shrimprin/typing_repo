@@ -2,9 +2,8 @@
 
 FactoryBot.define do
   factory :user do
-    id { '' }
-    name { 'MyString' }
-    github_id { 'MyString' }
+    name { Faker::Name.name }
+    sequence(:github_id) { |n| n }
     is_mute { false }
   end
 end
