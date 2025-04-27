@@ -41,10 +41,18 @@ Style/FrozenStringLiteralComment:
   Enabled: true
   EnforcedStyle: always
 
+# exampleの行数をチェック
+RSpec/ExampleLength:
+  Max: 20
+
 # テストファイルのtypeを設定する（書かないとルーティングのヘルパーメソッドが読み込まれない）
 RSpecRails/InferredSpecType:
   Enabled: false
 
 # 複数のexpectを許可
 RSpec/MultipleExpectations:
+  Enabled: false
+
+# instance_doubleを必須としない(doubleを許可する)
+RSpec/VerifiedDoubles:
   Enabled: false
