@@ -3,8 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Repository, type: :model do
-  let(:user) { create(:user) }
-  let(:repository) { build(:repository, user:) }
+  let(:repository) { build(:repository) }
 
   describe '#save_with_file_items' do
     let(:github_client_mock) { instance_double(Octokit::Client) }
