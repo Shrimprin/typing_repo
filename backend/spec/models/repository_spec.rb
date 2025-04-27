@@ -95,7 +95,7 @@ RSpec.describe Repository, type: :model do
         )
     end
 
-    it 'save save repository and file_items' do
+    it 'save repository and file_items' do
       expect(repository.file_items.count).to eq(0)
       repository.send(:save_file_items, github_client_mock)
 
@@ -112,6 +112,17 @@ RSpec.describe Repository, type: :model do
 
       expect(decoded_text).to eq('こんにちは、世界！')
       expect(decoded_text.encoding.name).to eq('UTF-8')
+    end
+
+    it 'handles invalid UTF-8 encoding' do
+      # 無効なUTF-8シーケンスを含むBase64エンコードされたテキスト
+      invalid_bytes = [0xFF, 0xFE, 0xFD].pack('C*') + 'こんにちは、世界！'.dup.force_encoding('ASCII-8BIT')
+      invalid_base64_text = Base64.strict_encode64(invalid_bytes)
+      decoded_text = repository.send(:decode_file_content, invalid_base64_text)
+
+      expect(decoded_text).to include('こんにちは、世界！')
+      expect(decoded_text.encoding.name).to eq('UTF-8')
+      expect(decoded_text.valid_encoding?).to be true
     end
   end
 end

@@ -8,20 +8,20 @@ RSpec.describe 'Api::Repositories', type: :request do
     let(:valid_url) { 'https://github.com/username/repository' }
     let(:valid_repository_url) { 'username/repository' }
 
-    let(:repository_info) do
-      instance_double(Octokit::Repository, name: 'repository')
-    end
-
-    let(:commit) do
-      double('commit', sha: 'commit_hash')
-    end
-
     before do
       create(:user)
       allow(ENV).to receive(:fetch).with('GITHUB_ACCESS_TOKEN').and_return('github_access_token')
     end
 
-    context 'when request is valid' do
+    context 'when saved successfully' do
+      let(:repository_info) do
+        instance_double(Octokit::Repository, name: 'repository')
+      end
+
+      let(:commit) do
+        double('commit', sha: 'commit_hash')
+      end
+
       before do
         github_client_mock = instance_double(Octokit::Client)
         allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
@@ -39,6 +39,31 @@ RSpec.describe 'Api::Repositories', type: :request do
         json = response.parsed_body
         expect(json.length).to eq 1
         expect(json['repository']['name']).to eq('repository')
+      end
+    end
+
+    context 'when save failed' do
+      # nameが空のrepositoryを用意してバリデーションエラーを発生させる
+      let(:repository_info) do
+        instance_double(Octokit::Repository, name: '')
+      end
+
+      let(:commit) do
+        double('commit', sha: 'commit_hash')
+      end
+
+      before do
+        github_client_mock = instance_double(Octokit::Client)
+        allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
+        allow(github_client_mock).to receive(:repository).with(valid_repository_url).and_return(repository_info)
+        allow(github_client_mock).to receive(:commits).with(valid_repository_url).and_return([commit])
+      end
+
+      it 'returns unprocessable_entity status' do
+        post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = response.parsed_body
+        expect(json['name']).to eq(['can\'t be blank'])
       end
     end
 
