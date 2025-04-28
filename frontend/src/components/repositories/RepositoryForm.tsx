@@ -20,8 +20,8 @@ type FormValues = {
 const schema = z.object({
   url: z
     .string()
-    .url('有効なURLを入力してください')
     .nonempty('URLは必須です')
+    .url('有効なURLを入力してください')
     .regex(/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/, 'GitHubのリポジトリURLを入力してください'),
 });
 
@@ -47,8 +47,8 @@ export default function RepositoryForm() {
       const res = await axiosPost(url, accessToken, postData);
       router.push(`/repositories/${res.data.repository.id}`);
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        setError(error.response.data.error);
+      if (axios.isAxiosError(error)) {
+        setError(error.message);
       } else {
         setError('サーバーエラーが発生しました。');
       }
