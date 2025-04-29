@@ -15,6 +15,11 @@ AllCops:
   # 新ルールは有効
   NewCops: enable
 
+# メソッドの複雑さ
+# A ：代入（Assignments）、B ：分岐（Branches）、C ：条件（Conditions）の2乗和の平方根
+Metrics/AbcSize:
+  Max: 30
+
 # メソッドの行数をチェック
 Metrics/MethodLength:
   Max: 30
@@ -36,10 +41,18 @@ Style/FrozenStringLiteralComment:
   Enabled: true
   EnforcedStyle: always
 
+# exampleの行数をチェック
+RSpec/ExampleLength:
+  Max: 20
+
 # テストファイルのtypeを設定する（書かないとルーティングのヘルパーメソッドが読み込まれない）
 RSpecRails/InferredSpecType:
   Enabled: false
 
 # 複数のexpectを許可
 RSpec/MultipleExpectations:
+  Enabled: false
+
+# instance_doubleを必須としない(doubleを許可する)
+RSpec/VerifiedDoubles:
   Enabled: false
