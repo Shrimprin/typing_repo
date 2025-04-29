@@ -41,6 +41,7 @@ jobs:
       RAILS_ENV: test
       DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
       SECRET_KEY_BASE: "test_secret_key"
+      FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
