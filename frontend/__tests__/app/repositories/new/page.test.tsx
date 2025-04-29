@@ -9,21 +9,16 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 
-jest.mock('axios', () => {
-  const actualAxios = jest.requireActual('axios');
-  return {
-    ...actualAxios,
-    post: jest.fn(),
-  };
-});
-
-const axiosMock = axios as jest.Mocked<typeof axios>;
-
-beforeEach(() => {
-  jest.clearAllMocks();
-});
+jest.mock('axios', () => ({
+  ...jest.requireActual('axios'),
+  post: jest.fn(),
+}));
 
 describe('NewRepositoryPage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('render title and description', () => {
     render(<NewRepositoryPage />);
 
@@ -42,7 +37,7 @@ describe('NewRepositoryPage', () => {
     const pushMock = jest.fn();
     (useRouter as jest.Mock).mockReturnValue({ push: pushMock });
 
-    axiosMock.post.mockResolvedValueOnce({
+    jest.spyOn(axios, 'post').mockResolvedValueOnce({
       data: {
         repository: {
           id: 1,
@@ -55,13 +50,7 @@ describe('NewRepositoryPage', () => {
 
     render(<NewRepositoryPage />);
 
-    const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
-    const addButton = screen.getByRole('button', { name: '追加' });
-
-    await act(async () => {
-      fireEvent.change(repositoryUrlInput, { target: { value: 'https://github.com/username/repository' } });
-      fireEvent.click(addButton);
-    });
+    await inputRepositoryUrlAndSubmit('https://github.com/username/repository');
 
     const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
     expect(axios.post).toHaveBeenCalledWith(
@@ -80,68 +69,61 @@ describe('NewRepositoryPage', () => {
     expect(pushMock).toHaveBeenCalledWith('/repositories/1');
   });
 
-  it('show error message when submit invalid url', async () => {
-    render(<NewRepositoryPage />);
+  describe('form validation', () => {
+    it('show error message when submit invalid url', async () => {
+      render(<NewRepositoryPage />);
 
-    const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
-    const addButton = screen.getByRole('button', { name: '追加' });
+      const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
+      const addButton = screen.getByRole('button', { name: '追加' });
 
-    await act(async () => {
-      fireEvent.change(repositoryUrlInput, { target: { value: 'invalid-url' } });
-      fireEvent.click(addButton);
+      await act(async () => {
+        fireEvent.change(repositoryUrlInput, { target: { value: 'invalid-url' } });
+        fireEvent.click(addButton);
+      });
+
+      expect(screen.getByText('有効なURLを入力してください')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('有効なURLを入力してください')).toBeInTheDocument();
+    it('show error message when submit with empty url', async () => {
+      render(<NewRepositoryPage />);
+
+      await inputRepositoryUrlAndSubmit('');
+      expect(screen.getByText('URLは必須です')).toBeInTheDocument();
+    });
   });
 
-  it('show error message when submit with empty url', async () => {
-    render(<NewRepositoryPage />);
+  describe('error handling', () => {
+    it('show error message when occur axios error', async () => {
+      jest.spyOn(axios, 'post').mockRejectedValueOnce({
+        message: 'Network Error',
+        name: 'AxiosError',
+        code: 'ERR_NETWORK',
+        isAxiosError: true,
+      } as AxiosError);
 
-    const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
-    const addButton = screen.getByRole('button', { name: '追加' });
+      render(<NewRepositoryPage />);
 
-    await act(async () => {
-      fireEvent.change(repositoryUrlInput, { target: { value: '' } });
-      fireEvent.click(addButton);
+      await inputRepositoryUrlAndSubmit('https://github.com/username/repository');
+      expect(screen.getByText('Network Error')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('URLは必須です')).toBeInTheDocument();
-  });
+    it('show error message when occur server error', async () => {
+      jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error('Server error'));
 
-  it('show error message when occur axios error', async () => {
-    axiosMock.post.mockRejectedValueOnce({
-      message: 'Network Error',
-      name: 'AxiosError',
-      code: 'ERR_NETWORK',
-      isAxiosError: true,
-    } as AxiosError);
+      render(<NewRepositoryPage />);
 
-    render(<NewRepositoryPage />);
-
-    const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
-    const addButton = screen.getByRole('button', { name: '追加' });
-
-    await act(async () => {
-      fireEvent.change(repositoryUrlInput, { target: { value: 'https://github.com/username/repository' } });
-      fireEvent.click(addButton);
+      await inputRepositoryUrlAndSubmit('https://github.com/username/repository');
+      expect(screen.getByText('サーバーエラーが発生しました。')).toBeInTheDocument();
     });
-
-    expect(screen.getByText('Network Error')).toBeInTheDocument();
-  });
-
-  it('show error message when occur server error', async () => {
-    axiosMock.post.mockRejectedValueOnce(new Error('Server error'));
-
-    render(<NewRepositoryPage />);
-
-    const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
-    const addButton = screen.getByRole('button', { name: '追加' });
-
-    await act(async () => {
-      fireEvent.change(repositoryUrlInput, { target: { value: 'https://github.com/username/repository' } });
-      fireEvent.click(addButton);
-    });
-
-    expect(screen.getByText('サーバーエラーが発生しました。')).toBeInTheDocument();
   });
 });
+
+const inputRepositoryUrlAndSubmit = async (url: string) => {
+  const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
+  const addButton = screen.getByRole('button', { name: '追加' });
+
+  await act(async () => {
+    fireEvent.change(repositoryUrlInput, { target: { value: url } });
+    fireEvent.click(addButton);
+  });
+};
