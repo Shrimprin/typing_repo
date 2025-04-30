@@ -40,6 +40,7 @@ export default tseslint.config(
     rules: {
       ...eslintPluginReadableTailwind.configs.warning.rules,
       ...eslintPluginReadableTailwind.configs.error.rules,
+      'readable-tailwind/multiline': ['warn', { printWidth: 120 }],
     },
   },
   eslintConfigPrettier,
