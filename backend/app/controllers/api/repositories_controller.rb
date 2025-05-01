@@ -2,6 +2,10 @@
 
 module Api
   class RepositoriesController < ApplicationController
+    def index
+      render json: { message: 'Success!' }
+    end
+
     def create
       url = repository_params[:url]
       if invalid_url?(url)
