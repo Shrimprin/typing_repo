@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
@@ -34,11 +35,10 @@ export default function RepositoryForm() {
   });
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  // const { data: session } = useSession(); TODO: ログイン実装時に使う
+  const { data: session } = useSession();
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    // const accessToken = session?.user?.accessToken; // TODO: ログイン実装時に使う
-    const accessToken = 'token_1234567890'; // TODO: 仮
+    const accessToken = session?.user?.accessToken;
     const url = '/api/repositories';
     const postData = {
       repository: { url: data.url },
