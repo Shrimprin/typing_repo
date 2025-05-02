@@ -3,13 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe 'Api::Repositories', type: :request do
+  include_context 'with authenticated user'
+
   describe 'POST /api/repositories' do
-    let(:headers) { { 'Authorization' => 'Bearer jwt' } }
     let(:valid_url) { 'https://github.com/username/repository' }
     let(:valid_repository_url) { 'username/repository' }
 
     before do
-      create(:user)
       allow(ENV).to receive(:fetch).with('GITHUB_ACCESS_TOKEN').and_return('github_access_token')
     end
 
