@@ -7,7 +7,6 @@ module Api
     def login
       user = User.find_or_create_by!(login_params)
       access_token = JsonWebToken.encode(user_id: user.id)
-      Rails.logger.debug access_token
       if user
         render json: { access_token: access_token }, status: :ok
       else
