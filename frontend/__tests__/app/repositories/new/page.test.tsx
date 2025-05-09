@@ -4,9 +4,14 @@ import axios, { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 
 import NewRepositoryPage from '@/app/repositories/new/page';
+import { mockUseSession } from '../../../mocks/auth';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
+}));
+
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(),
 }));
 
 jest.mock('axios', () => ({
@@ -17,6 +22,7 @@ jest.mock('axios', () => ({
 describe('NewRepositoryPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseSession();
   });
 
   it('render title and description', () => {
@@ -60,7 +66,7 @@ describe('NewRepositoryPage', () => {
       },
       {
         headers: {
-          Authorization: 'Bearer token_1234567890', // TODO: 仮。userのJWTを入れる
+          Authorization: 'Bearer token_1234567890',
           'Content-Type': 'application/json',
         },
       },
