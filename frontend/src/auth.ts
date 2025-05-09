@@ -19,6 +19,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   basePath: '/api/auth',
   callbacks: {
+    authorized({ request, auth }) {
+      const { pathname } = request.nextUrl;
+      if (pathname.startsWith('/repositories') && !auth) {
+        return Response.redirect(new URL('/', request.nextUrl));
+        // TODO: メッセージを表示する
+      }
+      return true;
+    },
     async signIn({ user, account, profile }) {
       const name = profile?.name;
       const githubId = account?.providerAccountId;
