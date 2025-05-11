@@ -30,3 +30,5 @@ group :development, :test do
   gem 'rubocop-rspec_rails', require: false
   gem 'simplecov', require: false
 end
+
+gem 'dockerfile-rails', '>= 1.7', group: :development
