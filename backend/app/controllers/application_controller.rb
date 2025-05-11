@@ -3,8 +3,19 @@
 class ApplicationController < ActionController::API
   before_action :authenticate_request!
 
+  private
+
   def authenticate_request!
-    # TODO: ログイン実装までは仮実装
-    @current_user = User.first
+    header = request.headers['Authorization']
+    token = header.split.last if header
+    decoded_token = JsonWebToken.decode(token)
+
+    if decoded_token
+      @current_user = User.find(decoded_token[:user_id])
+    else
+      render json: { error: 'ログインしてください' }, status: :unauthorized
+    end
+  rescue ActiveRecord::RecordNotFound, JWT::DecodeError
+    render json: { error: 'ログインしてください' }, status: :unauthorized
   end
 end

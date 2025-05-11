@@ -7,6 +7,7 @@ gem 'bootsnap', require: false
 gem 'closure_tree'
 gem 'dotenv-rails'
 gem 'faraday-retry'
+gem 'jwt'
 gem 'octokit'
 gem 'pg', '~> 1.1'
 gem 'puma', '>= 5.0'
