@@ -9,6 +9,9 @@ jobs:
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     concurrency: deploy-group # optional: ensure only one action runs at a time
     steps:
       - uses: actions/checkout@v4
