@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Api::Repositories', type: :request do
   include_context 'with authenticated user'
 
-  describe 'GET #index' do
+  describe 'GET /api/repositories' do
     context 'when user has repositories' do
       let!(:repositories) { create_list(:repository, 3, :with_file_items, user: user) }
 
@@ -35,7 +35,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
     context 'when repository has any file items' do
       it 'returns progress 1.0' do
-        create(:repository, user: user)
+        create(:repository, user: user) 
         get api_repositories_path, headers: headers
         json = response.parsed_body
         expect(json['repositories'].length).to eq(1)
