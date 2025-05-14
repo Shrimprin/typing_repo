@@ -5,6 +5,45 @@ require 'rails_helper'
 RSpec.describe 'Api::Repositories', type: :request do
   include_context 'with authenticated user'
 
+  describe 'GET /api/repositories' do
+    context 'when user has repositories' do
+      let!(:repositories) { create_list(:repository, 3, :with_file_items, user: user) }
+
+      it 'returns repositories and success status' do
+        get api_repositories_path, headers: headers
+        json = response.parsed_body
+        expect(response).to have_http_status(:ok)
+        expect(json['repositories'].length).to eq(3)
+        expect(json['repositories'].map { |r| r['id'] }).to match_array(repositories.map(&:id))
+        repositories.each do |repository|
+          repository_json = json['repositories'].find { |r| r['id'] == repository.id }
+          expect(repository_json['name']).to eq(repository.name)
+          expect(repository_json['user_id']).to eq(repository.user_id)
+          expect(repository_json['last_typed_at']).to eq(repository.last_typed_at&.as_json)
+          expect(repository_json['progress']).to eq(0.4)
+        end
+      end
+    end
+
+    context 'when user has no repositories' do
+      it 'returns an empty array' do
+        get api_repositories_path, headers: headers
+        json = response.parsed_body
+        expect(json['repositories']).to be_empty
+      end
+    end
+
+    context 'when repository has any file items' do
+      it 'returns progress 1.0' do
+        create(:repository, user: user)
+        get api_repositories_path, headers: headers
+        json = response.parsed_body
+        expect(json['repositories'].length).to eq(1)
+        expect(json['repositories'][0]['progress']).to eq(1.0)
+      end
+    end
+  end
+
   describe 'POST /api/repositories' do
     let(:valid_url) { 'https://github.com/username/repository' }
     let(:valid_repository_url) { 'username/repository' }

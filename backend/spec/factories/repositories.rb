@@ -2,9 +2,18 @@
 
 FactoryBot.define do
   factory :repository do
-    sequence(:name) { |n| "repository#{n}" }
-    sequence(:url) { |n| "user/repo#{n}" }
-    sequence(:commit_hash) { |n| "abc123def456#{n}" }
     user
+    sequence(:name) { |n| "repository_#{n}" }
+    sequence(:url) { |n| "user/repository_#{n}" }
+    commit_hash { SecureRandom.hex(20) }
+    last_typed_at { nil }
+
+    trait :with_file_items do
+      after(:create) do |repository|
+        directory = create(:file_item, :directory, repository: repository)
+        create_list(:file_item, 2, :typed, repository: repository, parent_id: directory.id)
+        create_list(:file_item, 3, repository: repository)
+      end
+    end
   end
 end

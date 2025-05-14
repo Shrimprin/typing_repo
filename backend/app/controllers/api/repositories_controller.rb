@@ -2,6 +2,11 @@
 
 module Api
   class RepositoriesController < ApplicationController
+    def index
+      repositories = @current_user.repositories
+      render json: RepositorySerializer.new(repositories, params: { progress: true }), status: :ok
+    end
+
     def create
       url = repository_params[:url]
       if invalid_url?(url)
