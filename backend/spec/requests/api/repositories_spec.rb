@@ -35,7 +35,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
     context 'when repository has any file items' do
       it 'returns progress 1.0' do
-        create(:repository, user: user) 
+        create(:repository, user: user)
         get api_repositories_path, headers: headers
         json = response.parsed_body
         expect(json['repositories'].length).to eq(1)
