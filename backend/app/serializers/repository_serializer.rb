@@ -10,7 +10,7 @@ class RepositorySerializer
   attribute :progress, if: proc { params[:progress] } do |repository|
     files = repository.file_items.where(type: :file)
     if files.empty?
-      100.0
+      1.0
     else
       typed_count = files.where(status: :typed).count
       typed_count.to_f / files.count
