@@ -7,6 +7,13 @@ module Api
       render json: RepositorySerializer.new(repositories, params: { progress: true }), status: :ok
     end
 
+    def show
+      repository = @current_user.repositories.find(params[:id])
+      render json: RepositorySerializer.new(repository, params: { file_items: true }), status: :ok
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: 'リポジトリが存在しません。' }, status: :not_found
+    end
+
     def create
       url = repository_params[:url]
       if invalid_url?(url)

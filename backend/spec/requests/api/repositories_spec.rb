@@ -44,6 +44,33 @@ RSpec.describe 'Api::Repositories', type: :request do
     end
   end
 
+  describe 'GET /api/repositories/:id' do
+    let!(:repository) { create(:repository, :with_file_items, user: user) }
+
+    context 'when repository exists' do
+      it 'returns the repository and success status' do
+        get api_repository_path(repository), headers: headers
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json['repository']['id']).to eq(repository.id)
+        expect(json['repository']['name']).to eq(repository.name)
+        expect(json['repository']['user_id']).to eq(repository.user_id)
+        expect(json['last_typed_at']).to eq(repository.last_typed_at&.as_json)
+        expect(json['repository']['file_items'].length).to eq(4)
+        expect(json['repository']['file_items'][0]['children'].length).to eq(2)
+      end
+    end
+
+    context 'when repository does not exist' do
+      it 'returns not found status' do
+        get api_repository_path(id: 0), headers: headers
+        expect(response).to have_http_status(:not_found)
+        json = response.parsed_body
+        expect(json['error']).to eq('リポジトリが存在しません。')
+      end
+    end
+  end
+
   describe 'POST /api/repositories' do
     let(:valid_url) { 'https://github.com/username/repository' }
     let(:valid_repository_url) { 'username/repository' }
