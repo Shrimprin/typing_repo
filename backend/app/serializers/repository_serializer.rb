@@ -16,4 +16,9 @@ class RepositorySerializer
       typed_count.to_f / files.count
     end
   end
+
+  attribute :file_items, if: proc { params[:file_items] } do |repository|
+    top_level_file_items = repository.file_items.where(parent_id: nil)
+    top_level_file_items.map { |fi| FileItemSerializer.new(fi, params: { children: true }) }
+  end
 end
