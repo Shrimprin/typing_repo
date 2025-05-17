@@ -3,8 +3,6 @@
 class RepositorySerializer
   include Alba::Serializer
 
-  root_key :repository, :repositories
-
   attributes :id, :user_id, :name, :last_typed_at
 
   attribute :progress, if: proc { params[:progress] } do |repository|
