@@ -5,7 +5,7 @@ import { Check, ChevronDown, ChevronRight, File, Folder } from 'lucide-react';
 import { useState } from 'react';
 
 import { FileItem } from '@/types';
-
+import { sortFileItems } from '@/utils/sort-file-items';
 type FileTreeItemProps = {
   fileItem: FileItem;
   level: number;
@@ -29,6 +29,7 @@ export function FileTreeItem({ fileItem, level, onSelectFile }: FileTreeItemProp
 
   const isTyped = fileItem.status === 'typed';
   const fileItems: FileItem[] = camelcaseKeys(fileItem.fileItems);
+  const sortedFileItems = sortFileItems(fileItems);
 
   return (
     <div style={{ marginLeft: `${level * 8}px` }}>
@@ -57,9 +58,9 @@ export function FileTreeItem({ fileItem, level, onSelectFile }: FileTreeItemProp
         )}
       </div>
 
-      {expanded && fileItems.length > 0 && (
+      {expanded && sortedFileItems.length > 0 && (
         <div>
-          {fileItems.map((child) => (
+          {sortedFileItems.map((child) => (
             <FileTreeItem key={child.id} fileItem={child} level={level + 1} onSelectFile={onSelectFile} />
           ))}
         </div>

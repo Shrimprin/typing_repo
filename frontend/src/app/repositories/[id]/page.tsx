@@ -9,6 +9,7 @@ import useSWR from 'swr';
 import { FileTree } from '@/components/repositories/FileTree';
 import { FileItem, Repository } from '@/types';
 import { fetcher } from '@/utils/fetcher';
+import { sortFileItems } from '@/utils/sort-file-items';
 
 export default function RepositoryDetailPage() {
   const { id } = useParams();
@@ -29,12 +30,13 @@ export default function RepositoryDetailPage() {
 
   const repository: Repository = camelcaseKeys(data);
   const fileItems: FileItem[] | [] = camelcaseKeys(repository.fileItems);
+  const sortedFileItems = sortFileItems(fileItems);
 
   return (
     <div className="flex h-screen flex-col">
       <div className="flex flex-1 overflow-hidden">
         <div className="w-1/4 min-w-[250px] overflow-y-auto border-r p-2">
-          <FileTree fileItems={fileItems} onSelectFile={setSelectedFile} />
+          <FileTree fileItems={sortedFileItems} onSelectFile={setSelectedFile} />
         </div>
 
         <div className="flex-1 overflow-y-auto">
