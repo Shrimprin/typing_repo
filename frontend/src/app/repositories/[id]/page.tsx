@@ -33,7 +33,7 @@ export default function RepositoryDetailPage() {
   return (
     <div className="flex h-screen flex-col">
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-1/4 overflow-y-auto border-r p-2">
+        <div className="w-1/4 min-w-[250px] overflow-y-auto border-r p-2">
           <FileTree fileItems={fileItems} onSelectFile={setSelectedFile} />
         </div>
 

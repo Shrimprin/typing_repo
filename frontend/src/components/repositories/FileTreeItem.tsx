@@ -41,16 +41,18 @@ export function FileTreeItem({ fileItem, level, onSelectFile }: FileTreeItemProp
       >
         {fileItem.type === 'dir' ? (
           <>
-            <span className="mr-1">{expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}</span>
-            <Folder size={16} className="mr-1" />
-            <span>{fileItem.name}</span>
+            <span className="mr-1 flex-shrink-0">
+              {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            </span>
+            <Folder size={16} className="mr-1 flex-shrink-0" />
+            <span className="truncate">{fileItem.name}</span>
           </>
         ) : (
           <>
-            <span className="mr-1 w-4"></span>
-            <File size={16} className="mr-1" />
-            <span>{fileItem.name}</span>
-            {isTyped && <Check size={16} className="ml-2 text-green-500" />}
+            <div className="mr-1 w-4 flex-shrink-0"></div>
+            <File size={16} className="mr-1 flex-shrink-0" />
+            <span className="truncate">{fileItem.name}</span>
+            {isTyped && <Check size={16} className="ml-2 flex-shrink-0 text-green-500" />}
           </>
         )}
       </div>
