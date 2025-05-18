@@ -57,7 +57,7 @@ RSpec.describe 'Api::Repositories', type: :request do
         expect(json['user_id']).to eq(repository.user_id)
         expect(json['last_typed_at']).to eq(repository.last_typed_at&.as_json)
         expect(json['file_items'].length).to eq(4)
-        expect(json['file_items'][0]['children'].length).to eq(2)
+        expect(json['file_items'][0]['file_items'].length).to eq(2)
       end
     end
 
