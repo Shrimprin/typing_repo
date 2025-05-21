@@ -37,7 +37,11 @@ export default function RepositoryDetailPage() {
     <div className="flex h-screen flex-col">
       <div className="flex flex-1 overflow-hidden">
         <div className="w-1/4 min-w-[250px] overflow-y-auto border-r p-2">
-          <FileTree fileItems={sortedFileItems} onSelectFileItem={setSelectedFileItem} />
+          <FileTree
+            fileItems={sortedFileItems}
+            selectedFileItem={selectedFileItem}
+            onSelectFileItem={setSelectedFileItem}
+          />
         </div>
 
         <div className="flex-1 overflow-y-auto">{selectedFileItem && <TypingArea fileItem={selectedFileItem} />}</div>

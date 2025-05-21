@@ -3,15 +3,22 @@ import { FileTreeItem } from './FileTreeItem';
 
 type FileTreeProps = {
   fileItems: FileItem[];
+  selectedFileItem: FileItem | null;
   onSelectFileItem: (file: FileItem) => void;
 };
 
-export function FileTree({ fileItems, onSelectFileItem }: FileTreeProps) {
+export function FileTree({ fileItems, selectedFileItem, onSelectFileItem }: FileTreeProps) {
   return (
     <>
       <div className="font-mono text-sm">
         {fileItems?.map((fileItem) => (
-          <FileTreeItem key={fileItem.id} fileItem={fileItem} level={0} onSelectFileItem={onSelectFileItem} />
+          <FileTreeItem
+            key={fileItem.id}
+            fileItem={fileItem}
+            selectedFileItem={selectedFileItem}
+            level={0}
+            onSelectFileItem={onSelectFileItem}
+          />
         ))}
       </div>
     </>

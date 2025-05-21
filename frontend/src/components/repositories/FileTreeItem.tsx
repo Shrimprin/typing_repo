@@ -8,11 +8,12 @@ import { FileItem } from '@/types';
 import { sortFileItems } from '@/utils/sort-file-items';
 type FileTreeItemProps = {
   fileItem: FileItem;
+  selectedFileItem: FileItem | null;
   level: number;
   onSelectFileItem: (file: FileItem) => void;
 };
 
-export function FileTreeItem({ fileItem, level, onSelectFileItem }: FileTreeItemProps) {
+export function FileTreeItem({ fileItem, selectedFileItem, level, onSelectFileItem }: FileTreeItemProps) {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -27,10 +28,10 @@ export function FileTreeItem({ fileItem, level, onSelectFileItem }: FileTreeItem
     }
   };
 
+  const isSelected = selectedFileItem?.id === fileItem.id;
   const isTyped = fileItem.status === 'typed';
   const fileItems: FileItem[] = camelcaseKeys(fileItem.fileItems);
   const sortedFileItems = sortFileItems(fileItems);
-
   return (
     <div style={{ marginLeft: `${level * 8}px` }}>
       <div
@@ -52,7 +53,14 @@ export function FileTreeItem({ fileItem, level, onSelectFileItem }: FileTreeItem
           <>
             <div className="mr-1 w-4 flex-shrink-0"></div>
             <File size={16} className="mr-1 flex-shrink-0" />
-            <span className="truncate">{fileItem.name}</span>
+            <span
+              className={`
+                truncate
+                ${isSelected ? 'font-bold' : ''}
+              `}
+            >
+              {fileItem.name}
+            </span>
             {isTyped && <Check size={16} className="ml-2 flex-shrink-0 text-green-500" />}
           </>
         )}
@@ -61,7 +69,13 @@ export function FileTreeItem({ fileItem, level, onSelectFileItem }: FileTreeItem
       {expanded && sortedFileItems.length > 0 && (
         <div>
           {sortedFileItems.map((child) => (
-            <FileTreeItem key={child.id} fileItem={child} level={level + 1} onSelectFileItem={onSelectFileItem} />
+            <FileTreeItem
+              key={child.id}
+              fileItem={child}
+              selectedFileItem={selectedFileItem}
+              level={level + 1}
+              onSelectFileItem={onSelectFileItem}
+            />
           ))}
         </div>
       )}
