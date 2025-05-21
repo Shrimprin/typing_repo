@@ -57,6 +57,7 @@ export function FileTreeItem({ fileItem, selectedFileItem, level, onSelectFileIt
               className={`
                 truncate
                 ${isSelected ? 'font-bold' : ''}
+                ${isTyped ? 'text-green-500' : ''}
               `}
             >
               {fileItem.name}
