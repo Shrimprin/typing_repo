@@ -15,7 +15,7 @@ export default function RepositoryDetailPage() {
   const { id } = useParams();
   const url = `/api/repositories/${id}`;
 
-  const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+  const [selectedFileItem, setSelectedFileItem] = useState<FileItem | null>(null);
   const { data: session } = useSession();
   const accessToken = session?.user?.accessToken;
   const { data, error } = useSWR(accessToken ? [url, accessToken] : null, ([url, accessToken]) =>
@@ -36,14 +36,14 @@ export default function RepositoryDetailPage() {
     <div className="flex h-screen flex-col">
       <div className="flex flex-1 overflow-hidden">
         <div className="w-1/4 min-w-[250px] overflow-y-auto border-r p-2">
-          <FileTree fileItems={sortedFileItems} onSelectFile={setSelectedFile} />
+          <FileTree fileItems={sortedFileItems} onSelectFileItem={setSelectedFileItem} />
         </div>
 
         <div className="flex-1 overflow-y-auto">
           <p>タイピング画面</p>
-          {selectedFile && (
+          {selectedFileItem && (
             <div>
-              <p>選択中のファイル: {selectedFile.name}</p>
+              <p>選択中のファイル: {selectedFileItem.name}</p>
             </div>
           )}
         </div>
