@@ -7,6 +7,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 
 import { FileTree } from '@/components/repositories/FileTree';
+import { TypingArea } from '@/components/repositories/TypingArea';
 import { FileItem, Repository } from '@/types';
 import { fetcher } from '@/utils/fetcher';
 import { sortFileItems } from '@/utils/sort-file-items';
@@ -39,14 +40,7 @@ export default function RepositoryDetailPage() {
           <FileTree fileItems={sortedFileItems} onSelectFileItem={setSelectedFileItem} />
         </div>
 
-        <div className="flex-1 overflow-y-auto">
-          <p>タイピング画面</p>
-          {selectedFileItem && (
-            <div>
-              <p>選択中のファイル: {selectedFileItem.name}</p>
-            </div>
-          )}
-        </div>
+        <div className="flex-1 overflow-y-auto">{selectedFileItem && <TypingArea fileItem={selectedFileItem} />}</div>
       </div>
     </div>
   );
