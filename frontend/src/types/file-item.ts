@@ -5,4 +5,5 @@ export type FileItem = {
   content: string;
   status: 'untyped' | 'typing' | 'typed';
   fileItems: FileItem[] | [];
+  fullPath: string;
 };
