@@ -9,13 +9,6 @@ type FileTreeProps = {
 export function FileTree({ fileItems, onSelectFileItem }: FileTreeProps) {
   return (
     <>
-      <div className="mb-2">
-        <input
-          type="search"
-          placeholder="タイピングするファイルを選択してください！"
-          className="w-full rounded bg-gray-200 p-2"
-        />
-      </div>
       <div className="font-mono text-sm">
         {fileItems?.map((fileItem) => (
           <FileTreeItem key={fileItem.id} fileItem={fileItem} level={0} onSelectFileItem={onSelectFileItem} />
