@@ -1,51 +1,29 @@
-'use client';
-
+import { AxiosError } from 'axios';
 import camelcaseKeys from 'camelcase-keys';
-import { useSession } from 'next-auth/react';
-import { useParams } from 'next/navigation';
-import { useState } from 'react';
-import useSWR from 'swr';
 
-import { FileTree } from '@/components/repositories/FileTree';
-import { TypingArea } from '@/components/repositories/TypingArea';
+import { auth } from '@/auth';
+import { RepositoryDetail } from '@/components/repositories/RepositoryDetail';
 import { FileItem, Repository } from '@/types';
 import { fetcher } from '@/utils/fetcher';
 import { sortFileItems } from '@/utils/sort-file-items';
 
-export default function RepositoryDetailPage() {
-  const { id } = useParams();
+export default async function RepositoryDetailPage({ params }: { params: { id: string } }) {
+  const { id } = await params;
   const url = `/api/repositories/${id}`;
-
-  const [selectedFileItem, setSelectedFileItem] = useState<FileItem | null>(null);
-  const { data: session } = useSession();
+  const session = await auth();
   const accessToken = session?.user?.accessToken;
-  const { data, error } = useSWR(accessToken ? [url, accessToken] : null, ([url, accessToken]) =>
-    fetcher(url, accessToken),
-  );
+  let repository: Repository;
 
-  if (error)
-    return (
-      <div className="flex h-screen items-center justify-center p-8 text-red-500">データの取得に失敗しました。</div>
-    );
-  if (!data) return <div className="flex h-screen items-center justify-center p-8">読み込み中...</div>;
+  try {
+    const data = await fetcher(url, accessToken);
+    repository = camelcaseKeys(data);
+  } catch (err: AxiosError | unknown) {
+    const errorMessage = err instanceof AxiosError ? err.message : '読み込みに失敗しました。';
+    return <div className="flex h-screen items-center justify-center p-8">{errorMessage}</div>;
+  }
 
-  const repository: Repository = camelcaseKeys(data);
   const fileItems: FileItem[] | [] = camelcaseKeys(repository.fileItems);
   const sortedFileItems = sortFileItems(fileItems);
 
-  return (
-    <div className="flex h-screen flex-col">
-      <div className="flex flex-1 overflow-hidden">
-        <div className="w-1/4 min-w-[250px] overflow-y-auto border-r p-2">
-          <FileTree
-            fileItems={sortedFileItems}
-            selectedFileItem={selectedFileItem}
-            onSelectFileItem={setSelectedFileItem}
-          />
-        </div>
-
-        <div className="flex-1 overflow-y-auto">{selectedFileItem && <TypingArea fileItem={selectedFileItem} />}</div>
-      </div>
-    </div>
-  );
+  return <RepositoryDetail fileItems={sortedFileItems} />;
 }
