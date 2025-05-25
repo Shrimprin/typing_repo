@@ -33,8 +33,9 @@ export function FileTreeItem({ fileItem, selectedFileItem, level, onSelectFileIt
   const isTyped = fileItem.status === 'typed';
   const fileItems: FileItem[] = camelcaseKeys(fileItem.fileItems);
   const sortedFileItems = sortFileItems(fileItems);
+
   return (
-    <div style={{ marginLeft: `${level * 8}px` }}>
+    <div style={{ marginLeft: `${level * 2}px` }}>
       <div
         className={`
           flex cursor-pointer items-center py-1
