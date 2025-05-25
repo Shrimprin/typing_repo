@@ -21,4 +21,16 @@ class FileItem < ApplicationRecord
     typing: 1,
     typed: 2
   }
+
+  def full_path
+    path = name
+    current_parent = parent
+
+    while current_parent
+      path = "#{current_parent.name}/#{path}"
+      current_parent = current_parent.parent
+    end
+
+    "#{repository.name}/#{path}"
+  end
 end

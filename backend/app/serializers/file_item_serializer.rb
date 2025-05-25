@@ -13,15 +13,5 @@ class FileItemSerializer
     file_item.children.map { |child| FileItemSerializer.new(child, params: { children: true }) }
   end
 
-  attribute :full_path, if: proc { params[:full_path] } do |file_item|
-    path = file_item.name
-    parent = file_item.parent
-
-    while parent
-      path = "#{parent.name}/#{path}"
-      parent = parent.parent
-    end
-
-    "#{file_item.repository.name}/#{path}"
-  end
+  attribute :full_path, if: proc { params[:full_path] }, &:full_path
 end
