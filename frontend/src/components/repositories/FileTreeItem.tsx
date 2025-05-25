@@ -1,6 +1,5 @@
 'use client';
 
-import camelcaseKeys from 'camelcase-keys';
 import { Check, ChevronDown, ChevronRight, File, Folder } from 'lucide-react';
 import { useState } from 'react';
 
@@ -31,7 +30,7 @@ export function FileTreeItem({ fileItem, selectedFileItem, level, onSelectFileIt
 
   const isSelected = selectedFileItem?.id === fileItem.id;
   const isTyped = fileItem.status === 'typed';
-  const fileItems: FileItem[] = camelcaseKeys(fileItem.fileItems);
+  const fileItems: FileItem[] = fileItem.fileItems;
   const sortedFileItems = sortFileItems(fileItems);
 
   return (

@@ -1,5 +1,4 @@
 import { AxiosError } from 'axios';
-import camelcaseKeys from 'camelcase-keys';
 
 import { auth } from '@/auth';
 import { RepositoryDetail } from '@/components/repositories/RepositoryDetail';
@@ -15,14 +14,13 @@ export default async function RepositoryDetailPage({ params }: { params: { id: s
   let repository: Repository;
 
   try {
-    const data = await fetcher(url, accessToken);
-    repository = camelcaseKeys(data);
+    repository = await fetcher(url, accessToken);
   } catch (err: AxiosError | unknown) {
     const errorMessage = err instanceof AxiosError ? err.message : 'エラーが発生しました。再度お試しください。';
     return <div className="flex h-screen items-center justify-center p-8">{errorMessage}</div>;
   }
 
-  const fileItems: FileItem[] | [] = camelcaseKeys(repository.fileItems);
+  const fileItems: FileItem[] | [] = repository.fileItems;
   const sortedFileItems = sortFileItems(fileItems);
 
   return <RepositoryDetail fileItems={sortedFileItems} />;

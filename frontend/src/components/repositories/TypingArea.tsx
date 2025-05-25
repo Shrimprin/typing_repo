@@ -1,5 +1,4 @@
 import { Card } from '@/components/ui/card';
-import camelcaseKeys from 'camelcase-keys';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation'; // Next.jsのパラメータフックをインポート
 import useSWR from 'swr';
@@ -32,8 +31,8 @@ export function TypingArea({ fileItem }: TypingAreaProps) {
           <div className="p-6 text-center font-mono text-gray-500">エラーが発生しました。再度お試しください。</div>
         ) : (
           <>
-            <TypingAreaHeader fileItem={camelcaseKeys(data)} />
-            <div className="overflow-x-auto px-4 font-mono text-sm whitespace-pre">{camelcaseKeys(data).content}</div>
+            <TypingAreaHeader fileItem={data} />
+            <div className="overflow-x-auto px-4 font-mono text-sm whitespace-pre">{data.content}</div>
           </>
         )}
       </Card>
