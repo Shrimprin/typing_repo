@@ -16,7 +16,9 @@ export function RepositoryDetail({ fileItems }: { fileItems: FileItem[] }) {
           <FileTree fileItems={fileItems} selectedFileItem={selectedFileItem} onSelectFileItem={setSelectedFileItem} />
         </div>
 
-        <div className="flex-1 overflow-y-auto">{selectedFileItem && <TypingArea fileItem={selectedFileItem} />}</div>
+        <div className="flex-1 overflow-y-auto">
+          <TypingArea fileItem={selectedFileItem} />
+        </div>
       </div>
     </div>
   );
