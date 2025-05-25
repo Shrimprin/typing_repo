@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 import { FileItem } from '@/types';
 import { sortFileItems } from '@/utils/sort-file-items';
+
 type FileTreeItemProps = {
   fileItem: FileItem;
   selectedFileItem: FileItem | null;
