@@ -49,7 +49,15 @@ export function FileTreeItem({ fileItem, selectedFileItem, level, onSelectFileIt
               {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </span>
             <Folder size={16} className="mr-1 flex-shrink-0" />
-            <span className="truncate">{fileItem.name}</span>
+            <span
+              className={`
+                truncate
+                ${isTyped ? 'text-green-500' : ''}
+              `}
+            >
+              {fileItem.name}
+            </span>
+            {isTyped && <Check size={16} className="ml-2 flex-shrink-0 text-green-500" />}
           </>
         ) : (
           <>
