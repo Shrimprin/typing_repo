@@ -14,11 +14,6 @@ jest.mock('next-auth/react', () => ({
   useSession: jest.fn(),
 }));
 
-jest.mock('axios', () => ({
-  ...jest.requireActual('axios'),
-  post: jest.fn(),
-}));
-
 describe('NewRepositoryPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
