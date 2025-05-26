@@ -32,17 +32,18 @@ export function FileTreeItem({ fileItem, selectedFileItem, level, onSelectFileIt
   const isTyped = fileItem.status === 'typed';
   const fileItems: FileItem[] = fileItem.fileItems;
   const sortedFileItems = sortFileItems(fileItems);
+  const isDir = fileItem.type === 'dir';
 
   return (
-    <div style={{ marginLeft: `${level * 2}px` }}>
-      <div
+    <div style={{ marginLeft: `${level * 4}px` }}>
+      <button
         className={`
-          flex cursor-pointer items-center py-1
+          flex w-full cursor-pointer py-1
           hover:bg-gray-100
         `}
-        onClick={fileItem.type === 'dir' ? toggleExpand : handleFileSelect}
+        onClick={isDir ? toggleExpand : handleFileSelect}
       >
-        {fileItem.type === 'dir' ? (
+        {isDir ? (
           <>
             <span className="mr-1 flex-shrink-0">
               {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -66,7 +67,7 @@ export function FileTreeItem({ fileItem, selectedFileItem, level, onSelectFileIt
             {isTyped && <Check size={16} className="ml-2 flex-shrink-0 text-green-500" />}
           </>
         )}
-      </div>
+      </button>
 
       {expanded && sortedFileItems.length > 0 && (
         <div>
