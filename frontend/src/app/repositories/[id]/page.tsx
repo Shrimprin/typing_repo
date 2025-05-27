@@ -6,7 +6,11 @@ import { FileItem, Repository } from '@/types';
 import { fetcher } from '@/utils/fetcher';
 import { sortFileItems } from '@/utils/sort-file-items';
 
-export default async function RepositoryDetailPage({ params }: { params: { id: string } }) {
+type RepositoryDetailPageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function RepositoryDetailPage({ params }: RepositoryDetailPageProps) {
   const { id } = await params;
   const url = `/api/repositories/${id}`;
   const session = await auth();
