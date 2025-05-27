@@ -14,6 +14,10 @@ jest.mock('next-auth/react', () => ({
   useSession: jest.fn(),
 }));
 
+jest.mock('@/auth', () => ({
+  auth: jest.fn(),
+}));
+
 describe('NewRepositoryPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
