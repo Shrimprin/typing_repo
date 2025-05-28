@@ -45,7 +45,7 @@ export default function RepositoryForm() {
     };
     try {
       const res = await axiosPost(url, accessToken, postData);
-      router.push(`/repositories/${res.data.repository.id}`);
+      router.push(`/repositories/${res.data.id}`);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(error.message);

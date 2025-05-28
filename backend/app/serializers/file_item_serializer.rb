@@ -3,13 +3,15 @@
 class FileItemSerializer
   include Alba::Serializer
 
-  attributes :id, :name, :type, :status
+  attributes :id, :name, :type, :status, :repository_id
 
-  attribute :content do |file_item|
+  attribute :content, if: proc { params[:content] } do |file_item|
     file_item.content || ''
   end
 
-  attribute :children, if: proc { params[:children] } do |file_item|
+  attribute :file_items, if: proc { params[:children] } do |file_item|
     file_item.children.map { |child| FileItemSerializer.new(child, params: { children: true }) }
   end
+
+  attribute :full_path, if: proc { params[:full_path] }, &:full_path
 end

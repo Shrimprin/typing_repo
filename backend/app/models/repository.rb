@@ -44,6 +44,7 @@ class Repository < ApplicationRecord
       decoded_file_content = decoded_file_content.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
     end
 
-    decoded_file_content
+    # nullバイトを削除
+    decoded_file_content.delete("\0")
   end
 end

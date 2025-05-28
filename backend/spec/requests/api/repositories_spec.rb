@@ -13,10 +13,10 @@ RSpec.describe 'Api::Repositories', type: :request do
         get api_repositories_path, headers: headers
         json = response.parsed_body
         expect(response).to have_http_status(:ok)
-        expect(json['repositories'].length).to eq(3)
-        expect(json['repositories'].map { |r| r['id'] }).to match_array(repositories.map(&:id))
+        expect(json.length).to eq(3)
+        expect(json.map { |r| r['id'] }).to match_array(repositories.map(&:id))
         repositories.each do |repository|
-          repository_json = json['repositories'].find { |r| r['id'] == repository.id }
+          repository_json = json.find { |r| r['id'] == repository.id }
           expect(repository_json['name']).to eq(repository.name)
           expect(repository_json['user_id']).to eq(repository.user_id)
           expect(repository_json['last_typed_at']).to eq(repository.last_typed_at&.as_json)
@@ -29,7 +29,7 @@ RSpec.describe 'Api::Repositories', type: :request do
       it 'returns an empty array' do
         get api_repositories_path, headers: headers
         json = response.parsed_body
-        expect(json['repositories']).to be_empty
+        expect(json).to be_empty
       end
     end
 
@@ -38,8 +38,8 @@ RSpec.describe 'Api::Repositories', type: :request do
         create(:repository, user: user)
         get api_repositories_path, headers: headers
         json = response.parsed_body
-        expect(json['repositories'].length).to eq(1)
-        expect(json['repositories'][0]['progress']).to eq(1.0)
+        expect(json.length).to eq(1)
+        expect(json[0]['progress']).to eq(1.0)
       end
     end
   end
@@ -52,12 +52,12 @@ RSpec.describe 'Api::Repositories', type: :request do
         get api_repository_path(repository), headers: headers
         expect(response).to have_http_status(:ok)
         json = response.parsed_body
-        expect(json['repository']['id']).to eq(repository.id)
-        expect(json['repository']['name']).to eq(repository.name)
-        expect(json['repository']['user_id']).to eq(repository.user_id)
+        expect(json['id']).to eq(repository.id)
+        expect(json['name']).to eq(repository.name)
+        expect(json['user_id']).to eq(repository.user_id)
         expect(json['last_typed_at']).to eq(repository.last_typed_at&.as_json)
-        expect(json['repository']['file_items'].length).to eq(4)
-        expect(json['repository']['file_items'][0]['children'].length).to eq(2)
+        expect(json['file_items'].length).to eq(4)
+        expect(json['file_items'][0]['file_items'].length).to eq(2)
       end
     end
 
@@ -103,8 +103,10 @@ RSpec.describe 'Api::Repositories', type: :request do
         post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
         expect(response).to have_http_status(:created)
         json = response.parsed_body
-        expect(json.length).to eq 1
-        expect(json['repository']['name']).to eq('repository')
+        expect(json['id']).to be_present
+        expect(json['user_id']).to eq(user.id)
+        expect(json['name']).to eq('repository')
+        expect(json['last_typed_at']).to be_nil
       end
     end
 

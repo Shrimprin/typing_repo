@@ -14,9 +14,8 @@ jest.mock('next-auth/react', () => ({
   useSession: jest.fn(),
 }));
 
-jest.mock('axios', () => ({
-  ...jest.requireActual('axios'),
-  post: jest.fn(),
+jest.mock('@/auth', () => ({
+  auth: jest.fn(),
 }));
 
 describe('NewRepositoryPage', () => {
@@ -45,12 +44,10 @@ describe('NewRepositoryPage', () => {
 
     jest.spyOn(axios, 'post').mockResolvedValueOnce({
       data: {
-        repository: {
-          id: 1,
-          user_id: 1,
-          name: 'repository-name',
-          last_typed_at: null,
-        },
+        id: 1,
+        user_id: 1,
+        name: 'repository-name',
+        last_typed_at: null,
       },
     });
 
