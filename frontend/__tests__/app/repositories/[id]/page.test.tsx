@@ -101,20 +101,19 @@ const mockFileItem = {
 };
 
 describe('RepositoryDetailPage', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
     mockAuth();
     mockUseSession();
     (useParams as jest.Mock).mockReturnValue({ id: '1' });
+    jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepository);
+
+    const repositoryDetailPage = await RepositoryDetailPage({ params: Promise.resolve({ id: '1' }) });
+    render(repositoryDetailPage);
   });
 
   describe('initial state', () => {
     it('render file tree with directories, files order both in alphabetical order', async () => {
-      jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepository);
-
-      const repositoryDetailPage = await RepositoryDetailPage({ params: { id: '1' } });
-      render(repositoryDetailPage);
-
       const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
       expect(axios.get).toHaveBeenCalledWith(`${BASE_URL}/api/repositories/1`, {
         headers: {
@@ -139,22 +138,12 @@ describe('RepositoryDetailPage', () => {
     });
 
     it('render typing area with explanatory message', async () => {
-      jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepository);
-
-      const repositoryDetailPage = await RepositoryDetailPage({ params: { id: '1' } });
-      render(repositoryDetailPage);
-
       expect(screen.getByText('タイピングするファイルを選んでください。')).toBeInTheDocument();
     });
   });
 
   describe('when directory is clicked', () => {
     it('render children of directory', async () => {
-      jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepository);
-
-      const repositoryDetailPage = await RepositoryDetailPage({ params: { id: '1' } });
-      render(repositoryDetailPage);
-
       const dir1 = screen.getByRole('button', { name: 'dir1' });
       await act(async () => {
         fireEvent.click(dir1);
@@ -167,11 +156,6 @@ describe('RepositoryDetailPage', () => {
 
   describe('when file is clicked', () => {
     it('render file content and full path', async () => {
-      jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepository);
-
-      const repositoryDetailPage = await RepositoryDetailPage({ params: { id: '1' } });
-      render(repositoryDetailPage);
-
       const dir1 = screen.getByRole('button', { name: 'dir1' });
       await act(async () => {
         fireEvent.click(dir1);
