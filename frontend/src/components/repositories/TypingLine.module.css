@@ -1,0 +1,18 @@
+.untypeText {
+  color: #999;
+}
+
+.typingText {
+  border-bottom: 1px solid;
+  display: inline-block;
+  line-height: 1.35;
+  vertical-align: bottom;
+}
+
+.correctTypedText {
+  background-color: #bbf7d0;
+}
+
+.incorrectTypedText {
+  background-color: #fecaca;
+}
