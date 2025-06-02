@@ -11,6 +11,13 @@ export function RepositoryDetail({ fileItems }: { fileItems: FileItem[] }) {
   const [typingStatus, setTypingStatus] = useState<TypingStatus>('ready');
 
   const handleFileSelect = (fileItem: FileItem) => {
+    if (typingStatus === 'typing' || typingStatus === 'paused') {
+      const confirmSwitch = window.confirm('タイピングを中断して移動しますか？タイピング中のデータは失われます。');
+      if (!confirmSwitch) {
+        return;
+      }
+    }
+
     setSelectedFileItem(fileItem);
     setTypingStatus('ready');
   };
