@@ -11,11 +11,12 @@ type TypingPanelProps = {
 
 export function TypingPanel({ fileItem, typingStatus, setTypingStatus }: TypingPanelProps) {
   const targetTextLines = fileItem?.content?.split(/(?<=\n)/) || [];
-  const { typedTextLines, cursorPositions, cursorLine, startTyping, resetTyping, pauseTyping } = useTypingHandler({
-    targetTextLines,
-    typingStatus,
-    setTypingStatus,
-  });
+  const { typedTextLines, cursorPositions, cursorLine, startTyping, resetTyping, pauseTyping, restartTyping } =
+    useTypingHandler({
+      targetTextLines,
+      typingStatus,
+      setTypingStatus,
+    });
   return (
     <>
       <TypingHeader
@@ -23,6 +24,7 @@ export function TypingPanel({ fileItem, typingStatus, setTypingStatus }: TypingP
         typingStatus={typingStatus}
         startTyping={startTyping}
         pauseTyping={pauseTyping}
+        restartTyping={restartTyping}
         resetTyping={resetTyping}
       />
       <TypingContent

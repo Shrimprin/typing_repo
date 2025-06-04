@@ -8,22 +8,31 @@ type TypingHeaderProps = {
   typingStatus: TypingStatus;
   startTyping: () => void;
   pauseTyping: () => void;
+  restartTyping: () => void;
   resetTyping: () => void;
 };
 
-export function TypingHeader({ fileItem, typingStatus, startTyping, pauseTyping, resetTyping }: TypingHeaderProps) {
+export function TypingHeader({
+  fileItem,
+  typingStatus,
+  startTyping,
+  pauseTyping,
+  restartTyping,
+  resetTyping,
+}: TypingHeaderProps) {
   const handleToggleTyping = () => {
-    if (typingStatus === 'ready' || typingStatus === 'paused') {
+    if (typingStatus === 'ready') {
       startTyping();
     } else if (typingStatus === 'typing') {
       pauseTyping();
+    } else if (typingStatus === 'paused') {
+      restartTyping();
     }
   };
 
   return (
     <div className="flex items-center justify-between border-b px-4 pb-2">
       <div className="truncate font-mono">{fileItem.fullPath || fileItem.name}</div>
-
       <div className="flex gap-2">
         <Button
           variant="outline"

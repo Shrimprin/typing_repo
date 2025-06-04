@@ -26,6 +26,10 @@ export function useTypingHandler({ targetTextLines, typingStatus, setTypingStatu
     setTypingStatus('paused');
   };
 
+  const restartTyping = () => {
+    setTypingStatus('typing');
+  };
+
   const resetTyping = () => {
     setCursorPositions(initialCursorPositions);
     setTypedTextLines(initialTypedTextLines);
@@ -128,6 +132,7 @@ export function useTypingHandler({ targetTextLines, typingStatus, setTypingStatu
     typingStatus,
     startTyping,
     resetTyping,
+    restartTyping,
     pauseTyping,
   };
 }
