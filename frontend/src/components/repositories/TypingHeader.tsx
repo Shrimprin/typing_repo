@@ -21,7 +21,7 @@ export function TypingHeader({
   resetTyping,
 }: TypingHeaderProps) {
   const handleToggleTyping = () => {
-    if (typingStatus === 'ready') {
+    if (typingStatus === 'ready' || typingStatus === 'completed') {
       startTyping();
     } else if (typingStatus === 'typing') {
       pauseTyping();
@@ -38,10 +38,18 @@ export function TypingHeader({
           variant="outline"
           size="sm"
           onClick={handleToggleTyping}
-          aria-label={typingStatus === 'typing' ? 'PAUSE' : 'PLAY'}
+          aria-label={typingStatus === 'typing' ? 'PAUSE' : typingStatus === 'completed' ? 'REPLAY' : 'PLAY'}
         >
-          {typingStatus === 'typing' ? <Pause size={16} /> : <Play size={16} />}
-          <span className="ml-1">{typingStatus === 'typing' ? 'PAUSE' : 'PLAY'}</span>
+          {typingStatus === 'typing' ? (
+            <Pause size={16} />
+          ) : typingStatus === 'completed' ? (
+            <RotateCcw size={16} />
+          ) : (
+            <Play size={16} />
+          )}
+          <span className="ml-1">
+            {typingStatus === 'typing' ? 'PAUSE' : typingStatus === 'completed' ? 'REPLAY' : 'PLAY'}
+          </span>
         </Button>
 
         {(typingStatus === 'typing' || typingStatus === 'paused') && (
