@@ -28,13 +28,6 @@ export function FileItemView({ fileItem, typingStatus, setTypingStatus }: FileIt
     isLoading,
   } = useSWR(url ? [url, accessToken] : null, ([url, accessToken]) => fetcher(url, accessToken));
 
-  // console.log('--------------------------------');
-  // console.log(fileItem?.id);
-  // console.log(fileItemData);
-  // console.log(error);
-  // console.log(isLoading);
-  // console.log('--------------------------------');
-
   return (
     <div className="flex flex-col">
       <Card className="m-4 overflow-hidden">
