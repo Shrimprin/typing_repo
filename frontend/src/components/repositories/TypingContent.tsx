@@ -19,11 +19,17 @@ export function TypingContent({
   typingStatus,
 }: TypingContentProps) {
   return (
-    <>
+    <div className="overflow-x-auto px-4">
       {typingStatus === 'ready' ? (
-        <div className="overflow-x-auto px-4 font-mono text-sm whitespace-pre">{content}</div>
+        <pre className="font-mono">
+          {content.split('\n').map((line, i) => (
+            <p key={i} className="h-[1.4em]">
+              {line}
+            </p>
+          ))}
+        </pre>
       ) : typingStatus === 'typing' || typingStatus === 'paused' ? (
-        <>
+        <div>
           {targetTextLines.map((targetTextLine, index) => (
             <TypingLine
               key={index}
@@ -33,10 +39,10 @@ export function TypingContent({
               isActive={cursorLine >= index}
             />
           ))}
-        </>
+        </div>
       ) : (
-        <div className="overflow-x-auto px-4 font-mono text-sm whitespace-pre">Completed!!</div>
+        <div className="h-[1.4em]">Completed!!</div>
       )}
-    </>
+    </div>
   );
 }
