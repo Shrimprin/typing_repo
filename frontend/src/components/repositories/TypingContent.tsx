@@ -36,7 +36,7 @@ export function TypingContent({
               typedText={typedTextLines[index]}
               targetTextLine={targetTextLine}
               cursorPosition={cursorPositions[index]}
-              isActive={cursorLine >= index}
+              isUntypedLine={index > cursorLine}
             />
           ))}
         </div>
