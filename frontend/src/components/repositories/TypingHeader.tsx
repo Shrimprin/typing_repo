@@ -8,7 +8,7 @@ type TypingHeaderProps = {
   typingStatus: TypingStatus;
   startTyping: () => void;
   pauseTyping: () => void;
-  restartTyping: () => void;
+  resumeTyping: () => void;
   resetTyping: () => void;
 };
 
@@ -17,7 +17,7 @@ export function TypingHeader({
   typingStatus,
   startTyping,
   pauseTyping,
-  restartTyping,
+  resumeTyping,
   resetTyping,
 }: TypingHeaderProps) {
   const handleToggleTyping = () => {
@@ -26,7 +26,7 @@ export function TypingHeader({
     } else if (typingStatus === 'typing') {
       pauseTyping();
     } else if (typingStatus === 'paused') {
-      restartTyping();
+      resumeTyping();
     }
   };
 

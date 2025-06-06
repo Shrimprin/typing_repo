@@ -26,7 +26,7 @@ export function useTypingHandler({ targetTextLines, typingStatus, setTypingStatu
     setTypingStatus('paused');
   };
 
-  const restartTyping = () => {
+  const resumeTyping = () => {
     setTypingStatus('typing');
   };
 
@@ -132,7 +132,7 @@ export function useTypingHandler({ targetTextLines, typingStatus, setTypingStatu
     typingStatus,
     startTyping,
     resetTyping,
-    restartTyping,
+    resumeTyping,
     pauseTyping,
   };
 }
