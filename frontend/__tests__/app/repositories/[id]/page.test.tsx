@@ -6,6 +6,7 @@ import axios from 'axios';
 import RepositoryDetailPage from '@/app/repositories/[id]/page';
 import { useParams } from 'next/navigation';
 import { mockAuth, mockUseSession } from '../../../mocks/auth';
+import { clickButton } from '../../../utils/testUtils';
 
 jest.mock('next/navigation', () => ({
   useParams: jest.fn(),
@@ -98,11 +99,6 @@ const mockFileItem = {
     content: 'console.log("Hello, world!");',
     fullPath: 'dir1/nested-file1.ts',
   },
-};
-
-const clickButton = async (buttonName: string) => {
-  const button = screen.getByRole('button', { name: buttonName });
-  await userEvent.click(button);
 };
 
 describe('RepositoryDetailPage', () => {
