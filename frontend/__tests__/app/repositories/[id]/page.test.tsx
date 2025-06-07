@@ -106,8 +106,12 @@ describe('RepositoryDetailPage', () => {
     mockAuth();
     mockUseSession();
     (useParams as jest.Mock).mockReturnValue({ id: '1' });
-    jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepository);
-
+    jest.spyOn(axios, 'get').mockImplementation((url) => {
+      if (url.includes('/file_items/')) {
+        return Promise.resolve(mockFileItem);
+      }
+      return Promise.resolve(mockRepository);
+    });
     const repositoryDetailPage = await RepositoryDetailPage({ params: Promise.resolve({ id: '1' }) });
     render(repositoryDetailPage);
   });
@@ -155,13 +159,11 @@ describe('RepositoryDetailPage', () => {
   });
 
   describe('when file is clicked', () => {
-    it('render file content and full path', async () => {
+    it('render full path, play button and file content', async () => {
       const dir1 = screen.getByRole('button', { name: 'dir1' });
       await act(async () => {
         fireEvent.click(dir1);
       });
-
-      jest.spyOn(axios, 'get').mockResolvedValueOnce(mockFileItem);
 
       const nestedFile1 = screen.getByRole('button', { name: 'nested-file1.ts' });
       await act(async () => {
@@ -177,7 +179,147 @@ describe('RepositoryDetailPage', () => {
       });
 
       expect(screen.getByText('dir1/nested-file1.ts')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
       expect(screen.getByText('console.log("Hello, world!");')).toBeInTheDocument();
+    });
+  });
+
+  describe('start typing', () => {
+    beforeEach(async () => {
+      const dir1 = screen.getByRole('button', { name: 'dir1' });
+      await act(async () => {
+        fireEvent.click(dir1);
+      });
+
+      const nestedFile1 = screen.getByRole('button', { name: 'nested-file1.ts' });
+      await act(async () => {
+        fireEvent.click(nestedFile1);
+      });
+
+      const playButton = screen.getByRole('button', { name: 'PLAY' });
+      await act(async () => {
+        fireEvent.click(playButton);
+      });
+    });
+
+    it('hide play button and render pause button and reset button', async () => {
+      expect(screen.queryByRole('button', { name: 'PLAY' })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'PAUSE' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'RESET' })).toBeInTheDocument();
+    });
+
+    it('render green highlighted text when type correct characters', async () => {
+      const charsToType = 'console';
+      for (const char of charsToType) {
+        await act(async () => {
+          fireEvent.keyDown(document, { key: char });
+        });
+      }
+
+      const greenHighlightedSpans = document.querySelectorAll('.bg-green-100');
+      expect(greenHighlightedSpans.length).toBe(7);
+
+      const typedText = Array.from(greenHighlightedSpans)
+        .map((span) => span.textContent)
+        .join('');
+      expect(typedText).toBe('console');
+    });
+
+    it('render red highlighted text when type incorrect character', async () => {
+      await act(async () => {
+        fireEvent.keyDown(document, { key: 'd' });
+      });
+
+      const redHighlightedSpans = document.querySelectorAll('.bg-red-100');
+      expect(redHighlightedSpans.length).toBe(1);
+      expect(redHighlightedSpans[0].textContent).toBe('c');
+    });
+
+    it('delete typed character when type backspace key', async () => {
+      const charsToType = 'con';
+      for (const char of charsToType) {
+        await act(async () => {
+          fireEvent.keyDown(document, { key: char });
+        });
+      }
+
+      await act(async () => {
+        fireEvent.keyDown(document, { key: 'Backspace' });
+      });
+
+      const greenHighlightedSpans = document.querySelectorAll('.bg-green-100');
+      expect(greenHighlightedSpans.length).toBe(2);
+
+      const typedText = Array.from(greenHighlightedSpans)
+        .map((span) => span.textContent)
+        .join('');
+      expect(typedText).toBe('co');
+    });
+
+    it('pauses typing when PAUSE button is clicked', async () => {
+      const pauseButton = screen.getByRole('button', { name: 'PAUSE' });
+      await act(async () => {
+        fireEvent.click(pauseButton);
+      });
+
+      expect(screen.getByRole('button', { name: 'RESUME' })).toBeInTheDocument();
+
+      await act(async () => {
+        fireEvent.keyDown(document, { key: 'c' });
+      });
+
+      const greenHighlightedSpans = document.querySelectorAll('.bg-green-100');
+      expect(greenHighlightedSpans.length).toBe(0);
+    });
+
+    it('resumes typing when RESUME button is clicked', async () => {
+      const pauseButton = screen.getByRole('button', { name: 'PAUSE' });
+      await act(async () => {
+        fireEvent.click(pauseButton);
+      });
+
+      const resumeButton = screen.getByRole('button', { name: 'RESUME' });
+      await act(async () => {
+        fireEvent.click(resumeButton);
+      });
+
+      await act(async () => {
+        fireEvent.keyDown(document, { key: 'c' });
+      });
+
+      const greenHighlightedSpans = document.querySelectorAll('.bg-green-100');
+      expect(greenHighlightedSpans.length).toBeGreaterThan(0);
+      expect(greenHighlightedSpans[0].textContent).toBe('c');
+    });
+
+    it('resets typing when RESET button is clicked', async () => {
+      const charsToType = 'con';
+      for (const char of charsToType) {
+        await act(async () => {
+          fireEvent.keyDown(document, { key: char });
+        });
+      }
+
+      const resetButton = screen.getByRole('button', { name: 'RESET' });
+      await act(async () => {
+        fireEvent.click(resetButton);
+      });
+
+      expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
+
+      const greenHighlightedSpans = document.querySelectorAll('.bg-green-100');
+      expect(greenHighlightedSpans.length).toBe(0);
+    });
+
+    it('render result when type all characters', async () => {
+      const content = 'console.log("Hello, world!");';
+      for (const char of content) {
+        await act(async () => {
+          fireEvent.keyDown(document, { key: char });
+        });
+      }
+
+      expect(screen.getByText('Completed!!')).toBeInTheDocument(); // TODO: 完了画面を作ったら修正する
     });
   });
 });
