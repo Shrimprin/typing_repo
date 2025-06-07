@@ -1,39 +1,48 @@
+'use client';
+
 import { Card } from '@/components/ui/card';
 import { useSession } from 'next-auth/react';
-import { useParams } from 'next/navigation'; // Next.jsのパラメータフックをインポート
+import { useParams } from 'next/navigation';
 import useSWR from 'swr';
 
-import { TypingAreaHeader } from '@/components/repositories/TypingAreaHeader';
-import { FileItem } from '@/types';
+import { FileItem, TypingStatus } from '@/types';
 import { fetcher } from '@/utils/fetcher';
+import { TypingPanel } from './TypingPanel';
 
-type TypingAreaProps = {
+type FileItemViewProps = {
   fileItem: FileItem | null;
+  typingStatus: TypingStatus;
+  setTypingStatus: (status: TypingStatus) => void;
 };
 
-export function TypingArea({ fileItem }: TypingAreaProps) {
+export function FileItemView({ fileItem, typingStatus, setTypingStatus }: FileItemViewProps) {
   const params = useParams();
   const url = fileItem ? `/api/repositories/${params.id}/file_items/${fileItem.id}` : null;
   const { data: session } = useSession();
   const accessToken = session?.user?.accessToken;
-  const { data, error, isLoading } = useSWR(url ? [url, accessToken] : null, ([url, accessToken]) =>
-    fetcher(url, accessToken),
-  );
+
+  // propsで渡されたfileItemにはcontentとfull_pathが含まれていないため、APIから取得する
+  const {
+    data: fileItemData,
+    error,
+    isLoading,
+  } = useSWR(url ? [url, accessToken] : null, ([url, accessToken]) => fetcher(url, accessToken));
 
   return (
     <div className="flex flex-col">
       <Card className="m-4 overflow-hidden">
-        {!fileItem ? (
+        {!fileItemData ? (
           <div className="p-6 text-center font-mono text-gray-500">タイピングするファイルを選んでください。</div>
         ) : isLoading ? (
           <div className="p-6 text-center font-mono text-gray-500">ファイルを読み込み中...</div>
         ) : error ? (
           <div className="p-6 text-center font-mono text-gray-500">エラーが発生しました。再度お試しください。</div>
         ) : (
-          <>
-            <TypingAreaHeader fileItem={data} />
-            <div className="overflow-x-auto px-4 font-mono text-sm whitespace-pre">{data.content}</div>
-          </>
+          <TypingPanel
+            fileItem={fileItemData as FileItem}
+            typingStatus={typingStatus}
+            setTypingStatus={setTypingStatus}
+          />
         )}
       </Card>
     </div>
