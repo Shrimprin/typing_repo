@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen } from '@testing-library/react';
-
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 
 import RepositoryDetailPage from '@/app/repositories/[id]/page';
@@ -102,9 +102,7 @@ const mockFileItem = {
 
 const clickButton = async (buttonName: string) => {
   const button = screen.getByRole('button', { name: buttonName });
-  await act(async () => {
-    fireEvent.click(button);
-  });
+  await userEvent.click(button);
 };
 
 describe('RepositoryDetailPage', () => {
@@ -198,12 +196,7 @@ describe('RepositoryDetailPage', () => {
     });
 
     it('render green highlighted text when type correct characters', async () => {
-      const charsToType = 'console';
-      for (const char of charsToType) {
-        await act(async () => {
-          fireEvent.keyDown(document, { key: char });
-        });
-      }
+      await userEvent.keyboard('console');
 
       const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
       expect(correctChars.length).toBe(7);
@@ -215,9 +208,7 @@ describe('RepositoryDetailPage', () => {
     });
 
     it('render red highlighted text when type incorrect character', async () => {
-      await act(async () => {
-        fireEvent.keyDown(document, { key: 'd' });
-      });
+      await userEvent.keyboard('d');
 
       const incorrectChars = document.querySelectorAll(`.${INCORRECT_CHARS_COLOR}`);
       expect(incorrectChars.length).toBe(1);
@@ -225,16 +216,8 @@ describe('RepositoryDetailPage', () => {
     });
 
     it('delete typed character when type backspace key', async () => {
-      const charsToType = 'con';
-      for (const char of charsToType) {
-        await act(async () => {
-          fireEvent.keyDown(document, { key: char });
-        });
-      }
-
-      await act(async () => {
-        fireEvent.keyDown(document, { key: 'Backspace' });
-      });
+      await userEvent.keyboard('con');
+      await userEvent.keyboard('{Backspace}');
 
       const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
       expect(correctChars.length).toBe(2);
@@ -250,9 +233,7 @@ describe('RepositoryDetailPage', () => {
 
       expect(screen.getByRole('button', { name: 'RESUME' })).toBeInTheDocument();
 
-      await act(async () => {
-        fireEvent.keyDown(document, { key: 'c' });
-      });
+      await userEvent.keyboard('c');
 
       const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
       expect(correctChars.length).toBe(0);
@@ -262,9 +243,7 @@ describe('RepositoryDetailPage', () => {
       await clickButton('PAUSE');
       await clickButton('RESUME');
 
-      await act(async () => {
-        fireEvent.keyDown(document, { key: 'c' });
-      });
+      await userEvent.keyboard('c');
 
       const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
       expect(correctChars.length).toBeGreaterThan(0);
@@ -272,12 +251,7 @@ describe('RepositoryDetailPage', () => {
     });
 
     it('resets typing when RESET button is clicked', async () => {
-      const charsToType = 'con';
-      for (const char of charsToType) {
-        await act(async () => {
-          fireEvent.keyDown(document, { key: char });
-        });
-      }
+      await userEvent.keyboard('con');
 
       await clickButton('RESET');
 
@@ -287,12 +261,7 @@ describe('RepositoryDetailPage', () => {
     });
 
     it('render result when type all characters', async () => {
-      const content = 'console.log("Hello, world!");';
-      for (const char of content) {
-        await act(async () => {
-          fireEvent.keyDown(document, { key: char });
-        });
-      }
+      await userEvent.keyboard('console.log("Hello, world!");');
 
       expect(screen.getByText('Completed!!')).toBeInTheDocument(); // TODO: 完了画面を作ったら修正する
     });
