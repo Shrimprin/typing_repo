@@ -100,6 +100,13 @@ const mockFileItem = {
   },
 };
 
+const clickButton = async (buttonName: string) => {
+  const button = screen.getByRole('button', { name: buttonName });
+  await act(async () => {
+    fireEvent.click(button);
+  });
+};
+
 describe('RepositoryDetailPage', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -148,10 +155,7 @@ describe('RepositoryDetailPage', () => {
 
   describe('when directory is clicked', () => {
     it('render children of directory', async () => {
-      const dir1 = screen.getByRole('button', { name: 'dir1' });
-      await act(async () => {
-        fireEvent.click(dir1);
-      });
+      await clickButton('dir1');
 
       expect(screen.getByRole('button', { name: 'nested-file1.ts' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'nested-file2.ts' })).toBeInTheDocument();
@@ -160,15 +164,8 @@ describe('RepositoryDetailPage', () => {
 
   describe('when file is clicked', () => {
     it('render full path, play button and file content', async () => {
-      const dir1 = screen.getByRole('button', { name: 'dir1' });
-      await act(async () => {
-        fireEvent.click(dir1);
-      });
-
-      const nestedFile1 = screen.getByRole('button', { name: 'nested-file1.ts' });
-      await act(async () => {
-        fireEvent.click(nestedFile1);
-      });
+      await clickButton('dir1');
+      await clickButton('nested-file1.ts');
 
       const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
       expect(axios.get).toHaveBeenCalledWith(`${BASE_URL}/api/repositories/1/file_items/4`, {
@@ -185,21 +182,13 @@ describe('RepositoryDetailPage', () => {
   });
 
   describe('start typing', () => {
+    const CORRECT_CHARS_COLOR = 'bg-green-100';
+    const INCORRECT_CHARS_COLOR = 'bg-red-100';
+
     beforeEach(async () => {
-      const dir1 = screen.getByRole('button', { name: 'dir1' });
-      await act(async () => {
-        fireEvent.click(dir1);
-      });
-
-      const nestedFile1 = screen.getByRole('button', { name: 'nested-file1.ts' });
-      await act(async () => {
-        fireEvent.click(nestedFile1);
-      });
-
-      const playButton = screen.getByRole('button', { name: 'PLAY' });
-      await act(async () => {
-        fireEvent.click(playButton);
-      });
+      await clickButton('dir1');
+      await clickButton('nested-file1.ts');
+      await clickButton('PLAY');
     });
 
     it('hide play button and render pause button and reset button', async () => {
@@ -216,10 +205,10 @@ describe('RepositoryDetailPage', () => {
         });
       }
 
-      const greenHighlightedSpans = document.querySelectorAll('.bg-green-100');
-      expect(greenHighlightedSpans.length).toBe(7);
+      const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
+      expect(correctChars.length).toBe(7);
 
-      const typedText = Array.from(greenHighlightedSpans)
+      const typedText = Array.from(correctChars)
         .map((span) => span.textContent)
         .join('');
       expect(typedText).toBe('console');
@@ -230,9 +219,9 @@ describe('RepositoryDetailPage', () => {
         fireEvent.keyDown(document, { key: 'd' });
       });
 
-      const redHighlightedSpans = document.querySelectorAll('.bg-red-100');
-      expect(redHighlightedSpans.length).toBe(1);
-      expect(redHighlightedSpans[0].textContent).toBe('c');
+      const incorrectChars = document.querySelectorAll(`.${INCORRECT_CHARS_COLOR}`);
+      expect(incorrectChars.length).toBe(1);
+      expect(incorrectChars[0].textContent).toBe('c');
     });
 
     it('delete typed character when type backspace key', async () => {
@@ -247,20 +236,17 @@ describe('RepositoryDetailPage', () => {
         fireEvent.keyDown(document, { key: 'Backspace' });
       });
 
-      const greenHighlightedSpans = document.querySelectorAll('.bg-green-100');
-      expect(greenHighlightedSpans.length).toBe(2);
+      const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
+      expect(correctChars.length).toBe(2);
 
-      const typedText = Array.from(greenHighlightedSpans)
+      const typedText = Array.from(correctChars)
         .map((span) => span.textContent)
         .join('');
       expect(typedText).toBe('co');
     });
 
     it('pauses typing when PAUSE button is clicked', async () => {
-      const pauseButton = screen.getByRole('button', { name: 'PAUSE' });
-      await act(async () => {
-        fireEvent.click(pauseButton);
-      });
+      await clickButton('PAUSE');
 
       expect(screen.getByRole('button', { name: 'RESUME' })).toBeInTheDocument();
 
@@ -268,28 +254,21 @@ describe('RepositoryDetailPage', () => {
         fireEvent.keyDown(document, { key: 'c' });
       });
 
-      const greenHighlightedSpans = document.querySelectorAll('.bg-green-100');
-      expect(greenHighlightedSpans.length).toBe(0);
+      const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
+      expect(correctChars.length).toBe(0);
     });
 
     it('resumes typing when RESUME button is clicked', async () => {
-      const pauseButton = screen.getByRole('button', { name: 'PAUSE' });
-      await act(async () => {
-        fireEvent.click(pauseButton);
-      });
-
-      const resumeButton = screen.getByRole('button', { name: 'RESUME' });
-      await act(async () => {
-        fireEvent.click(resumeButton);
-      });
+      await clickButton('PAUSE');
+      await clickButton('RESUME');
 
       await act(async () => {
         fireEvent.keyDown(document, { key: 'c' });
       });
 
-      const greenHighlightedSpans = document.querySelectorAll('.bg-green-100');
-      expect(greenHighlightedSpans.length).toBeGreaterThan(0);
-      expect(greenHighlightedSpans[0].textContent).toBe('c');
+      const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
+      expect(correctChars.length).toBeGreaterThan(0);
+      expect(correctChars[0].textContent).toBe('c');
     });
 
     it('resets typing when RESET button is clicked', async () => {
@@ -300,15 +279,11 @@ describe('RepositoryDetailPage', () => {
         });
       }
 
-      const resetButton = screen.getByRole('button', { name: 'RESET' });
-      await act(async () => {
-        fireEvent.click(resetButton);
-      });
+      await clickButton('RESET');
 
       expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
-
-      const greenHighlightedSpans = document.querySelectorAll('.bg-green-100');
-      expect(greenHighlightedSpans.length).toBe(0);
+      const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
+      expect(correctChars.length).toBe(0);
     });
 
     it('render result when type all characters', async () => {
