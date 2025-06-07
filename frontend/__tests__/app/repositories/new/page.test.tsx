@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import axios, { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 
@@ -17,6 +18,18 @@ jest.mock('next-auth/react', () => ({
 jest.mock('@/auth', () => ({
   auth: jest.fn(),
 }));
+
+const inputRepositoryUrlAndSubmit = async (url: string) => {
+  const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
+  const addButton = screen.getByRole('button', { name: '追加' });
+
+  if (url === '') {
+    await userEvent.clear(repositoryUrlInput);
+  } else {
+    await userEvent.type(repositoryUrlInput, url);
+  }
+  await userEvent.click(addButton);
+};
 
 describe('NewRepositoryPage', () => {
   beforeEach(() => {
@@ -76,13 +89,7 @@ describe('NewRepositoryPage', () => {
     it('show error message when submit invalid url', async () => {
       render(<NewRepositoryPage />);
 
-      const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
-      const addButton = screen.getByRole('button', { name: '追加' });
-
-      await act(async () => {
-        fireEvent.change(repositoryUrlInput, { target: { value: 'invalid-url' } });
-        fireEvent.click(addButton);
-      });
+      await inputRepositoryUrlAndSubmit('invalid-url');
 
       expect(screen.getByText('有効なURLを入力してください')).toBeInTheDocument();
     });
@@ -91,6 +98,7 @@ describe('NewRepositoryPage', () => {
       render(<NewRepositoryPage />);
 
       await inputRepositoryUrlAndSubmit('');
+
       expect(screen.getByText('URLは必須です')).toBeInTheDocument();
     });
   });
@@ -107,26 +115,17 @@ describe('NewRepositoryPage', () => {
       render(<NewRepositoryPage />);
 
       await inputRepositoryUrlAndSubmit('https://github.com/username/repository');
+
       expect(screen.getByText('Network Error')).toBeInTheDocument();
     });
 
     it('show error message when occur server error', async () => {
       jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error('Server error'));
-
       render(<NewRepositoryPage />);
 
       await inputRepositoryUrlAndSubmit('https://github.com/username/repository');
+
       expect(screen.getByText('サーバーエラーが発生しました。')).toBeInTheDocument();
     });
   });
 });
-
-const inputRepositoryUrlAndSubmit = async (url: string) => {
-  const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
-  const addButton = screen.getByRole('button', { name: '追加' });
-
-  await act(async () => {
-    fireEvent.change(repositoryUrlInput, { target: { value: url } });
-    fireEvent.click(addButton);
-  });
-};
