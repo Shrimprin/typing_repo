@@ -8,6 +8,7 @@ type TypingContentProps = {
   cursorLine: number;
   cursorPositions: number[];
   typingStatus: TypingStatus;
+  errorMessage: string | null;
 };
 
 export function TypingContent({
@@ -17,31 +18,38 @@ export function TypingContent({
   cursorLine,
   cursorPositions,
   typingStatus,
+  errorMessage,
 }: TypingContentProps) {
   return (
     <div className="overflow-x-auto px-4">
-      {typingStatus === 'ready' ? (
-        <pre className="font-mono">
-          {content.split('\n').map((line, i) => (
-            <p key={i} className="h-[1.4em]">
-              {line}
-            </p>
-          ))}
-        </pre>
-      ) : typingStatus === 'typing' || typingStatus === 'paused' ? (
-        <div>
-          {targetTextLines.map((targetTextLine, index) => (
-            <TypingLine
-              key={index}
-              typedText={typedTextLines[index]}
-              targetTextLine={targetTextLine}
-              cursorPosition={cursorPositions[index]}
-              isUntypedLine={index > cursorLine}
-            />
-          ))}
-        </div>
+      {errorMessage ? (
+        <div className="p-6 text-center font-mono text-gray-500">{errorMessage}</div>
       ) : (
-        <div className="h-[1.4em]">Completed!!</div>
+        <>
+          {typingStatus === 'ready' ? (
+            <pre className="font-mono">
+              {content.split('\n').map((line, i) => (
+                <p key={i} className="h-[1.4em]">
+                  {line}
+                </p>
+              ))}
+            </pre>
+          ) : typingStatus === 'typing' || typingStatus === 'paused' ? (
+            <div>
+              {targetTextLines.map((targetTextLine, index) => (
+                <TypingLine
+                  key={index}
+                  typedText={typedTextLines[index]}
+                  targetTextLine={targetTextLine}
+                  cursorPosition={cursorPositions[index]}
+                  isUntypedLine={index > cursorLine}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="h-[1.4em]">Completed!!</div>
+          )}
+        </>
       )}
     </div>
   );

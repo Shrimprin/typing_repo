@@ -27,5 +27,5 @@ export default async function RepositoryDetailPage({ params }: RepositoryDetailP
   const fileItems: FileItem[] | [] = repository.fileItems;
   const sortedFileItems = sortFileItems(fileItems);
 
-  return <RepositoryDetail fileItems={sortedFileItems} />;
+  return <RepositoryDetail initialFileItems={sortedFileItems} />;
 }

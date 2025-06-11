@@ -6,7 +6,12 @@ import { FileItem, TypingStatus } from '@/types';
 import { FileItemView } from './FileItemView';
 import { FileTree } from './FileTree';
 
-export function RepositoryDetail({ fileItems }: { fileItems: FileItem[] }) {
+type RepositoryDetailProps = {
+  initialFileItems: FileItem[];
+};
+
+export function RepositoryDetail({ initialFileItems }: RepositoryDetailProps) {
+  const [fileItems, setFileItems] = useState<FileItem[]>(initialFileItems);
   const [selectedFileItem, setSelectedFileItem] = useState<FileItem | null>(null);
   const [typingStatus, setTypingStatus] = useState<TypingStatus>('ready');
 
@@ -17,7 +22,6 @@ export function RepositoryDetail({ fileItems }: { fileItems: FileItem[] }) {
         return;
       }
     }
-
     setSelectedFileItem(fileItem);
     setTypingStatus('ready');
   };
@@ -30,7 +34,12 @@ export function RepositoryDetail({ fileItems }: { fileItems: FileItem[] }) {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <FileItemView fileItem={selectedFileItem} typingStatus={typingStatus} setTypingStatus={setTypingStatus} />
+          <FileItemView
+            fileItem={selectedFileItem}
+            setFileItems={setFileItems}
+            typingStatus={typingStatus}
+            setTypingStatus={setTypingStatus}
+          />
         </div>
       </div>
     </div>
