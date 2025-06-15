@@ -1,19 +1,34 @@
+import axios from 'axios';
+import { useSession } from 'next-auth/react';
+import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
-import { TypingStatus } from '@/types';
+import { FileItem, TypingStatus } from '@/types';
+import { axiosPatch } from '@/utils/axios';
 
 type useTypingHandlerProps = {
   targetTextLines: string[];
+  setFileItems: (fileItems: FileItem[]) => void;
+  fileItemId?: string;
   typingStatus: TypingStatus;
   setTypingStatus: (status: TypingStatus) => void;
 };
 
-export function useTypingHandler({ targetTextLines, typingStatus, setTypingStatus }: useTypingHandlerProps) {
+export function useTypingHandler({
+  targetTextLines,
+  setFileItems,
+  fileItemId,
+  typingStatus,
+  setTypingStatus,
+}: useTypingHandlerProps) {
   const initialCursorPositions = targetTextLines.map((line) => line.indexOf(line.trimStart()));
   const [cursorPositions, setCursorPositions] = useState(initialCursorPositions);
   const initialTypedTextLines = targetTextLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
   const [typedTextLines, setTypedTextLines] = useState(initialTypedTextLines);
   const [cursorLine, setCursorLine] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { data: session } = useSession();
+  const params = useParams();
 
   const startTyping = () => {
     setTypedTextLines(initialTypedTextLines);
@@ -36,6 +51,28 @@ export function useTypingHandler({ targetTextLines, typingStatus, setTypingStatu
     setCursorLine(0);
     setTypingStatus('ready');
   };
+
+  const handleComplete = useCallback(async () => {
+    try {
+      const url = `/api/repositories/${params.id}/file_items/${fileItemId || params.fileItemId}`;
+      const accessToken = session?.user?.accessToken;
+      const postData = {
+        file_item: {
+          status: 'typed',
+        },
+      };
+
+      const res = await axiosPatch(url, accessToken, postData);
+      setTypingStatus('completed');
+      setFileItems(res.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('サーバーエラーが発生しました。');
+      }
+    }
+  }, [fileItemId, params, session, setFileItems, setTypingStatus]);
 
   const isComplete = useCallback(
     (newCursorPositions: number[]) => {
@@ -111,10 +148,10 @@ export function useTypingHandler({ targetTextLines, typingStatus, setTypingStatu
       setCursorLine(result.newCursorLine);
 
       if (isComplete(result.newCursorPositions)) {
-        setTypingStatus('completed');
+        handleComplete();
       }
     },
-    [typingStatus, setTypingStatus, handleCharacterInput, handleBackspace, isComplete],
+    [typingStatus, handleCharacterInput, handleBackspace, isComplete, handleComplete],
   );
 
   useEffect(() => {
@@ -130,6 +167,7 @@ export function useTypingHandler({ targetTextLines, typingStatus, setTypingStatu
     cursorLine,
     cursorPositions,
     typingStatus,
+    errorMessage,
     startTyping,
     resetTyping,
     resumeTyping,

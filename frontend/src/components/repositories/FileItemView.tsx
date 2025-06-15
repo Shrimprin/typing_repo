@@ -11,11 +11,12 @@ import { TypingPanel } from './TypingPanel';
 
 type FileItemViewProps = {
   fileItem: FileItem | null;
+  setFileItems: (fileItems: FileItem[]) => void;
   typingStatus: TypingStatus;
   setTypingStatus: (status: TypingStatus) => void;
 };
 
-export function FileItemView({ fileItem, typingStatus, setTypingStatus }: FileItemViewProps) {
+export function FileItemView({ fileItem, setFileItems, typingStatus, setTypingStatus }: FileItemViewProps) {
   const params = useParams();
   const url = fileItem ? `/api/repositories/${params.id}/file_items/${fileItem.id}` : null;
   const { data: session } = useSession();
@@ -40,6 +41,7 @@ export function FileItemView({ fileItem, typingStatus, setTypingStatus }: FileIt
         ) : (
           <TypingPanel
             fileItem={fileItemData as FileItem}
+            setFileItems={setFileItems}
             typingStatus={typingStatus}
             setTypingStatus={setTypingStatus}
           />

@@ -33,4 +33,20 @@ class FileItem < ApplicationRecord
 
     "#{repository.name}/#{path}"
   end
+
+  def update_with_parent(params)
+    transaction do
+      update(params) && update_parent_status
+    end
+  end
+
+  def update_parent_status
+    return true unless parent
+
+    children = parent.children
+    is_all_typed = children.all?(&:typed?)
+    return true unless is_all_typed
+
+    parent.update!(status: :typed) && parent.update_parent_status
+  end
 end
