@@ -13,12 +13,14 @@ module Api
     def update
       repository = @current_user.repositories.find(params[:repository_id])
       file_item = repository.file_items.find(params[:id])
-      if file_item.update_with_parent(file_item_params)
+      if file_item.update_with_parent(file_item_params) && repository.update(last_typed_at: Time.zone.now)
         top_level_file_items = repository.file_items.roots
         render json: FileItemSerializer.new(top_level_file_items, params: { children: true }), status: :ok
       else
-        render json: { error: 'ファイルの更新に失敗しました。' }, status: :unprocessable_entity
+        render json: file_item.errors, status: :unprocessable_entity
       end
+    rescue StandardError
+      render json: { error: 'ファイルの更新に失敗しました。' }, status: :internal_server_error
     end
 
     private

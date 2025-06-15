@@ -47,6 +47,6 @@ class FileItem < ApplicationRecord
     is_all_typed = children.all?(&:typed?)
     return true unless is_all_typed
 
-    parent.update(status: :typed) && parent.update_parent_status
+    parent.update!(status: :typed) && parent.update_parent_status
   end
 end
