@@ -35,26 +35,22 @@ RSpec.describe 'Api::FileItems', type: :request do
     let(:untyped_file_item) { repository.file_items.where(type: :file, status: :untyped).first }
 
     context 'when update successfully' do
-      it 'returns success status' do
+      before do
         patch api_repository_file_item_path(repository_id: repository.id, id: untyped_file_item.id),
               params: { file_item: { status: :typed } }, headers: headers
+      end
 
+      it 'returns success status' do
         expect(response).to have_http_status(:ok)
       end
 
       it 'updates the file item and returns success status' do
-        patch api_repository_file_item_path(repository_id: repository.id, id: untyped_file_item.id),
-              params: { file_item: { status: :typed } }, headers: headers
-
         json = response.parsed_body
         updated_file_item = json.find { |item| item['id'] == untyped_file_item.id }
         expect(updated_file_item['status']).to eq('typed')
       end
 
       it 'returns all file items' do
-        patch api_repository_file_item_path(repository_id: repository.id, id: untyped_file_item.id),
-              params: { file_item: { status: :typed } }, headers: headers
-
         expect(response).to have_http_status(:ok)
         json = response.parsed_body
         expect(json.length).to eq(4)
