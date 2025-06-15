@@ -257,6 +257,42 @@ describe('RepositoryDetailPage', () => {
     });
 
     it('render result when type all characters', async () => {
+      const mockFileItems = [
+        {
+          id: 1,
+          name: 'file1.ts',
+          type: 'file',
+          status: 'untyped',
+          fileItems: [],
+        },
+        {
+          id: 2,
+          name: 'file2.ts',
+          type: 'file',
+          status: 'typed',
+          fileItems: [],
+        },
+        {
+          id: 3,
+          name: 'dir1',
+          type: 'dir',
+          status: 'untyped',
+          fileItems: [
+            {
+              id: 4,
+              name: 'nested-file1.ts',
+              type: 'file',
+              status: 'typed',
+              fileItems: [],
+            },
+          ],
+        },
+      ];
+
+      jest.spyOn(axios, 'patch').mockImplementation(() => {
+        return Promise.resolve(mockFileItems);
+      });
+
       await userEvent.keyboard('console.log("Hello, world!");');
 
       expect(screen.getByText('Completed!!')).toBeInTheDocument(); // TODO: 完了画面を作ったら修正する
