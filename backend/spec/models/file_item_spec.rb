@@ -90,7 +90,7 @@ RSpec.describe FileItem, type: :model do
 
   describe '#update_parent_status' do
     let(:repository) { create(:repository) }
-    let(:parent_dir) { create(:file_item, :directory, repository:, status: :untyped) }
+    let(:parent_dir) { create(:file_item, :directory, repository:) }
     let(:typed_file_item) { create(:file_item, :typed, repository:, parent: parent_dir) }
 
     context 'when all siblings are typed' do
