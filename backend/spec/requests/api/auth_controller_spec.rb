@@ -26,7 +26,6 @@ RSpec.describe 'Api::Auth', type: :request do
     context 'when existing user' do
       it 'return access token' do
         existing_user = create(:user, github_id: valid_params[:github_id], name: valid_params[:name])
-
         expect do
           post '/api/auth/callback/github', params: valid_params
         end.not_to change(User, :count)
@@ -45,7 +44,6 @@ RSpec.describe 'Api::Auth', type: :request do
     context 'when invalid params' do
       it 'return validation error' do
         invalid_params = { github_id: '12345' }
-
         post '/api/auth/callback/github', params: invalid_params
 
         expect(response).to have_http_status(:unprocessable_entity)

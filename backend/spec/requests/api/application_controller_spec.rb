@@ -32,6 +32,7 @@ RSpec.describe 'ApplicationController', type: :request do
     context 'when token is valid' do
       it 'returns success status and current_user_id' do
         get '/test_authentication', headers: headers
+
         expect(response).to have_http_status(:ok)
         expect(response.parsed_body['user_id']).to eq(user.id)
       end
@@ -42,6 +43,7 @@ RSpec.describe 'ApplicationController', type: :request do
 
       it 'returns unauthorized status' do
         get '/test_authentication', headers: headers
+
         expect(response).to have_http_status(:unauthorized)
         expect(response.parsed_body['error']).to eq('ログインしてください')
       end
@@ -53,6 +55,7 @@ RSpec.describe 'ApplicationController', type: :request do
 
       it 'returns unauthorized status' do
         get '/test_authentication', headers: headers
+
         expect(response).to have_http_status(:unauthorized)
         expect(response.parsed_body['error']).to eq('ログインしてください')
       end

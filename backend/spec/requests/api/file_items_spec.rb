@@ -12,6 +12,7 @@ RSpec.describe 'Api::FileItems', type: :request do
     context 'when file item exists' do
       it 'returns the file item and success status' do
         get api_repository_file_item_path(repository_id: repository.id, id: file_item.id), headers: headers
+
         expect(response).to have_http_status(:ok)
         json = response.parsed_body
         expect(json['id']).to eq(file_item.id)
@@ -26,6 +27,7 @@ RSpec.describe 'Api::FileItems', type: :request do
     context 'when file item does not exist' do
       it 'returns not found status' do
         get api_repository_file_item_path(repository_id: repository.id, id: 0), headers: headers
+
         expect(response).to have_http_status(:not_found)
       end
     end

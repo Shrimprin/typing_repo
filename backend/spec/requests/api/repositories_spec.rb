@@ -11,6 +11,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
       it 'returns repositories and success status' do
         get api_repositories_path, headers: headers
+
         json = response.parsed_body
         expect(response).to have_http_status(:ok)
         expect(json.length).to eq(3)
@@ -28,6 +29,7 @@ RSpec.describe 'Api::Repositories', type: :request do
     context 'when user has no repositories' do
       it 'returns an empty array' do
         get api_repositories_path, headers: headers
+
         json = response.parsed_body
         expect(json).to be_empty
       end
@@ -37,6 +39,7 @@ RSpec.describe 'Api::Repositories', type: :request do
       it 'returns progress 1.0' do
         create(:repository, user: user)
         get api_repositories_path, headers: headers
+
         json = response.parsed_body
         expect(json.length).to eq(1)
         expect(json[0]['progress']).to eq(1.0)
@@ -50,6 +53,7 @@ RSpec.describe 'Api::Repositories', type: :request do
     context 'when repository exists' do
       it 'returns the repository and success status' do
         get api_repository_path(repository), headers: headers
+
         expect(response).to have_http_status(:ok)
         json = response.parsed_body
         expect(json['id']).to eq(repository.id)
@@ -64,6 +68,7 @@ RSpec.describe 'Api::Repositories', type: :request do
     context 'when repository does not exist' do
       it 'returns not found status' do
         get api_repository_path(id: 0), headers: headers
+
         expect(response).to have_http_status(:not_found)
         json = response.parsed_body
         expect(json['error']).to eq('リポジトリが存在しません。')
@@ -129,6 +134,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
       it 'returns unprocessable_entity status' do
         post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
+
         expect(response).to have_http_status(:unprocessable_entity)
         json = response.parsed_body
         expect(json['name']).to eq(['can\'t be blank'])
@@ -139,6 +145,7 @@ RSpec.describe 'Api::Repositories', type: :request do
       it 'returns unprocessable_entity status' do
         invalid_url = 'https://invalid_url.com'
         post api_repositories_path, params: { repository: { url: invalid_url } }, headers: headers
+
         expect(response).to have_http_status(:unprocessable_entity)
         json = response.parsed_body
         expect(json['error']).to eq('無効なURLです。')
@@ -156,6 +163,7 @@ RSpec.describe 'Api::Repositories', type: :request do
       it 'returns not found status' do
         non_existent_url = 'https://github.com/username/invalid_url'
         post api_repositories_path, params: { repository: { url: non_existent_url } }, headers: headers
+
         expect(response).to have_http_status(:not_found)
         json = response.parsed_body
         expect(json['error']).to eq('リポジトリが存在しません。')
@@ -171,6 +179,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
       it 'returns too_many_requests status' do
         post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
+
         expect(response).to have_http_status(:too_many_requests)
         json = response.parsed_body
         expect(json['error']).to eq('APIリクエストが多すぎます。少し時間をおいてから再度実行してください。')
@@ -186,6 +195,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
       it 'returns unauthorized status' do
         post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
+
         expect(response).to have_http_status(:unauthorized)
         json = response.parsed_body
         expect(json['error']).to eq('アクセストークンが無効です。')
@@ -201,6 +211,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
       it 'returns internal_server_error status' do
         post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
+
         expect(response).to have_http_status(:internal_server_error)
         json = response.parsed_body
         expect(json['error']).to eq('リポジトリ情報の取得中にエラーが発生しました。')
