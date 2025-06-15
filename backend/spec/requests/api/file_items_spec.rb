@@ -30,4 +30,56 @@ RSpec.describe 'Api::FileItems', type: :request do
       end
     end
   end
+
+  describe 'PATCH /api/repositories/:repository_id/file_items/:id' do
+    let(:untyped_file_item) { repository.file_items.where(type: :file, status: :untyped).first }
+
+    context 'when update successfully' do
+      it 'returns success status' do
+        patch api_repository_file_item_path(repository_id: repository.id, id: untyped_file_item.id),
+              params: { file_item: { status: :typed } }, headers: headers
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'updates the file item and returns success status' do
+        patch api_repository_file_item_path(repository_id: repository.id, id: untyped_file_item.id),
+              params: { file_item: { status: :typed } }, headers: headers
+
+        json = response.parsed_body
+        updated_file_item = json.find { |item| item['id'] == untyped_file_item.id }
+        expect(updated_file_item['status']).to eq('typed')
+      end
+
+      it 'returns all file items' do
+        patch api_repository_file_item_path(repository_id: repository.id, id: untyped_file_item.id),
+              params: { file_item: { status: :typed } }, headers: headers
+
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json.length).to eq(4)
+        expect(json.first['file_items'].length).to eq(2)
+      end
+    end
+
+    context 'when update failed' do
+      it 'returns unprocessable entity status' do
+        patch api_repository_file_item_path(repository_id: repository.id, id: file_item.id),
+              params: { file_item: { status: '' } }, headers: headers
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = response.parsed_body
+        expect(json['status']).to eq(['can\'t be blank'])
+      end
+    end
+
+    context 'when unexpected error occurs' do
+      it 'returns internal server error status' do
+        patch api_repository_file_item_path(repository_id: repository.id, id: file_item.id),
+              params: { file_item: { status: :invalid } }, headers: headers
+
+        expect(response).to have_http_status(:internal_server_error)
+      end
+    end
+  end
 end
