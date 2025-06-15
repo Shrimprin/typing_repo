@@ -21,87 +21,87 @@ jest.mock('@/auth', () => ({
   auth: jest.fn(),
 }));
 
-const mockRepository = {
-  data: {
-    id: 1,
-    name: 'test-repo',
-    lastTypedAt: null,
-    userId: 1,
-    fileItems: [
-      {
-        id: 1,
-        name: 'file1.ts',
-        type: 'file',
-        status: 'untyped',
-        fileItems: [],
-      },
-      {
-        id: 2,
-        name: 'file2.ts',
-        type: 'file',
-        status: 'typed',
-        fileItems: [],
-      },
-      {
-        id: 3,
-        name: 'dir1',
-        type: 'dir',
-        status: 'untyped',
-        fileItems: [
-          {
-            id: 4,
-            name: 'nested-file1.ts',
-            type: 'file',
-            status: 'untyped',
-            fileItems: [],
-          },
-          {
-            id: 5,
-            name: 'nested-file2.ts',
-            type: 'file',
-            status: 'untyped',
-            fileItems: [],
-          },
-        ],
-      },
-      {
-        id: 6,
-        name: 'dir2',
-        type: 'dir',
-        status: 'untyped',
-        fileItems: [
-          {
-            id: 7,
-            name: 'nested-file3.ts',
-            type: 'file',
-            status: 'untyped',
-            fileItems: [],
-          },
-        ],
-      },
-      {
-        id: 8,
-        name: 'file3.ts',
-        type: 'file',
-        status: 'untyped',
-        fileItems: [],
-      },
-    ],
-  },
-};
-
-const mockFileItem = {
-  data: {
-    id: 4,
-    name: 'nested-file1.ts',
-    type: 'file',
-    status: 'untyped',
-    content: 'console.log("Hello, world!");',
-    fullPath: 'dir1/nested-file1.ts',
-  },
-};
-
 describe('RepositoryDetailPage', () => {
+  const mockRepository = {
+    data: {
+      id: 1,
+      name: 'test-repo',
+      lastTypedAt: null,
+      userId: 1,
+      fileItems: [
+        {
+          id: 1,
+          name: 'file1.ts',
+          type: 'file',
+          status: 'untyped',
+          fileItems: [],
+        },
+        {
+          id: 2,
+          name: 'file2.ts',
+          type: 'file',
+          status: 'typed',
+          fileItems: [],
+        },
+        {
+          id: 3,
+          name: 'dir1',
+          type: 'dir',
+          status: 'untyped',
+          fileItems: [
+            {
+              id: 4,
+              name: 'nested-file1.ts',
+              type: 'file',
+              status: 'untyped',
+              fileItems: [],
+            },
+            {
+              id: 5,
+              name: 'nested-file2.ts',
+              type: 'file',
+              status: 'untyped',
+              fileItems: [],
+            },
+          ],
+        },
+        {
+          id: 6,
+          name: 'dir2',
+          type: 'dir',
+          status: 'untyped',
+          fileItems: [
+            {
+              id: 7,
+              name: 'nested-file3.ts',
+              type: 'file',
+              status: 'untyped',
+              fileItems: [],
+            },
+          ],
+        },
+        {
+          id: 8,
+          name: 'file3.ts',
+          type: 'file',
+          status: 'untyped',
+          fileItems: [],
+        },
+      ],
+    },
+  };
+
+  const mockFileItem = {
+    data: {
+      id: 4,
+      name: 'nested-file1.ts',
+      type: 'file',
+      status: 'untyped',
+      content: 'console.log("Hello, world!");',
+      fullPath: 'dir1/nested-file1.ts',
+    },
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
     mockAuth();
