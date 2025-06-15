@@ -14,18 +14,18 @@ RSpec.describe Repository, type: :model do
         allow(repository).to receive(:save_file_items).with(github_client_mock).and_return(true)
       end
 
-      it 'return true' do
+      it 'returns true' do
         expect(repository.save_with_file_items(github_client_mock)).to be true
       end
     end
 
-    context 'when repository save failed' do
+    context 'when save failed' do
       before do
         allow(repository).to receive(:save).and_return(false)
         allow(repository).to receive(:save_file_items).with(github_client_mock).and_return(true)
       end
 
-      it 'return false' do
+      it 'returns false' do
         expect(repository.save_with_file_items(github_client_mock)).to be false
       end
     end
@@ -36,11 +36,11 @@ RSpec.describe Repository, type: :model do
         allow(repository).to receive(:save_file_items).with(github_client_mock).and_return(false)
       end
 
-      it 'return false' do
+      it 'returns false' do
         expect(repository.save_with_file_items(github_client_mock)).to be false
       end
 
-      it 'rolls back the transaction and does not create a repository record' do
+      it 'rolls backs the transaction and does not create a repository record' do
         expect do
           repository.save_with_file_items(github_client_mock)
         end.not_to change(described_class, :count)
@@ -94,7 +94,7 @@ RSpec.describe Repository, type: :model do
         )
     end
 
-    it 'save repository and file_items' do
+    it 'saves repository and file_items' do
       expect(repository.file_items.count).to eq(0)
       repository.send(:save_file_items, github_client_mock)
 

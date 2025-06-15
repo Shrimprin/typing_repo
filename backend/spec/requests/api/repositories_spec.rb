@@ -104,7 +104,7 @@ RSpec.describe 'Api::Repositories', type: :request do
           .and_return([])
       end
 
-      it 'create repository' do
+      it 'creates repository' do
         post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
         expect(response).to have_http_status(:created)
         json = response.parsed_body

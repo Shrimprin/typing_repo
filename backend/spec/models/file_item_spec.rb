@@ -9,7 +9,7 @@ RSpec.describe FileItem, type: :model do
     let(:middle_dir) { create(:file_item, :directory, name: 'middle_dir', repository:, parent: root_dir) }
     let(:file_item) { create(:file_item, name: 'test_file.rb', repository:, parent: middle_dir) }
 
-    it 'return the full path' do
+    it 'returns the full path' do
       expect(file_item.full_path).to eq('test_repo/root_dir/middle_dir/test_file.rb')
     end
   end
