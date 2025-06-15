@@ -75,6 +75,8 @@ RSpec.describe 'Api::FileItems', type: :request do
               params: { file_item: { status: :invalid } }, headers: headers
 
         expect(response).to have_http_status(:internal_server_error)
+        json = response.parsed_body
+        expect(json['error']).to eq('ファイルの更新に失敗しました。')
       end
     end
   end
