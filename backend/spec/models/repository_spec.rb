@@ -28,6 +28,12 @@ RSpec.describe Repository, type: :model do
       it 'returns false' do
         expect(repository.save_with_file_items(github_client_mock)).to be false
       end
+
+      it 'does not create a repository' do
+        expect do
+          repository.save_with_file_items(github_client_mock)
+        end.not_to change(described_class, :count)
+      end
     end
 
     context 'when save_file_items failed' do
@@ -40,7 +46,7 @@ RSpec.describe Repository, type: :model do
         expect(repository.save_with_file_items(github_client_mock)).to be false
       end
 
-      it 'rolls backs the transaction and does not create a repository record' do
+      it 'rolls backs the transaction and does not create a repository' do
         expect do
           repository.save_with_file_items(github_client_mock)
         end.not_to change(described_class, :count)
