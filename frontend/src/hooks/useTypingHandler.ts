@@ -9,7 +9,7 @@ import { axiosPatch } from '@/utils/axios';
 type useTypingHandlerProps = {
   targetTextLines: string[];
   setFileItems: (fileItems: FileItem[]) => void;
-  fileItemId?: string;
+  fileItemId?: number;
   typingStatus: TypingStatus;
   setTypingStatus: (status: TypingStatus) => void;
 };
@@ -54,7 +54,7 @@ export function useTypingHandler({
 
   const handleComplete = useCallback(async () => {
     try {
-      const url = `/api/repositories/${params.id}/file_items/${fileItemId || params.fileItemId}`;
+      const url = `/api/repositories/${params.id}/file_items/${fileItemId}`;
       const accessToken = session?.user?.accessToken;
       const postData = {
         file_item: {

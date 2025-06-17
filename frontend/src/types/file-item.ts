@@ -1,5 +1,5 @@
 export type FileItem = {
-  id: string;
+  id: number;
   name: string;
   type: 'dir' | 'file';
   content?: string;
