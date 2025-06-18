@@ -12,7 +12,7 @@ type TypingHeaderProps = {
   resetTyping: () => void;
 };
 
-export function TypingHeader({
+export default function TypingHeader({
   fileItem,
   typingStatus,
   startTyping,

@@ -13,7 +13,7 @@ type FileTreeItemProps = {
   onSelectFileItem: (file: FileItem) => void;
 };
 
-export function FileTreeItem({ fileItem, level, selectedFileItem, onSelectFileItem }: FileTreeItemProps) {
+export default function FileTreeItem({ fileItem, level, selectedFileItem, onSelectFileItem }: FileTreeItemProps) {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpand = () => {

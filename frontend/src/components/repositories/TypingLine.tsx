@@ -42,4 +42,4 @@ const TypingLine = React.memo(function TypingLine({
   );
 });
 
-export { TypingLine };
+export default TypingLine;

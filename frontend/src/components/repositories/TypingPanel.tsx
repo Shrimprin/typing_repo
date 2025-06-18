@@ -1,7 +1,7 @@
 import { useTypingHandler } from '@/hooks/useTypingHandler';
 import { FileItem, TypingStatus } from '@/types';
-import { TypingContent } from './TypingContent';
-import { TypingHeader } from './TypingHeader';
+import TypingContent from './TypingContent';
+import TypingHeader from './TypingHeader';
 
 type TypingPanelProps = {
   fileItem: FileItem;
@@ -10,7 +10,7 @@ type TypingPanelProps = {
   setTypingStatus: (status: TypingStatus) => void;
 };
 
-export function TypingPanel({ fileItem, typingStatus, setFileItems, setTypingStatus }: TypingPanelProps) {
+export default function TypingPanel({ fileItem, typingStatus, setFileItems, setTypingStatus }: TypingPanelProps) {
   const targetTextLines = fileItem?.content?.split(/(?<=\n)/) || [];
   const {
     cursorPositions,

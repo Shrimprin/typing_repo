@@ -1,5 +1,5 @@
 import { FileItem } from '@/types';
-import { FileTreeItem } from './FileTreeItem';
+import FileTreeItem from './FileTreeItem';
 
 type FileTreeProps = {
   fileItems: FileItem[];
@@ -7,7 +7,7 @@ type FileTreeProps = {
   onSelectFileItem: (file: FileItem) => void;
 };
 
-export function FileTree({ fileItems, selectedFileItem, onSelectFileItem }: FileTreeProps) {
+export default function FileTree({ fileItems, selectedFileItem, onSelectFileItem }: FileTreeProps) {
   return (
     <>
       <div className="font-mono text-sm">

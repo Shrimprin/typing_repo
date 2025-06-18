@@ -1,4 +1,4 @@
-import { TypingLine } from '@/components/repositories/TypingLine';
+import TypingLine from '@/components/repositories/TypingLine';
 import { TypingStatus } from '@/types';
 
 type TypingContentProps = {
@@ -11,7 +11,7 @@ type TypingContentProps = {
   errorMessage?: string;
 };
 
-export function TypingContent({
+export default function TypingContent({
   content,
   cursorLine,
   cursorPositions,

@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios';
 
 import { auth } from '@/auth';
-import { RepositoryDetail } from '@/components/repositories/RepositoryDetail';
+import RepositoryDetail from '@/components/repositories/RepositoryDetail';
 import { FileItem, Repository } from '@/types';
 import { fetcher } from '@/utils/fetcher';
 import { sortFileItems } from '@/utils/sort-file-items';
