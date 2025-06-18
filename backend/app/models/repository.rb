@@ -4,9 +4,9 @@ class Repository < ApplicationRecord
   belongs_to :user
   has_many :file_items, dependent: :destroy
 
+  validates :commit_hash, presence: true
   validates :name, presence: true
   validates :url, presence: true
-  validates :commit_hash, presence: true
 
   def save_with_file_items(client)
     transaction do
