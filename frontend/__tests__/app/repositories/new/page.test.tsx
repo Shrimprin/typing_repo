@@ -58,9 +58,9 @@ describe('NewRepositoryPage', () => {
     jest.spyOn(axios, 'post').mockResolvedValueOnce({
       data: {
         id: 1,
-        user_id: 1,
+        userId: 1,
         name: 'repository-name',
-        last_typed_at: null,
+        lastTypedAt: null,
       },
     });
 
