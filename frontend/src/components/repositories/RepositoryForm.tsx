@@ -33,7 +33,7 @@ export default function RepositoryForm() {
       url: '',
     },
   });
-  const [error, setError] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>();
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -48,9 +48,9 @@ export default function RepositoryForm() {
       router.push(`/repositories/${res.data.id}`);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        setError(error.message);
+        setErrorMessage(error.message);
       } else {
-        setError('サーバーエラーが発生しました。');
+        setErrorMessage('サーバーエラーが発生しました。');
       }
     }
   };
@@ -67,7 +67,7 @@ export default function RepositoryForm() {
               <FormControl>
                 <Input placeholder="https://github.com/username/repository" {...field} />
               </FormControl>
-              <FormMessage>{form.formState.errors.url?.message || error}</FormMessage>
+              <FormMessage>{form.formState.errors.url?.message || errorMessage}</FormMessage>
             </FormItem>
           )}
         />

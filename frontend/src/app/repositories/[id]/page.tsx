@@ -19,8 +19,8 @@ export default async function RepositoryDetailPage({ params }: RepositoryDetailP
 
   try {
     repository = await fetcher(url, accessToken);
-  } catch (err: AxiosError | unknown) {
-    const errorMessage = err instanceof AxiosError ? err.message : 'エラーが発生しました。再度お試しください。';
+  } catch (error: AxiosError | unknown) {
+    const errorMessage = error instanceof AxiosError ? error.message : 'エラーが発生しました。再度お試しください。';
     return <div className="flex h-screen items-center justify-center p-8">{errorMessage}</div>;
   }
 
