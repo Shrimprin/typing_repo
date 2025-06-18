@@ -5,17 +5,17 @@ import { TypingHeader } from './TypingHeader';
 
 type TypingPanelProps = {
   fileItem: FileItem;
-  setFileItems: (fileItems: FileItem[]) => void;
   typingStatus: TypingStatus;
+  setFileItems: (fileItems: FileItem[]) => void;
   setTypingStatus: (status: TypingStatus) => void;
 };
 
-export function TypingPanel({ fileItem, setFileItems, typingStatus, setTypingStatus }: TypingPanelProps) {
+export function TypingPanel({ fileItem, typingStatus, setFileItems, setTypingStatus }: TypingPanelProps) {
   const targetTextLines = fileItem?.content?.split(/(?<=\n)/) || [];
   const {
-    typedTextLines,
     cursorPositions,
     cursorLine,
+    typedTextLines,
     errorMessage,
     startTyping,
     resetTyping,
@@ -23,9 +23,9 @@ export function TypingPanel({ fileItem, setFileItems, typingStatus, setTypingSta
     resumeTyping,
   } = useTypingHandler({
     targetTextLines,
+    typingStatus,
     fileItemId: fileItem.id,
     setFileItems,
-    typingStatus,
     setTypingStatus,
   });
   return (
@@ -40,10 +40,10 @@ export function TypingPanel({ fileItem, setFileItems, typingStatus, setTypingSta
       />
       <TypingContent
         content={fileItem.content || ''}
-        targetTextLines={targetTextLines}
-        typedTextLines={typedTextLines}
         cursorLine={cursorLine}
         cursorPositions={cursorPositions}
+        targetTextLines={targetTextLines}
+        typedTextLines={typedTextLines}
         typingStatus={typingStatus}
         errorMessage={errorMessage}
       />

@@ -8,12 +8,12 @@ import { sortFileItems } from '@/utils/sort-file-items';
 
 type FileTreeItemProps = {
   fileItem: FileItem;
-  selectedFileItem: FileItem | null;
   level: number;
+  selectedFileItem?: FileItem;
   onSelectFileItem: (file: FileItem) => void;
 };
 
-export function FileTreeItem({ fileItem, selectedFileItem, level, onSelectFileItem }: FileTreeItemProps) {
+export function FileTreeItem({ fileItem, level, selectedFileItem, onSelectFileItem }: FileTreeItemProps) {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -83,8 +83,8 @@ export function FileTreeItem({ fileItem, selectedFileItem, level, onSelectFileIt
             <FileTreeItem
               key={child.id}
               fileItem={child}
-              selectedFileItem={selectedFileItem}
               level={level + 1}
+              selectedFileItem={selectedFileItem}
               onSelectFileItem={onSelectFileItem}
             />
           ))}

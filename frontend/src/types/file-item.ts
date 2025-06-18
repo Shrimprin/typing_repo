@@ -3,10 +3,10 @@ export type FileItemStatus = 'untyped' | 'typing' | 'typed';
 
 export type FileItem = {
   id: number;
-  content?: string;
   fileItems: FileItem[] | [];
-  fullPath?: string;
   name: string;
   status: FileItemStatus;
   type: FileItemType;
+  content?: string;
+  fullPath?: string;
 };

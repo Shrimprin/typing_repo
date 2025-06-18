@@ -3,20 +3,20 @@ import { TypingStatus } from '@/types';
 
 type TypingContentProps = {
   content: string;
-  targetTextLines: string[];
-  typedTextLines: string[];
   cursorLine: number;
   cursorPositions: number[];
+  targetTextLines: string[];
+  typedTextLines: string[];
   typingStatus: TypingStatus;
-  errorMessage: string | null;
+  errorMessage?: string;
 };
 
 export function TypingContent({
   content,
-  targetTextLines,
-  typedTextLines,
   cursorLine,
   cursorPositions,
+  targetTextLines,
+  typedTextLines,
   typingStatus,
   errorMessage,
 }: TypingContentProps) {
@@ -39,10 +39,10 @@ export function TypingContent({
               {targetTextLines.map((targetTextLine, index) => (
                 <TypingLine
                   key={index}
-                  typedText={typedTextLines[index]}
-                  targetTextLine={targetTextLine}
                   cursorPosition={cursorPositions[index]}
                   isUntypedLine={index > cursorLine}
+                  targetTextLine={targetTextLine}
+                  typedText={typedTextLines[index]}
                 />
               ))}
             </div>

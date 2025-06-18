@@ -3,7 +3,7 @@ import { FileTreeItem } from './FileTreeItem';
 
 type FileTreeProps = {
   fileItems: FileItem[];
-  selectedFileItem: FileItem | null;
+  selectedFileItem?: FileItem;
   onSelectFileItem: (file: FileItem) => void;
 };
 
@@ -15,8 +15,8 @@ export function FileTree({ fileItems, selectedFileItem, onSelectFileItem }: File
           <FileTreeItem
             key={fileItem.id}
             fileItem={fileItem}
-            selectedFileItem={selectedFileItem}
             level={0}
+            selectedFileItem={selectedFileItem}
             onSelectFileItem={onSelectFileItem}
           />
         ))}

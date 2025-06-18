@@ -2,17 +2,17 @@ import { IconCornerDownLeft } from '@tabler/icons-react';
 import React from 'react';
 
 type TypingLineProps = {
-  typedText: string;
-  targetTextLine: string;
   cursorPosition: number;
   isUntypedLine: boolean;
+  targetTextLine: string;
+  typedText: string;
 };
 
 const TypingLine = React.memo(function TypingLine({
-  typedText,
-  targetTextLine,
   cursorPosition,
   isUntypedLine,
+  targetTextLine,
+  typedText,
 }: TypingLineProps) {
   const getCharClass = (index: number) => {
     const isUntypedText = index > typedText.length;
