@@ -37,30 +37,30 @@ describe('NewRepositoryPage', () => {
     mockUseSession();
   });
 
-  it('render title and description', () => {
+  it('renders title and description', () => {
     render(<NewRepositoryPage />);
 
     expect(screen.getByText('リポジトリを追加')).toBeInTheDocument();
     expect(screen.getByText('タイピングしたいGitHubリポジトリのURLを入力してください。')).toBeInTheDocument();
   });
 
-  it('render form', () => {
+  it('renders form', () => {
     render(<NewRepositoryPage />);
 
     expect(screen.getByPlaceholderText('https://github.com/username/repository')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '追加' })).toBeInTheDocument();
   });
 
-  it('navigate to repository page when submit with valid url', async () => {
+  it('navigates to repository page when submit with valid url', async () => {
     const pushMock = jest.fn();
     (useRouter as jest.Mock).mockReturnValue({ push: pushMock });
 
     jest.spyOn(axios, 'post').mockResolvedValueOnce({
       data: {
         id: 1,
-        user_id: 1,
+        userId: 1,
         name: 'repository-name',
-        last_typed_at: null,
+        lastTypedAt: null,
       },
     });
 
@@ -86,7 +86,7 @@ describe('NewRepositoryPage', () => {
   });
 
   describe('form validation', () => {
-    it('show error message when submit invalid url', async () => {
+    it('shows error message when submit invalid url', async () => {
       render(<NewRepositoryPage />);
 
       await inputRepositoryUrlAndSubmit('invalid-url');
@@ -94,7 +94,7 @@ describe('NewRepositoryPage', () => {
       expect(screen.getByText('有効なURLを入力してください')).toBeInTheDocument();
     });
 
-    it('show error message when submit with empty url', async () => {
+    it('shows error message when submit with empty url', async () => {
       render(<NewRepositoryPage />);
 
       await inputRepositoryUrlAndSubmit('');
@@ -104,7 +104,7 @@ describe('NewRepositoryPage', () => {
   });
 
   describe('error handling', () => {
-    it('show error message when occur axios error', async () => {
+    it('shows error message when occur axios error', async () => {
       jest.spyOn(axios, 'post').mockRejectedValueOnce({
         message: 'Network Error',
         name: 'AxiosError',
@@ -119,7 +119,7 @@ describe('NewRepositoryPage', () => {
       expect(screen.getByText('Network Error')).toBeInTheDocument();
     });
 
-    it('show error message when occur server error', async () => {
+    it('shows error message when occur server error', async () => {
       jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error('Server error'));
       render(<NewRepositoryPage />);
 

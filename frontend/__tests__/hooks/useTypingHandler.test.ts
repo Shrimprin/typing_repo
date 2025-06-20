@@ -1,17 +1,48 @@
 import { act, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import axios, { AxiosError } from 'axios';
 
 import { useTypingHandler } from '@/hooks/useTypingHandler';
 import { TypingStatus } from '@/types';
+import { useParams } from 'next/navigation';
+import { mockAuth, mockUseSession } from '../mocks/auth';
 
+jest.mock('next/navigation', () => ({
+  useParams: jest.fn(),
+}));
+
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(),
+}));
+
+jest.mock('@/auth', () => ({
+  auth: jest.fn(),
+}));
+
+const typeEntireContent = async () => {
+  await userEvent.keyboard('def hello_world{Enter}');
+  await userEvent.keyboard("puts 'Hello, World!'{Enter}");
+  await userEvent.keyboard('end{Enter}');
+};
 describe('useTypingHandler', () => {
   const targetTextLines = ['def hello_world\n', "  puts 'Hello, World!'\n", 'end\n'];
   const mockSetTypingStatus = jest.fn();
+  const mockSetFileItems = jest.fn();
   const defaultProps = {
     targetTextLines,
     typingStatus: 'ready' as TypingStatus,
     setTypingStatus: mockSetTypingStatus,
+    setFileItems: mockSetFileItems,
+    fileItemId: 1,
   };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockAuth();
+    mockUseSession();
+    (useParams as jest.Mock).mockReturnValue({ id: '1' });
+  });
+
   describe('initial state', () => {
     it('has typing status is ready', () => {
       const { result } = renderHook(() => useTypingHandler(defaultProps));
@@ -167,11 +198,19 @@ describe('useTypingHandler', () => {
     });
 
     it('can complete typing', async () => {
+      jest.spyOn(axios, 'patch').mockResolvedValueOnce({
+        data: {
+          id: '1',
+          name: 'test-file-name',
+          status: 'typed',
+          type: 'file',
+          fileItems: [],
+        },
+      });
+
       const { result } = renderHook(() => useTypingHandler(typingProps));
 
-      await userEvent.keyboard('def hello_world{Enter}');
-      await userEvent.keyboard("puts 'Hello, World!'{Enter}");
-      await userEvent.keyboard('end{Enter}');
+      await typeEntireContent();
 
       expect(mockSetTypingStatus).toHaveBeenCalledWith('completed');
       expect(result.current.typedTextLines).toEqual(['def hello_world\n', "  puts 'Hello, World!'\n", 'end\n']);
@@ -179,7 +218,7 @@ describe('useTypingHandler', () => {
       expect(result.current.cursorLine).toBe(2);
     });
 
-    it('can rest typing', async () => {
+    it('can reset typing', async () => {
       const { result } = renderHook(() => useTypingHandler(typingProps));
 
       await userEvent.keyboard('def hello_world{Enter}');
@@ -252,6 +291,73 @@ describe('useTypingHandler', () => {
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
       expect(result.current.cursorPositions).toEqual([0, 2, 0]);
       expect(result.current.cursorLine).toBe(0);
+    });
+  });
+
+  describe('handleComplete', () => {
+    const typingProps = {
+      ...defaultProps,
+      typingStatus: 'typing' as TypingStatus,
+    };
+
+    it('updates file item status to typed', async () => {
+      const mockResponse = {
+        data: {
+          id: '1',
+          name: 'test-file-name',
+          status: 'typed',
+          type: 'file',
+          fileItems: [],
+        },
+      };
+
+      jest.spyOn(axios, 'patch').mockResolvedValueOnce(mockResponse);
+
+      renderHook(() => useTypingHandler(typingProps));
+
+      await typeEntireContent();
+
+      const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+      expect(axios.patch).toHaveBeenCalledWith(
+        `${BASE_URL}/api/repositories/1/file_items/1`,
+        {
+          file_item: { status: 'typed' },
+        },
+        {
+          headers: {
+            Authorization: 'Bearer token_1234567890',
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      expect(mockSetFileItems).toHaveBeenCalledWith(mockResponse.data);
+      expect(mockSetTypingStatus).toHaveBeenCalledWith('completed');
+    });
+
+    it('shows error message when occur axios error', async () => {
+      jest.spyOn(axios, 'patch').mockRejectedValueOnce({
+        message: 'Network Error',
+        name: 'AxiosError',
+        code: 'ERR_NETWORK',
+        isAxiosError: true,
+      } as AxiosError);
+
+      const { result } = renderHook(() => useTypingHandler(typingProps));
+
+      await typeEntireContent();
+
+      expect(result.current.errorMessage).toBe('Network Error');
+      expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
+    });
+
+    it('shows error message when occur server error', async () => {
+      jest.spyOn(axios, 'patch').mockRejectedValueOnce(new Error('Server Error'));
+
+      const { result } = renderHook(() => useTypingHandler(typingProps));
+
+      await typeEntireContent();
+      expect(result.current.errorMessage).toBe('サーバーエラーが発生しました。');
+      expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
     });
   });
 });

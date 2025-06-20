@@ -7,16 +7,16 @@ import useSWR from 'swr';
 
 import { FileItem, TypingStatus } from '@/types';
 import { fetcher } from '@/utils/fetcher';
-import { TypingPanel } from './TypingPanel';
+import TypingPanel from './TypingPanel';
 
 type FileItemViewProps = {
-  fileItem: FileItem | null;
-  setFileItems: (fileItems: FileItem[]) => void;
   typingStatus: TypingStatus;
+  fileItem?: FileItem;
+  setFileItems: (fileItems: FileItem[]) => void;
   setTypingStatus: (status: TypingStatus) => void;
 };
 
-export function FileItemView({ fileItem, setFileItems, typingStatus, setTypingStatus }: FileItemViewProps) {
+export default function FileItemView({ typingStatus, fileItem, setFileItems, setTypingStatus }: FileItemViewProps) {
   const params = useParams();
   const url = fileItem ? `/api/repositories/${params.id}/file_items/${fileItem.id}` : null;
   const { data: session } = useSession();
@@ -41,8 +41,8 @@ export function FileItemView({ fileItem, setFileItems, typingStatus, setTypingSt
         ) : (
           <TypingPanel
             fileItem={fileItemData as FileItem}
-            setFileItems={setFileItems}
             typingStatus={typingStatus}
+            setFileItems={setFileItems}
             setTypingStatus={setTypingStatus}
           />
         )}

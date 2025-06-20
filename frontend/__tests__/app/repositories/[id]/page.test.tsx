@@ -21,87 +21,87 @@ jest.mock('@/auth', () => ({
   auth: jest.fn(),
 }));
 
-const mockRepository = {
-  data: {
-    id: 1,
-    name: 'test-repo',
-    lastTypedAt: null,
-    userId: 1,
-    fileItems: [
-      {
-        id: 1,
-        name: 'file1.ts',
-        type: 'file',
-        status: 'untyped',
-        fileItems: [],
-      },
-      {
-        id: 2,
-        name: 'file2.ts',
-        type: 'file',
-        status: 'typed',
-        fileItems: [],
-      },
-      {
-        id: 3,
-        name: 'dir1',
-        type: 'dir',
-        status: 'untyped',
-        fileItems: [
-          {
-            id: 4,
-            name: 'nested-file1.ts',
-            type: 'file',
-            status: 'untyped',
-            fileItems: [],
-          },
-          {
-            id: 5,
-            name: 'nested-file2.ts',
-            type: 'file',
-            status: 'untyped',
-            fileItems: [],
-          },
-        ],
-      },
-      {
-        id: 6,
-        name: 'dir2',
-        type: 'dir',
-        status: 'untyped',
-        fileItems: [
-          {
-            id: 7,
-            name: 'nested-file3.ts',
-            type: 'file',
-            status: 'untyped',
-            fileItems: [],
-          },
-        ],
-      },
-      {
-        id: 8,
-        name: 'file3.ts',
-        type: 'file',
-        status: 'untyped',
-        fileItems: [],
-      },
-    ],
-  },
-};
-
-const mockFileItem = {
-  data: {
-    id: 4,
-    name: 'nested-file1.ts',
-    type: 'file',
-    status: 'untyped',
-    content: 'console.log("Hello, world!");',
-    fullPath: 'dir1/nested-file1.ts',
-  },
-};
-
 describe('RepositoryDetailPage', () => {
+  const mockRepository = {
+    data: {
+      id: 1,
+      name: 'test-repo',
+      lastTypedAt: null,
+      userId: 1,
+      fileItems: [
+        {
+          id: 1,
+          name: 'file1.ts',
+          type: 'file',
+          status: 'untyped',
+          fileItems: [],
+        },
+        {
+          id: 2,
+          name: 'file2.ts',
+          type: 'file',
+          status: 'typed',
+          fileItems: [],
+        },
+        {
+          id: 3,
+          name: 'dir1',
+          type: 'dir',
+          status: 'untyped',
+          fileItems: [
+            {
+              id: 4,
+              name: 'nested-file1.ts',
+              type: 'file',
+              status: 'untyped',
+              fileItems: [],
+            },
+            {
+              id: 5,
+              name: 'nested-file2.ts',
+              type: 'file',
+              status: 'untyped',
+              fileItems: [],
+            },
+          ],
+        },
+        {
+          id: 6,
+          name: 'dir2',
+          type: 'dir',
+          status: 'untyped',
+          fileItems: [
+            {
+              id: 7,
+              name: 'nested-file3.ts',
+              type: 'file',
+              status: 'untyped',
+              fileItems: [],
+            },
+          ],
+        },
+        {
+          id: 8,
+          name: 'file3.ts',
+          type: 'file',
+          status: 'untyped',
+          fileItems: [],
+        },
+      ],
+    },
+  };
+
+  const mockFileItem = {
+    data: {
+      id: 4,
+      name: 'nested-file1.ts',
+      type: 'file',
+      status: 'untyped',
+      content: 'console.log("Hello, world!");',
+      fullPath: 'dir1/nested-file1.ts',
+    },
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
     mockAuth();
@@ -118,7 +118,7 @@ describe('RepositoryDetailPage', () => {
   });
 
   describe('initial state', () => {
-    it('render file tree with directories, files order both in alphabetical order', async () => {
+    it('renders file tree with directories, files order both in alphabetical order', async () => {
       const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
       expect(axios.get).toHaveBeenCalledWith(`${BASE_URL}/api/repositories/1`, {
         headers: {
@@ -142,13 +142,13 @@ describe('RepositoryDetailPage', () => {
       expect(screen.queryByRole('button', { name: 'nested-file3.txt' })).not.toBeInTheDocument();
     });
 
-    it('render typing area with explanatory message', async () => {
+    it('renders typing area with explanatory message', async () => {
       expect(screen.getByText('タイピングするファイルを選んでください。')).toBeInTheDocument();
     });
   });
 
   describe('when directory is clicked', () => {
-    it('render children of directory', async () => {
+    it('renders children of directory', async () => {
       await clickButton('dir1');
 
       expect(screen.getByRole('button', { name: 'nested-file1.ts' })).toBeInTheDocument();
@@ -157,7 +157,7 @@ describe('RepositoryDetailPage', () => {
   });
 
   describe('when file is clicked', () => {
-    it('render full path, play button and file content', async () => {
+    it('renders full path, play button and file content', async () => {
       await clickButton('dir1');
       await clickButton('nested-file1.ts');
 
@@ -185,13 +185,13 @@ describe('RepositoryDetailPage', () => {
       await clickButton('PLAY');
     });
 
-    it('hide play button and render pause button and reset button', async () => {
+    it('hides play button and render pause button and reset button', async () => {
       expect(screen.queryByRole('button', { name: 'PLAY' })).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'PAUSE' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'RESET' })).toBeInTheDocument();
     });
 
-    it('render green highlighted text when type correct characters', async () => {
+    it('renders green highlighted text when type correct characters', async () => {
       await userEvent.keyboard('console');
 
       const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
@@ -203,7 +203,7 @@ describe('RepositoryDetailPage', () => {
       expect(typedText).toBe('console');
     });
 
-    it('render red highlighted text when type incorrect character', async () => {
+    it('renders red highlighted text when type incorrect character', async () => {
       await userEvent.keyboard('d');
 
       const incorrectChars = document.querySelectorAll(`.${INCORRECT_CHARS_COLOR}`);
@@ -211,7 +211,7 @@ describe('RepositoryDetailPage', () => {
       expect(incorrectChars[0].textContent).toBe('c');
     });
 
-    it('delete typed character when type backspace key', async () => {
+    it('deletes typed character when type backspace key', async () => {
       await userEvent.keyboard('con');
       await userEvent.keyboard('{Backspace}');
 
@@ -256,7 +256,7 @@ describe('RepositoryDetailPage', () => {
       expect(correctChars.length).toBe(0);
     });
 
-    it('render result when type all characters', async () => {
+    it('renders result when type all characters', async () => {
       const mockFileItems = [
         {
           id: 1,

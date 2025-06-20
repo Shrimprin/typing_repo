@@ -8,17 +8,17 @@ import { axiosPatch } from '@/utils/axios';
 
 type useTypingHandlerProps = {
   targetTextLines: string[];
-  setFileItems: (fileItems: FileItem[]) => void;
-  fileItemId?: string;
   typingStatus: TypingStatus;
+  fileItemId?: number;
+  setFileItems: (fileItems: FileItem[]) => void;
   setTypingStatus: (status: TypingStatus) => void;
 };
 
 export function useTypingHandler({
   targetTextLines,
-  setFileItems,
-  fileItemId,
   typingStatus,
+  fileItemId,
+  setFileItems,
   setTypingStatus,
 }: useTypingHandlerProps) {
   const initialCursorPositions = targetTextLines.map((line) => line.indexOf(line.trimStart()));
@@ -26,7 +26,7 @@ export function useTypingHandler({
   const initialTypedTextLines = targetTextLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
   const [typedTextLines, setTypedTextLines] = useState(initialTypedTextLines);
   const [cursorLine, setCursorLine] = useState(0);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>();
   const { data: session } = useSession();
   const params = useParams();
 
@@ -54,7 +54,7 @@ export function useTypingHandler({
 
   const handleComplete = useCallback(async () => {
     try {
-      const url = `/api/repositories/${params.id}/file_items/${fileItemId || params.fileItemId}`;
+      const url = `/api/repositories/${params.id}/file_items/${fileItemId}`;
       const accessToken = session?.user?.accessToken;
       const postData = {
         file_item: {
@@ -163,14 +163,14 @@ export function useTypingHandler({
   }, [handleKeyDown]);
 
   return {
-    typedTextLines,
     cursorLine,
     cursorPositions,
+    typedTextLines,
     typingStatus,
     errorMessage,
     startTyping,
-    resetTyping,
     resumeTyping,
     pauseTyping,
+    resetTyping,
   };
 }

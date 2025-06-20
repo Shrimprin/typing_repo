@@ -7,7 +7,7 @@ RSpec.describe 'Api::Auth', type: :request do
     let(:valid_params) { { github_id: '12345', name: 'テストユーザー' } }
 
     context 'when new user' do
-      it 'create user and return access token' do
+      it 'creates user and returns access token' do
         expect do
           post '/api/auth/callback/github', params: valid_params
         end.to change(User, :count).by(1)
@@ -24,9 +24,8 @@ RSpec.describe 'Api::Auth', type: :request do
     end
 
     context 'when existing user' do
-      it 'return access token' do
+      it 'returns access token' do
         existing_user = create(:user, github_id: valid_params[:github_id], name: valid_params[:name])
-
         expect do
           post '/api/auth/callback/github', params: valid_params
         end.not_to change(User, :count)
@@ -43,9 +42,8 @@ RSpec.describe 'Api::Auth', type: :request do
     end
 
     context 'when invalid params' do
-      it 'return validation error' do
+      it 'returns validation error' do
         invalid_params = { github_id: '12345' }
-
         post '/api/auth/callback/github', params: invalid_params
 
         expect(response).to have_http_status(:unprocessable_entity)
@@ -55,7 +53,7 @@ RSpec.describe 'Api::Auth', type: :request do
     end
 
     context 'when unexpected error occurs' do
-      it 'return error message' do
+      it 'returns error message' do
         allow(User).to receive(:find_or_create_by!).and_raise(StandardError.new('テストエラー'))
 
         post '/api/auth/callback/github', params: valid_params

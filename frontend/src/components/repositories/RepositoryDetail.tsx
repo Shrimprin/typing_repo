@@ -3,16 +3,16 @@
 import { useState } from 'react';
 
 import { FileItem, TypingStatus } from '@/types';
-import { FileItemView } from './FileItemView';
-import { FileTree } from './FileTree';
+import FileItemView from './FileItemView';
+import FileTree from './FileTree';
 
 type RepositoryDetailProps = {
   initialFileItems: FileItem[];
 };
 
-export function RepositoryDetail({ initialFileItems }: RepositoryDetailProps) {
+export default function RepositoryDetail({ initialFileItems }: RepositoryDetailProps) {
   const [fileItems, setFileItems] = useState<FileItem[]>(initialFileItems);
-  const [selectedFileItem, setSelectedFileItem] = useState<FileItem | null>(null);
+  const [selectedFileItem, setSelectedFileItem] = useState<FileItem>();
   const [typingStatus, setTypingStatus] = useState<TypingStatus>('ready');
 
   const handleFileSelect = (fileItem: FileItem) => {
@@ -35,9 +35,9 @@ export function RepositoryDetail({ initialFileItems }: RepositoryDetailProps) {
 
         <div className="flex-1 overflow-y-auto">
           <FileItemView
+            typingStatus={typingStatus}
             fileItem={selectedFileItem}
             setFileItems={setFileItems}
-            typingStatus={typingStatus}
             setTypingStatus={setTypingStatus}
           />
         </div>

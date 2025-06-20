@@ -10,9 +10,9 @@ FactoryBot.define do
 
     trait :with_file_items do
       after(:create) do |repository|
-        directory = create(:file_item, :directory, repository: repository)
-        create_list(:file_item, 2, :typed, repository: repository, parent_id: directory.id)
-        create_list(:file_item, 3, repository: repository)
+        directory = create(:file_item, :directory, repository:)
+        create_list(:file_item, 2, :typed, repository:, parent_id: directory.id)
+        create_list(:file_item, 3, repository:)
       end
     end
   end

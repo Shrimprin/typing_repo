@@ -3,13 +3,12 @@
 class FileItem < ApplicationRecord
   self.inheritance_column = nil # typeカラムを使うため単一テーブル継承を無効
 
-  validates :name, presence: true
-  validates :type, presence: true
-  validates :status, presence: true
-
+  belongs_to :repository
   has_closure_tree
 
-  belongs_to :repository
+  validates :name, presence: true
+  validates :status, presence: true
+  validates :type, presence: true
 
   enum :type, {
     file: 0,
@@ -34,12 +33,6 @@ class FileItem < ApplicationRecord
     "#{repository.name}/#{path}"
   end
 
-  def update_with_parent(params)
-    transaction do
-      update(params) && update_parent_status
-    end
-  end
-
   def update_parent_status
     return true unless parent
 
@@ -48,5 +41,11 @@ class FileItem < ApplicationRecord
     return true unless is_all_typed
 
     parent.update!(status: :typed) && parent.update_parent_status
+  end
+
+  def update_with_parent(params)
+    transaction do
+      update(params) && update_parent_status
+    end
   end
 end
