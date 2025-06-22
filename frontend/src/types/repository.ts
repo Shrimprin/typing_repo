@@ -7,4 +7,5 @@ export type Repository = {
   lastTypedAt?: string;
   name: string;
   url: string;
+  progress?: number;
 };
