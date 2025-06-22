@@ -5,6 +5,7 @@ import RepositoryFooter from '@/components/repositories/index/RepositoryFooter';
 import RepositoryList from '@/components/repositories/index/RepositoryList';
 import { Repository } from '@/types/repository';
 import { fetcher } from '@/utils/fetcher';
+import { sortRepositories } from '@/utils/sort';
 
 export default async function RepositoriesPage() {
   const url = '/api/repositories';
@@ -19,9 +20,11 @@ export default async function RepositoriesPage() {
     return <div className="flex h-screen items-center justify-center p-8">{errorMessage}</div>;
   }
 
+  const sortedRepositories = sortRepositories(repositories);
+
   return (
     <div className="flex min-h-screen flex-col px-2">
-      <RepositoryList repositories={repositories} />
+      <RepositoryList repositories={sortedRepositories} />
       <RepositoryFooter />
     </div>
   );
