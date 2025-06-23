@@ -1,3 +1,7 @@
+import { FolderOpen, Plus } from 'lucide-react';
+import Link from 'next/link';
+
+import { Button } from '@/components/ui/button';
 import { Repository } from '@/types/repository';
 import RepositoryListItem from './RepositoryListItem';
 
@@ -8,9 +12,23 @@ type Props = {
 export default function RepositoryList({ repositories }: Props) {
   return (
     <div className="container mx-auto max-w-4xl flex-grow py-4">
-      {repositories.map((repository) => (
-        <RepositoryListItem key={repository.id} repository={repository} />
-      ))}
+      {repositories.length > 0 ? (
+        repositories.map((repository) => <RepositoryListItem key={repository.id} repository={repository} />)
+      ) : (
+        <div className="py-12 text-center font-mono">
+          <div className="mb-4 text-gray-400">
+            <FolderOpen className="mx-auto h-12 w-12" />
+          </div>
+          <h3 className="mb-2 text-lg font-medium text-gray-900">リポジトリがありません</h3>
+          <p className="mb-6 text-sm text-gray-500">リポジトリを追加してタイピングを始めましょう</p>
+          <Button asChild>
+            <Link href="/repositories/new">
+              <Plus className="mr-2 h-4 w-4" />
+              リポジトリを追加
+            </Link>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
