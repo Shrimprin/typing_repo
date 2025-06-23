@@ -18,7 +18,7 @@ jest.mock('@/auth', () => ({
   auth: jest.fn(),
 }));
 
-describe('RepositoriesPage', () => {
+const renderRepositoriesPage = async () => {
   const mockRepositories = [
     {
       id: '1',
@@ -63,17 +63,23 @@ describe('RepositoriesPage', () => {
       progress: 15.0,
     },
   ];
+  jest.spyOn(axios, 'get').mockResolvedValue({ data: mockRepositories });
 
+  const repositoriesPage = await RepositoriesPage();
+  render(repositoriesPage);
+};
+
+describe('RepositoriesPage', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     mockAuth();
-    jest.spyOn(axios, 'get').mockResolvedValue({ data: mockRepositories });
-
-    const repositoriesPage = await RepositoriesPage();
-    render(repositoriesPage);
   });
 
   describe('when repositories exists', () => {
+    beforeEach(async () => {
+      await renderRepositoriesPage();
+    });
+
     it('calls api', async () => {
       const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
       expect(axios.get).toHaveBeenCalledWith(`${BASE_URL}/api/repositories`, {
@@ -117,9 +123,24 @@ describe('RepositoriesPage', () => {
   });
 
   describe('when repositories does not exist', () => {
-    // TODO: リポジトリが存在しない場合のテストを追加する
+    beforeEach(async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue({ data: [] });
+      const repositoriesPage = await RepositoriesPage();
+      render(repositoriesPage);
+    });
+
+    it('renders empty state', async () => {
+      expect(screen.getByRole('heading', { level: 3, name: 'リポジトリがありません' })).toBeInTheDocument();
+      expect(screen.getByText('リポジトリを追加してタイピングを始めましょう')).toBeInTheDocument();
+      const repositoryAddLinks = screen.getAllByRole('link', { name: 'リポジトリを追加' });
+      expect(repositoryAddLinks.length).toBe(2); // リポジトリ0件の表示: 1 + フッター: 1
+      expect(repositoryAddLinks[0]).toHaveAttribute('href', '/repositories/new');
+    });
   });
+
   it('renders repository-add-button in footer', async () => {
+    await renderRepositoriesPage();
+
     const repositoryAddButton = screen.getByRole('link', { name: 'リポジトリを追加' });
 
     expect(repositoryAddButton).toBeInTheDocument();
