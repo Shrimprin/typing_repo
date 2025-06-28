@@ -19,12 +19,12 @@ export default function RepositoryList({ repositories }: Props) {
           <div className="mb-4 text-gray-400">
             <FolderOpen className="mx-auto h-12 w-12" />
           </div>
-          <h3 className="mb-2 text-lg font-medium text-gray-900">リポジトリがありません</h3>
-          <p className="mb-6 text-sm text-gray-500">リポジトリを追加してタイピングを始めましょう</p>
+          <h3 className="mb-2 text-lg font-medium text-gray-900">No repositories</h3>
+          <p className="mb-6 text-sm text-gray-500">Add a repository to start typing.</p>
           <Button asChild>
             <Link href="/repositories/new">
               <Plus className="mr-2 h-4 w-4" />
-              リポジトリを追加
+              Add Repository
             </Link>
           </Button>
         </div>

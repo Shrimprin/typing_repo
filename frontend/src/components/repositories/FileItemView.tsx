@@ -33,11 +33,11 @@ export default function FileItemView({ typingStatus, fileItem, setFileItems, set
     <div className="flex flex-col">
       <Card className="m-4 overflow-hidden">
         {!fileItemData ? (
-          <div className="p-6 text-center font-mono text-gray-500">タイピングするファイルを選んでください。</div>
+          <div className="p-6 text-center font-mono text-gray-500">Select a file to start typing.</div>
         ) : isLoading ? (
-          <div className="p-6 text-center font-mono text-gray-500">ファイルを読み込み中...</div>
+          <div className="p-6 text-center font-mono text-gray-500">Loading file...</div>
         ) : error ? (
-          <div className="p-6 text-center font-mono text-gray-500">エラーが発生しました。再度お試しください。</div>
+          <div className="p-6 text-center font-mono text-gray-500">An error occurred. Please try again.</div>
         ) : (
           <TypingPanel
             fileItem={fileItemData as FileItem}

@@ -1,5 +1,5 @@
 import { formatDistanceToNow } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 
@@ -33,11 +33,11 @@ export default function RepositoryListItem({ repository }: Props) {
           <RepositoryProgress progress={repository.progress || 0} />
           {repository.lastTypedAt && (
             <p className="text-muted-foreground font-mono text-sm">
+              typed{' '}
               {formatDistanceToNow(new Date(repository.lastTypedAt), {
                 addSuffix: true,
-                locale: ja,
+                locale: enUS,
               })}
-              にタイプ
             </p>
           )}
         </div>
@@ -45,7 +45,7 @@ export default function RepositoryListItem({ repository }: Props) {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="リポジトリの設定メニュー">
+          <Button variant="ghost" size="icon" aria-label="settings">
             <MoreHorizontal className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>

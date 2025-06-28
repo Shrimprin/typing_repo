@@ -7,7 +7,7 @@ module Api
       file_item = repository.file_items.find(params[:id])
       render json: FileItemSerializer.new(file_item, params: { content: true, full_path: true }), status: :ok
     rescue ActiveRecord::RecordNotFound
-      render json: { error: 'ファイルが存在しません。' }, status: :not_found
+      render json: { error: 'File not found' }, status: :not_found
     end
 
     def update
@@ -20,7 +20,7 @@ module Api
         render json: file_item.errors, status: :unprocessable_entity
       end
     rescue StandardError
-      render json: { error: 'ファイルの更新に失敗しました。' }, status: :internal_server_error
+      render json: { error: 'Failed to update file' }, status: :internal_server_error
     end
 
     private
