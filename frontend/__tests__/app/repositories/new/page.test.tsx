@@ -16,7 +16,7 @@ const inputRepositoryUrlAndSubmit = async (url: string) => {
   } else {
     await userEvent.type(repositoryUrlInput, url);
   }
-  await clickButton('追加');
+  await clickButton('Add Repository');
 };
 
 describe('NewRepositoryPage', () => {
@@ -28,15 +28,15 @@ describe('NewRepositoryPage', () => {
   it('renders title and description', () => {
     render(<NewRepositoryPage />);
 
-    expect(screen.getByText('リポジトリを追加')).toBeInTheDocument();
-    expect(screen.getByText('タイピングしたいGitHubリポジトリのURLを入力してください。')).toBeInTheDocument();
+    expect(screen.getByText('New Repository')).toBeInTheDocument();
+    expect(screen.getByText('Enter the URL of the GitHub repository you want to type.')).toBeInTheDocument();
   });
 
   it('renders form', () => {
     render(<NewRepositoryPage />);
 
     expect(screen.getByPlaceholderText('https://github.com/username/repository')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '追加' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add Repository' })).toBeInTheDocument();
   });
 
   it('navigates to repository page when submit with valid url', async () => {
@@ -79,7 +79,7 @@ describe('NewRepositoryPage', () => {
 
       await inputRepositoryUrlAndSubmit('invalid-url');
 
-      expect(screen.getByText('有効なURLを入力してください')).toBeInTheDocument();
+      expect(screen.getByText('Enter a valid URL')).toBeInTheDocument();
     });
 
     it('shows error message when submit with empty url', async () => {
@@ -87,7 +87,7 @@ describe('NewRepositoryPage', () => {
 
       await inputRepositoryUrlAndSubmit('');
 
-      expect(screen.getByText('URLは必須です')).toBeInTheDocument();
+      expect(screen.getByText('URL is required')).toBeInTheDocument();
     });
   });
 
@@ -113,7 +113,7 @@ describe('NewRepositoryPage', () => {
 
       await inputRepositoryUrlAndSubmit('https://github.com/username/repository');
 
-      expect(screen.getByText('サーバーエラーが発生しました。')).toBeInTheDocument();
+      expect(screen.getByText('An error occurred. Please try again.')).toBeInTheDocument();
     });
   });
 });

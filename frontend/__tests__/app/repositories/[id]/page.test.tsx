@@ -130,7 +130,7 @@ describe('RepositoryDetailPage', () => {
     });
 
     it('renders typing area with explanatory message', async () => {
-      expect(screen.getByText('タイピングするファイルを選んでください。')).toBeInTheDocument();
+      expect(screen.getByText('Select a file to start typing.')).toBeInTheDocument();
     });
   });
 

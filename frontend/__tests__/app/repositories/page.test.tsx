@@ -101,7 +101,7 @@ describe('RepositoriesPage', () => {
     });
 
     it('renders modal when more-button is clicked', async () => {
-      const moreButtons = screen.getAllByRole('button', { name: 'リポジトリの設定メニュー' });
+      const moreButtons = screen.getAllByRole('button', { name: 'settings' });
       const firstMoreButton = moreButtons[0];
 
       await userEvent.click(firstMoreButton);
@@ -118,9 +118,9 @@ describe('RepositoriesPage', () => {
     });
 
     it('renders empty state', async () => {
-      expect(screen.getByRole('heading', { level: 3, name: 'リポジトリがありません' })).toBeInTheDocument();
-      expect(screen.getByText('リポジトリを追加してタイピングを始めましょう')).toBeInTheDocument();
-      const repositoryAddLinks = screen.getAllByRole('link', { name: 'リポジトリを追加' });
+      expect(screen.getByRole('heading', { level: 3, name: 'No repositories' })).toBeInTheDocument();
+      expect(screen.getByText('Add a repository to start typing.')).toBeInTheDocument();
+      const repositoryAddLinks = screen.getAllByRole('link', { name: 'Add Repository' });
       expect(repositoryAddLinks.length).toBe(2); // リポジトリ0件の表示: 1 + フッター: 1
       expect(repositoryAddLinks[0]).toHaveAttribute('href', '/repositories/new');
     });
@@ -129,7 +129,7 @@ describe('RepositoriesPage', () => {
   it('renders repository-add-button in footer', async () => {
     await renderRepositoriesPage();
 
-    const repositoryAddButton = screen.getByRole('link', { name: 'リポジトリを追加' });
+    const repositoryAddButton = screen.getByRole('link', { name: 'Add Repository' });
 
     expect(repositoryAddButton).toBeInTheDocument();
     expect(repositoryAddButton).toHaveAttribute('href', '/repositories/new');
@@ -149,7 +149,7 @@ describe('RepositoriesPage', () => {
       const repositoriesPage = await RepositoriesPage();
       render(repositoriesPage);
 
-      expect(screen.getByText('エラーが発生しました。再度お試しください。')).toBeInTheDocument();
+      expect(screen.getByText('An error occurred. Please try again.')).toBeInTheDocument();
     });
   });
 });
