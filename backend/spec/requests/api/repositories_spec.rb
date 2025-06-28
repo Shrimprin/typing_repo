@@ -71,7 +71,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:not_found)
         json = response.parsed_body
-        expect(json['error']).to eq('リポジトリが存在しません。')
+        expect(json['error']).to eq('Repository not found')
       end
     end
   end
@@ -148,7 +148,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:unprocessable_entity)
         json = response.parsed_body
-        expect(json['error']).to eq('無効なURLです。')
+        expect(json['error']).to eq('Invalid URL')
       end
     end
 
@@ -166,7 +166,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:not_found)
         json = response.parsed_body
-        expect(json['error']).to eq('リポジトリが存在しません。')
+        expect(json['error']).to eq('Repository not found')
       end
     end
 
@@ -182,7 +182,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:too_many_requests)
         json = response.parsed_body
-        expect(json['error']).to eq('APIリクエストが多すぎます。少し時間をおいてから再度実行してください。')
+        expect(json['error']).to eq('Too many requests. Please try again later.')
       end
     end
 
@@ -198,7 +198,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:unauthorized)
         json = response.parsed_body
-        expect(json['error']).to eq('アクセストークンが無効です。')
+        expect(json['error']).to eq('Invalid access token')
       end
     end
 
@@ -214,7 +214,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:internal_server_error)
         json = response.parsed_body
-        expect(json['error']).to eq('リポジトリ情報の取得中にエラーが発生しました。')
+        expect(json['error']).to eq('An error occurred. Please try again.')
       end
     end
   end

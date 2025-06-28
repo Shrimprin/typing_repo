@@ -11,13 +11,13 @@ module Api
       repository = @current_user.repositories.find(params[:id])
       render json: RepositorySerializer.new(repository, params: { file_items: true }), status: :ok
     rescue ActiveRecord::RecordNotFound
-      render json: { error: 'リポジトリが存在しません。' }, status: :not_found
+      render json: { error: 'Repository not found' }, status: :not_found
     end
 
     def create
       url = repository_params[:url]
       if invalid_url?(url)
-        render json: { error: '無効なURLです。' }, status: :unprocessable_entity
+        render json: { error: 'Invalid URL' }, status: :unprocessable_entity
         return
       end
 
@@ -37,13 +37,13 @@ module Api
           render json: repository.errors, status: :unprocessable_entity
         end
       rescue Octokit::NotFound
-        render json: { error: 'リポジトリが存在しません。' }, status: :not_found
+        render json: { error: 'Repository not found' }, status: :not_found
       rescue Octokit::TooManyRequests
-        render json: { error: 'APIリクエストが多すぎます。少し時間をおいてから再度実行してください。' }, status: :too_many_requests
+        render json: { error: 'Too many requests. Please try again later.' }, status: :too_many_requests
       rescue Octokit::Unauthorized
-        render json: { error: 'アクセストークンが無効です。' }, status: :unauthorized
+        render json: { error: 'Invalid access token' }, status: :unauthorized
       rescue StandardError
-        render json: { error: 'リポジトリ情報の取得中にエラーが発生しました。' }, status: :internal_server_error
+        render json: { error: 'An error occurred. Please try again.' }, status: :internal_server_error
       end
     end
 
