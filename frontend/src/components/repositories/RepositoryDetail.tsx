@@ -17,7 +17,9 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
 
   const handleFileSelect = (fileItem: FileItem) => {
     if (typingStatus === 'typing' || typingStatus === 'paused') {
-      const confirmSwitch = window.confirm('タイピングを中断して移動しますか？タイピング中のデータは失われます。');
+      const confirmSwitch = window.confirm(
+        'Are you sure you want to switch files? The data you are typing will be lost.',
+      );
       if (!confirmSwitch) {
         return;
       }

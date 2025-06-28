@@ -9,7 +9,7 @@ export default function RepositoryFooter() {
       <div className="flex justify-center font-mono">
         <Button variant="outline" asChild>
           <Link href="/repositories/new">
-            <Plus /> リポジトリを追加
+            <Plus /> Add Repository
           </Link>
         </Button>
       </div>

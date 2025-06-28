@@ -17,7 +17,7 @@ export default async function RepositoriesPage() {
   try {
     repositories = await fetcher(url, accessToken);
   } catch (error: AxiosError | unknown) {
-    const errorMessage = error instanceof AxiosError ? error.message : 'エラーが発生しました。再度お試しください。';
+    const errorMessage = error instanceof AxiosError ? error.message : 'An error occurred. Please try again.';
     return <div className="flex h-screen items-center justify-center p-8">{errorMessage}</div>;
   }
 
@@ -25,7 +25,7 @@ export default async function RepositoriesPage() {
 
   return (
     <>
-      <Header title="リポジトリ一覧" />
+      <Header title="Repositories" />
       <div className="flex min-h-screen flex-col px-2">
         <RepositoryList repositories={sortedRepositories} />
         <RepositoryFooter />

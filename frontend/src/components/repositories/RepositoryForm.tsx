@@ -21,9 +21,9 @@ type FormValues = {
 const schema = z.object({
   url: z
     .string()
-    .nonempty('URLは必須です')
-    .url('有効なURLを入力してください')
-    .regex(/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/, 'GitHubのリポジトリURLを入力してください'),
+    .nonempty('URL is required')
+    .url('Enter a valid URL')
+    .regex(/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/, 'Enter a valid GitHub repository URL'),
 });
 
 export default function RepositoryForm() {
@@ -50,7 +50,7 @@ export default function RepositoryForm() {
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.message);
       } else {
-        setErrorMessage('サーバーエラーが発生しました。');
+        setErrorMessage('An error occurred. Please try again.');
       }
     }
   };
@@ -63,7 +63,7 @@ export default function RepositoryForm() {
           name="url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>GitHubリポジトリのURL</FormLabel>
+              <FormLabel>GitHub Repository URL</FormLabel>
               <FormControl>
                 <Input placeholder="https://github.com/username/repository" {...field} />
               </FormControl>
@@ -72,7 +72,7 @@ export default function RepositoryForm() {
           )}
         />
         <Button type="submit" disabled={form.formState.isSubmitting}>
-          追加
+          Add Repository
         </Button>
       </form>
     </Form>

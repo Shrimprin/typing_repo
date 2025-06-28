@@ -19,7 +19,7 @@ export default function Header({ title = '', moreComponent }: HeaderProps) {
           {moreComponent && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="リポジトリの設定メニュー">
+                <Button variant="ghost" size="icon" aria-label="settings">
                   <MoreHorizontal className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>

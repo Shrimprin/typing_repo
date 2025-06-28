@@ -23,7 +23,7 @@ export default async function RepositoryDetailPage({ params }: RepositoryDetailP
   try {
     repository = await fetcher(url, accessToken);
   } catch (error: AxiosError | unknown) {
-    const errorMessage = error instanceof AxiosError ? error.message : 'エラーが発生しました。再度お試しください。';
+    const errorMessage = error instanceof AxiosError ? error.message : 'An error occurred. Please try again.';
     return <div className="flex h-screen items-center justify-center p-8">{errorMessage}</div>;
   }
 
@@ -34,11 +34,11 @@ export default async function RepositoryDetailPage({ params }: RepositoryDetailP
     <>
       <DropdownMenuItem>
         <Settings className="mr-2 h-4 w-4 font-mono" />
-        設定
+        Settings
       </DropdownMenuItem>
       <DropdownMenuItem className="font-mono text-red-600">
         <Trash2 className="mr-2 h-4 w-4 text-red-600" />
-        リポジトリを削除
+        Delete Repository
       </DropdownMenuItem>
     </>
   );
