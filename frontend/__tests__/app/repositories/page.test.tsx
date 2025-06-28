@@ -6,18 +6,6 @@ import axios, { AxiosError } from 'axios';
 import RepositoriesPage from '@/app/repositories/page';
 import { mockAuth } from '../../mocks/auth';
 
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}));
-
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(),
-}));
-
-jest.mock('@/auth', () => ({
-  auth: jest.fn(),
-}));
-
 const renderRepositoriesPage = async () => {
   const mockRepositories = [
     {

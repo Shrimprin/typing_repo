@@ -8,19 +8,6 @@ import { useParams } from 'next/navigation';
 import { mockAuth, mockUseSession } from '../../../mocks/auth';
 import { clickButton } from '../../../utils/testUtils';
 
-jest.mock('next/navigation', () => ({
-  useParams: jest.fn(),
-  useRouter: jest.fn(),
-}));
-
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(),
-}));
-
-jest.mock('@/auth', () => ({
-  auth: jest.fn(),
-}));
-
 describe('RepositoryDetailPage', () => {
   const mockRepository = {
     data: {

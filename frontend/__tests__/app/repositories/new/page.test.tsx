@@ -8,18 +8,6 @@ import NewRepositoryPage from '@/app/repositories/new/page';
 import { mockUseSession } from '../../../mocks/auth';
 import { clickButton } from '../../../utils/testUtils';
 
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}));
-
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(),
-}));
-
-jest.mock('@/auth', () => ({
-  auth: jest.fn(),
-}));
-
 const inputRepositoryUrlAndSubmit = async (url: string) => {
   const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
 
