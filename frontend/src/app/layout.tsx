@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
-import Header from '@/components/common/Header';
 import AuthProvider from '@/providers/Auth';
 
 import './globals.css';
@@ -36,8 +35,7 @@ export default function RootLayout({
         `}
       >
         <AuthProvider>
-          <Header />
-          <main className="pt-16">{children}</main>
+          <main>{children}</main>
         </AuthProvider>
       </body>
     </html>

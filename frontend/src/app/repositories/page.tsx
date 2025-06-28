@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import { AxiosError } from 'axios';
 
+import Header from '@/components/common/Header';
 import RepositoryFooter from '@/components/repositories/index/RepositoryFooter';
 import RepositoryList from '@/components/repositories/index/RepositoryList';
 import { Repository } from '@/types/repository';
@@ -23,9 +24,12 @@ export default async function RepositoriesPage() {
   const sortedRepositories = sortRepositories(repositories);
 
   return (
-    <div className="flex min-h-screen flex-col px-2">
-      <RepositoryList repositories={sortedRepositories} />
-      <RepositoryFooter />
-    </div>
+    <>
+      <Header title="リポジトリ一覧" />
+      <div className="flex min-h-screen flex-col px-2">
+        <RepositoryList repositories={sortedRepositories} />
+        <RepositoryFooter />
+      </div>
+    </>
   );
 }
