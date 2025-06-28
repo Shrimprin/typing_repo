@@ -114,7 +114,7 @@ describe('RepositoryDetailPage', () => {
         },
       });
 
-      const fileTreeItems = screen.getAllByRole('button');
+      const fileTreeItems = screen.getByTestId('file-tree').querySelectorAll('button');
       expect(fileTreeItems.length).toBe(5);
 
       expect(fileTreeItems[0].textContent).toContain('dir1');
