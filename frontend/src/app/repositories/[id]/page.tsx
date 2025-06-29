@@ -33,11 +33,11 @@ export default async function RepositoryDetailPage({ params }: RepositoryDetailP
   const moreComponent = (
     <>
       <DropdownMenuItem>
-        <Settings className="mr-2 h-4 w-4 font-mono" />
+        <Settings className="mr-2 h-4 w-4" />
         Settings
       </DropdownMenuItem>
-      <DropdownMenuItem className="font-mono text-red-600">
-        <Trash2 className="mr-2 h-4 w-4 text-red-600" />
+      <DropdownMenuItem className="text-destructive">
+        <Trash2 className="mr-2 h-4 w-4" />
         Delete Repository
       </DropdownMenuItem>
     </>

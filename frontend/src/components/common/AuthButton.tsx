@@ -1,5 +1,6 @@
 import { signIn, signOut } from '@/auth';
 import { Button } from '@/components/ui/button';
+import { LogOut } from 'lucide-react';
 
 export function SignIn({ provider }: { provider?: string }) {
   return (
@@ -9,7 +10,9 @@ export function SignIn({ provider }: { provider?: string }) {
         await signIn(provider);
       }}
     >
-      <Button type="submit">Signin with GitHub</Button>
+      <Button type="submit" variant="outline">
+        Sign in with GitHub
+      </Button>
     </form>
   );
 }
@@ -23,7 +26,10 @@ export function SignOut() {
         await signOut();
       }}
     >
-      <Button type="submit">Sign Out</Button>
+      <button className="flex h-auto items-center gap-2">
+        <LogOut />
+        Sign out
+      </button>
     </form>
   );
 }

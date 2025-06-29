@@ -15,13 +15,13 @@ export default function RepositoryList({ repositories }: Props) {
       {repositories.length > 0 ? (
         repositories.map((repository) => <RepositoryListItem key={repository.id} repository={repository} />)
       ) : (
-        <div className="py-12 text-center font-mono">
-          <div className="mb-4 text-gray-400">
+        <div className="py-12 text-center">
+          <div className="mb-4">
             <FolderOpen className="mx-auto h-12 w-12" />
           </div>
-          <h3 className="mb-2 text-lg font-medium text-gray-900">No repositories</h3>
-          <p className="mb-6 text-sm text-gray-500">Add a repository to start typing.</p>
-          <Button asChild>
+          <h3 className="mb-2 text-lg font-medium">No repositories</h3>
+          <p className="text-muted-foreground mb-6 text-sm">Add a repository to start typing.</p>
+          <Button variant="outline" asChild>
             <Link href="/repositories/new">
               <Plus className="mr-2 h-4 w-4" />
               Add Repository

@@ -163,8 +163,8 @@ describe('RepositoryDetailPage', () => {
   });
 
   describe('start typing', () => {
-    const CORRECT_CHARS_COLOR = 'bg-green-100';
-    const INCORRECT_CHARS_COLOR = 'bg-red-100';
+    const CORRECT_CHARS_SELECTOR = '[class*="bg-secondary"]';
+    const INCORRECT_CHARS_SELECTOR = '[class*="bg-destructive"]';
 
     beforeEach(async () => {
       await clickButton('dir1');
@@ -181,7 +181,7 @@ describe('RepositoryDetailPage', () => {
     it('renders green highlighted text when type correct characters', async () => {
       await userEvent.keyboard('console');
 
-      const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
+      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       expect(correctChars.length).toBe(7);
 
       const typedText = Array.from(correctChars)
@@ -193,7 +193,7 @@ describe('RepositoryDetailPage', () => {
     it('renders red highlighted text when type incorrect character', async () => {
       await userEvent.keyboard('d');
 
-      const incorrectChars = document.querySelectorAll(`.${INCORRECT_CHARS_COLOR}`);
+      const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
       expect(incorrectChars.length).toBe(1);
       expect(incorrectChars[0].textContent).toBe('c');
     });
@@ -202,7 +202,7 @@ describe('RepositoryDetailPage', () => {
       await userEvent.keyboard('con');
       await userEvent.keyboard('{Backspace}');
 
-      const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
+      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       expect(correctChars.length).toBe(2);
 
       const typedText = Array.from(correctChars)
@@ -218,7 +218,7 @@ describe('RepositoryDetailPage', () => {
 
       await userEvent.keyboard('c');
 
-      const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
+      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       expect(correctChars.length).toBe(0);
     });
 
@@ -228,7 +228,7 @@ describe('RepositoryDetailPage', () => {
 
       await userEvent.keyboard('c');
 
-      const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
+      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       expect(correctChars.length).toBeGreaterThan(0);
       expect(correctChars[0].textContent).toBe('c');
     });
@@ -239,7 +239,7 @@ describe('RepositoryDetailPage', () => {
       await clickButton('RESET');
 
       expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
-      const correctChars = document.querySelectorAll(`.${CORRECT_CHARS_COLOR}`);
+      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       expect(correctChars.length).toBe(0);
     });
 

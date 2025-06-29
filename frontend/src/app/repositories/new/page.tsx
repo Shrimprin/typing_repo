@@ -8,7 +8,7 @@ const NewRepositoryPage: NextPage = () => {
     <>
       <Header title="New Repository" />
       <div className="mx-auto max-w-md p-4">
-        <p className="mb-4 text-sm text-gray-500">Enter the URL of the GitHub repository you want to type.</p>
+        <p className="text-muted-foreground mb-4 text-sm">Enter the URL of the GitHub repository you want to type.</p>
         <RepositoryForm />
       </div>
     </>

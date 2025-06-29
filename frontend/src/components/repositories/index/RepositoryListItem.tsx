@@ -22,7 +22,7 @@ export default function RepositoryListItem({ repository }: Props) {
     <div className="flex items-center justify-between border-b py-6">
       <div className="min-w-0 flex-grow">
         <Link href={`/repositories/${repository.id}`} className={`hover:underline`}>
-          <h2 className="truncate font-mono text-lg font-semibold">{repository.name}</h2>
+          <h2 className="truncate text-lg font-semibold">{repository.name}</h2>
         </Link>
         <div
           className={`
@@ -32,7 +32,7 @@ export default function RepositoryListItem({ repository }: Props) {
         >
           <RepositoryProgress progress={repository.progress || 0} />
           {repository.lastTypedAt && (
-            <p className="text-muted-foreground font-mono text-sm">
+            <p className="text-muted-foreground text-sm">
               typed{' '}
               {formatDistanceToNow(new Date(repository.lastTypedAt), {
                 addSuffix: true,
