@@ -36,8 +36,8 @@ export default async function RepositoryDetailPage({ params }: RepositoryDetailP
         <Settings className="mr-2 h-4 w-4 font-mono" />
         Settings
       </DropdownMenuItem>
-      <DropdownMenuItem className="font-mono text-red-600">
-        <Trash2 className="mr-2 h-4 w-4 text-red-600" />
+      <DropdownMenuItem className="text-destructive font-mono">
+        <Trash2 className="mr-2 h-4 w-4" />
         Delete Repository
       </DropdownMenuItem>
     </>

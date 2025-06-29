@@ -3,7 +3,7 @@ type RepositoryProgressProps = {
 };
 
 export default function RepositoryProgress({ progress }: RepositoryProgressProps) {
-  const colorClass = progress === 1 ? 'text-green-500' : 'text-blue-500';
+  const colorClass = progress === 1 ? 'text-secondary' : 'text-primary';
 
   return (
     <div className="flex items-center space-x-2">

@@ -52,12 +52,12 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
             <span
               className={`
                 truncate
-                ${isTyped ? 'text-green-500' : ''}
+                ${isTyped ? 'text-secondary' : ''}
               `}
             >
               {fileItem.name}
             </span>
-            {isTyped && <Check size={16} className="ml-2 flex-shrink-0 text-green-500" />}
+            {isTyped && <Check size={16} className="text-secondary ml-2 flex-shrink-0" />}
           </>
         ) : (
           <>
@@ -66,13 +66,13 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
             <span
               className={`
                 truncate
-                ${isSelected ? 'font-bold' : ''}
-                ${isTyped ? 'text-green-500' : ''}
+                ${isSelected ? 'text-primary font-bold' : ''}
+                ${isTyped ? 'text-secondary' : ''}
               `}
             >
               {fileItem.name}
             </span>
-            {isTyped && <Check size={16} className="ml-2 flex-shrink-0 text-green-500" />}
+            {isTyped && <Check size={16} className="text-secondary ml-2 flex-shrink-0" />}
           </>
         )}
       </button>
