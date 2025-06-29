@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Api::Auth', type: :request do
   describe 'POST /api/auth/callback/github' do
-    let(:valid_params) { { github_id: '12345', name: 'テストユーザー' } }
+    let(:valid_params) { { auth: { github_id: '12345', name: 'テストユーザー' } } }
 
     context 'when new user' do
       it 'creates user and returns access token' do
@@ -25,7 +25,7 @@ RSpec.describe 'Api::Auth', type: :request do
 
     context 'when existing user' do
       it 'returns access token' do
-        existing_user = create(:user, github_id: valid_params[:github_id], name: valid_params[:name])
+        existing_user = create(:user, github_id: valid_params[:auth][:github_id], name: valid_params[:auth][:name])
         expect do
           post '/api/auth/callback/github', params: valid_params
         end.not_to change(User, :count)
@@ -43,7 +43,7 @@ RSpec.describe 'Api::Auth', type: :request do
 
     context 'when invalid params' do
       it 'returns validation error' do
-        invalid_params = { github_id: '12345' }
+        invalid_params = { auth: { github_id: '12345' } }
         post '/api/auth/callback/github', params: invalid_params
 
         expect(response).to have_http_status(:unprocessable_entity)

@@ -17,7 +17,7 @@ module Api
     private
 
     def login_params
-      params.permit(:github_id, :name)
+      params.expect(auth: %i[github_id name])
     end
   end
 end
