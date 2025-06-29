@@ -14,8 +14,8 @@ export default function Header({ title = '', moreComponent }: HeaderProps) {
     <>
       <div className={`bg-background fixed top-0 flex h-16 w-screen items-center justify-between border-b px-8`}>
         <div className="flex items-center gap-3">
-          <h1 className="font-mono text-xl font-bold">LOGO</h1>
-          <h1 className="font-mono text-lg font-bold">{title}</h1>
+          <h1 className="text-xl font-bold">LOGO</h1>
+          <h1 className="text-lg font-bold">{title}</h1>
           {moreComponent && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

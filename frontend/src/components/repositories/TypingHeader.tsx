@@ -59,7 +59,7 @@ export default function TypingHeader({
 
   return (
     <div className="flex items-center justify-between border-b px-4 pb-2">
-      <div className="truncate font-mono">{fileItem.fullPath || fileItem.name}</div>
+      <div className="truncate">{fileItem.fullPath || fileItem.name}</div>
       <div className="flex gap-2">
         <Button variant="outline" size="sm" onClick={handleToggleTyping} aria-label={buttonLabel}>
           {buttonIcon}

@@ -10,7 +10,7 @@ type FileTreeProps = {
 export default function FileTree({ fileItems, selectedFileItem, onSelectFileItem }: FileTreeProps) {
   return (
     <>
-      <div className="font-mono text-sm" data-testid="file-tree">
+      <div className="text-sm" data-testid="file-tree">
         {fileItems?.map((fileItem) => (
           <FileTreeItem
             key={fileItem.id}

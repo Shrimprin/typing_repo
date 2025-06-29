@@ -33,11 +33,11 @@ export default function FileItemView({ typingStatus, fileItem, setFileItems, set
     <div className="flex flex-col">
       <Card className="m-4 overflow-hidden">
         {!fileItemData ? (
-          <div className="p-6 text-center font-mono">Select a file to start typing.</div>
+          <div className="p-6 text-center">Select a file to start typing.</div>
         ) : isLoading ? (
-          <div className="p-6 text-center font-mono">Loading file...</div>
+          <div className="p-6 text-center">Loading file...</div>
         ) : error ? (
-          <div className="p-6 text-center font-mono">An error occurred. Please try again.</div>
+          <div className="p-6 text-center">An error occurred. Please try again.</div>
         ) : (
           <TypingPanel
             fileItem={fileItemData as FileItem}

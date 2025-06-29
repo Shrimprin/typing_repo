@@ -15,7 +15,7 @@ export default function RepositoryList({ repositories }: Props) {
       {repositories.length > 0 ? (
         repositories.map((repository) => <RepositoryListItem key={repository.id} repository={repository} />)
       ) : (
-        <div className="py-12 text-center font-mono">
+        <div className="py-12 text-center">
           <div className="mb-4">
             <FolderOpen className="mx-auto h-12 w-12" />
           </div>

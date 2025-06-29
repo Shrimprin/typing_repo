@@ -36,7 +36,7 @@ export default function RepositoryProgress({ progress }: RepositoryProgressProps
       </div>
       <span
         className={`
-          font-mono text-sm font-medium
+          text-sm font-medium
           ${colorClass}
         `}
       >

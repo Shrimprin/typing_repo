@@ -1,18 +1,14 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Quantico } from 'next/font/google';
 
 import AuthProvider from '@/providers/Auth';
 
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const quantico = Quantico({
+  variable: '--font-quantico',
   subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+  weight: ['400'],
 });
 
 export const metadata: Metadata = {
@@ -29,9 +25,9 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`
-          ${geistSans.variable}
-          ${geistMono.variable}
           antialiased
+          ${quantico.variable}
+          font-sans
         `}
       >
         <AuthProvider>

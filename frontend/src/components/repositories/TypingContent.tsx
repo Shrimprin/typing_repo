@@ -23,7 +23,7 @@ export default function TypingContent({
   return (
     <div className="overflow-x-auto px-4">
       {errorMessage ? (
-        <div className="p-6 text-center font-mono">{errorMessage}</div>
+        <div className="p-6 text-center">{errorMessage}</div>
       ) : (
         <>
           {typingStatus === 'ready' ? (
