@@ -85,4 +85,36 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* スクロールバーのスタイル */
+  /* Chrome, Safari, Edgeなどのブラウザ用 */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: oklch(0.205 0 0);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.269 0 0);
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.556 0 0);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: oklch(0.205 0 0);
+  }
+
+  /* Firefox用 */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.269 0 0) oklch(0.205 0 0);
+  }
 }

@@ -31,7 +31,7 @@ export default async function UserButton() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end" forceMount>
-          <DropdownMenuLabel className="font-normal">
+          <DropdownMenuLabel>
             <div className="flex flex-col space-y-1">
               <p className="text-sm leading-none font-medium">{session.user.name}</p>
               {/* // 確認用 */}

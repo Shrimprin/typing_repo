@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { axiosPost } from '@/utils/axios';
+import { Plus } from 'lucide-react';
 
 type FormValues = {
   url: string;
@@ -72,6 +73,7 @@ export default function RepositoryForm() {
           )}
         />
         <Button type="submit" disabled={form.formState.isSubmitting}>
+          <Plus />
           Add Repository
         </Button>
       </form>

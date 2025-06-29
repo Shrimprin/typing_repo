@@ -21,8 +21,8 @@ const TypingLine = React.memo(function TypingLine({
 
     if (isUntypedText || isUntypedLine) return 'text-muted-foreground';
     if (isTypingText) return 'border-b border-foreground';
-    if (isCorrectTypedText) return 'bg-green-100';
-    return 'bg-red-100'; // タイポした文字
+    if (isCorrectTypedText) return 'bg-cyan-500/30 text-cyan-300 ';
+    return 'bg-pink-500/30 text-pink-300'; // タイポした文字
   };
 
   return (

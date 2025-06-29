@@ -12,7 +12,7 @@ type HeaderProps = {
 export default function Header({ title = '', moreComponent }: HeaderProps) {
   return (
     <>
-      <div className={`fixed top-0 z-50 flex h-16 w-screen items-center justify-between border-b bg-white px-8`}>
+      <div className={`bg-background fixed top-0 flex h-16 w-screen items-center justify-between border-b px-8`}>
         <div className="flex items-center gap-3">
           <h1 className="font-mono text-xl font-bold">LOGO</h1>
           <h1 className="font-mono text-lg font-bold">{title}</h1>

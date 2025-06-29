@@ -9,7 +9,15 @@ export default function RepositoryProgress({ progress }: RepositoryProgressProps
     <div className="flex items-center space-x-2">
       <div className="relative h-5 w-5">
         <svg className="h-5 w-5 -rotate-90 transform" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" className="text-gray-200" />
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="2"
+            fill="none"
+            className={`text-muted-foreground`}
+          />
           <circle
             cx="12"
             cy="12"

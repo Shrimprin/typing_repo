@@ -38,8 +38,8 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
     <div style={{ marginLeft: `${level * 4}px` }}>
       <button
         className={`
+          hover:bg-accent
           flex w-full cursor-pointer py-1
-          hover:bg-gray-100
         `}
         onClick={isDir ? toggleExpand : handleFileSelect}
       >
