@@ -72,7 +72,7 @@ export default function RepositoryForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={form.formState.isSubmitting}>
+        <Button type="submit" variant="outline" disabled={form.formState.isSubmitting}>
           <Plus />
           Add Repository
         </Button>
