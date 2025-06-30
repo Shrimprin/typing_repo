@@ -356,7 +356,7 @@ describe('useTypingHandler', () => {
       const { result } = renderHook(() => useTypingHandler(typingProps));
 
       await typeEntireContent();
-      expect(result.current.errorMessage).toBe('サーバーエラーが発生しました。');
+      expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
       expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
     });
   });

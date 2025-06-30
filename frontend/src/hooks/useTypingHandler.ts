@@ -69,7 +69,7 @@ export function useTypingHandler({
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.message);
       } else {
-        setErrorMessage('サーバーエラーが発生しました。');
+        setErrorMessage('An error occurred. Please try again.');
       }
     }
   }, [fileItemId, params, session, setFileItems, setTypingStatus]);
