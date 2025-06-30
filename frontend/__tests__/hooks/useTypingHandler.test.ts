@@ -199,13 +199,15 @@ describe('useTypingHandler', () => {
 
     it('can complete typing', async () => {
       jest.spyOn(axios, 'patch').mockResolvedValueOnce({
-        data: {
-          id: '1',
-          name: 'test-file-name',
-          status: 'typed',
-          type: 'file',
-          fileItems: [],
-        },
+        data: [
+          {
+            id: '1',
+            name: 'test-file-name',
+            status: 'typed',
+            type: 'file',
+            fileItems: [],
+          },
+        ],
       });
 
       const { result } = renderHook(() => useTypingHandler(typingProps));
@@ -301,17 +303,17 @@ describe('useTypingHandler', () => {
     };
 
     it('updates file item status to typed', async () => {
-      const mockResponse = {
-        data: {
+      const mockResponse = [
+        {
           id: '1',
           name: 'test-file-name',
           status: 'typed',
           type: 'file',
           fileItems: [],
         },
-      };
+      ];
 
-      jest.spyOn(axios, 'patch').mockResolvedValueOnce(mockResponse);
+      jest.spyOn(axios, 'patch').mockResolvedValueOnce({ data: mockResponse });
 
       renderHook(() => useTypingHandler(typingProps));
 
@@ -330,7 +332,7 @@ describe('useTypingHandler', () => {
           },
         },
       );
-      expect(mockSetFileItems).toHaveBeenCalledWith(mockResponse.data);
+      expect(mockSetFileItems).toHaveBeenCalledWith(mockResponse);
       expect(mockSetTypingStatus).toHaveBeenCalledWith('completed');
     });
 
