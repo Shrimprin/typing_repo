@@ -277,7 +277,7 @@ describe('RepositoryDetailPage', () => {
       ];
 
       jest.spyOn(axios, 'patch').mockImplementation(() => {
-        return Promise.resolve(mockFileItems);
+        return Promise.resolve({ data: mockFileItems });
       });
 
       await userEvent.keyboard('console.log("Hello, world!");');
