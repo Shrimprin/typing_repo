@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FileItem, TypingStatus } from '@/types';
 import { axiosPatch } from '@/utils/axios';
+import { sortFileItems } from '@/utils/sort';
 
 type useTypingHandlerProps = {
   targetTextLines: string[];
@@ -64,7 +65,8 @@ export function useTypingHandler({
 
       const res = await axiosPatch(url, accessToken, postData);
       setTypingStatus('completed');
-      setFileItems(res.data);
+      const sortedFileItems = sortFileItems(res.data);
+      setFileItems(sortedFileItems);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.message);
