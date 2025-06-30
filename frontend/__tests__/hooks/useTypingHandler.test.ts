@@ -4,6 +4,7 @@ import axios, { AxiosError } from 'axios';
 
 import { useTypingHandler } from '@/hooks/useTypingHandler';
 import { TypingStatus } from '@/types';
+import { sortFileItems } from '@/utils/sort';
 import { useParams } from 'next/navigation';
 import { mockAuth, mockUseSession } from '../mocks/auth';
 
@@ -17,6 +18,10 @@ jest.mock('next-auth/react', () => ({
 
 jest.mock('@/auth', () => ({
   auth: jest.fn(),
+}));
+
+jest.mock('@/utils/sort', () => ({
+  sortFileItems: jest.fn(),
 }));
 
 const typeEntireContent = async () => {
@@ -302,38 +307,162 @@ describe('useTypingHandler', () => {
       typingStatus: 'typing' as TypingStatus,
     };
 
-    it('updates file item status to typed', async () => {
+    describe('when success', () => {
       const mockResponse = [
         {
-          id: '1',
-          name: 'test-file-name',
-          status: 'typed',
+          id: 1,
+          name: 'file1.ts',
           type: 'file',
+          status: 'typed',
+          fileItems: [],
+        },
+        {
+          id: 2,
+          name: 'file2.ts',
+          type: 'file',
+          status: 'typed',
+          fileItems: [],
+        },
+        {
+          id: 3,
+          name: 'dir1',
+          type: 'dir',
+          status: 'untyped',
+          fileItems: [
+            {
+              id: 4,
+              name: 'nested-file1.ts',
+              type: 'file',
+              status: 'untyped',
+              fileItems: [],
+            },
+            {
+              id: 5,
+              name: 'nested-file2.ts',
+              type: 'file',
+              status: 'untyped',
+              fileItems: [],
+            },
+          ],
+        },
+        {
+          id: 6,
+          name: 'dir2',
+          type: 'dir',
+          status: 'untyped',
+          fileItems: [
+            {
+              id: 7,
+              name: 'nested-file3.ts',
+              type: 'file',
+              status: 'untyped',
+              fileItems: [],
+            },
+          ],
+        },
+        {
+          id: 8,
+          name: 'file3.ts',
+          type: 'file',
+          status: 'untyped',
           fileItems: [],
         },
       ];
 
-      jest.spyOn(axios, 'patch').mockResolvedValueOnce({ data: mockResponse });
-
-      renderHook(() => useTypingHandler(typingProps));
-
-      await typeEntireContent();
-
-      const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-      expect(axios.patch).toHaveBeenCalledWith(
-        `${BASE_URL}/api/repositories/1/file_items/1`,
+      const sortedResponse = [
         {
-          file_item: { status: 'typed' },
+          id: 3,
+          name: 'dir1',
+          type: 'dir',
+          status: 'untyped',
+          fileItems: [
+            {
+              id: 4,
+              name: 'nested-file1.ts',
+              type: 'file',
+              status: 'untyped',
+              fileItems: [],
+            },
+            {
+              id: 5,
+              name: 'nested-file2.ts',
+              type: 'file',
+              status: 'untyped',
+              fileItems: [],
+            },
+          ],
         },
         {
-          headers: {
-            Authorization: 'Bearer token_1234567890',
-            'Content-Type': 'application/json',
+          id: 6,
+          name: 'dir2',
+          type: 'dir',
+          status: 'untyped',
+          fileItems: [
+            {
+              id: 7,
+              name: 'nested-file3.ts',
+              type: 'file',
+              status: 'untyped',
+              fileItems: [],
+            },
+          ],
+        },
+        {
+          id: 1,
+          name: 'file1.ts',
+          type: 'file',
+          status: 'typed',
+          fileItems: [],
+        },
+        {
+          id: 2,
+          name: 'file2.ts',
+          type: 'file',
+          status: 'typed',
+          fileItems: [],
+        },
+        {
+          id: 8,
+          name: 'file3.ts',
+          type: 'file',
+          status: 'untyped',
+          fileItems: [],
+        },
+      ];
+
+      beforeEach(async () => {
+        jest.spyOn(axios, 'patch').mockResolvedValueOnce({ data: mockResponse });
+        (sortFileItems as jest.Mock).mockReturnValue(sortedResponse);
+
+        renderHook(() => useTypingHandler(typingProps));
+
+        await typeEntireContent();
+      });
+
+      it('updates file item status to typed', () => {
+        const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+        expect(axios.patch).toHaveBeenCalledWith(
+          `${BASE_URL}/api/repositories/1/file_items/1`,
+          {
+            file_item: { status: 'typed' },
           },
-        },
-      );
-      expect(mockSetFileItems).toHaveBeenCalledWith(mockResponse);
-      expect(mockSetTypingStatus).toHaveBeenCalledWith('completed');
+          {
+            headers: {
+              Authorization: 'Bearer token_1234567890',
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+      });
+
+      it('sorts file items', () => {
+        expect(sortFileItems).toHaveBeenCalledWith(mockResponse);
+        expect(mockSetFileItems).toHaveBeenCalledWith(sortedResponse);
+      });
+
+      it('updates typing status to completed', () => {
+        expect(mockSetTypingStatus).toHaveBeenCalledWith('completed');
+      });
     });
 
     it('shows error message when occur axios error', async () => {
