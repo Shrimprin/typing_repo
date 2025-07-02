@@ -6,7 +6,10 @@ module Api
     before_action :set_file_item, only: %i[show update]
 
     def show
-      render json: FileItemSerializer.new(@file_item, params: { content: true, full_path: true }), status: :ok
+      render json: FileItemSerializer.new(
+        @file_item,
+        params: { content: true, full_path: true, typing_progress: true, children: true }
+      ), status: :ok
     end
 
     def update

@@ -16,6 +16,6 @@ class FileItemSerializer
   attribute :full_path, if: proc { params[:full_path] }, &:full_path
 
   attribute :typing_progress, if: proc { params[:typing_progress] } do |file_item|
-    TypingProgressSerializer.new(file_item.typing_progress)
+    file_item.typing_progress ? TypingProgressSerializer.new(file_item.typing_progress) : nil
   end
 end
