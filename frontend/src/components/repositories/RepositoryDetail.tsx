@@ -40,6 +40,7 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
             typingStatus={typingStatus}
             fileItem={selectedFileItem}
             setFileItems={setFileItems}
+            setSelectedFileItem={setSelectedFileItem}
             setTypingStatus={setTypingStatus}
           />
         </div>

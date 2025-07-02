@@ -7,10 +7,17 @@ type TypingPanelProps = {
   fileItem: FileItem;
   typingStatus: TypingStatus;
   setFileItems: (fileItems: FileItem[]) => void;
+  setSelectedFileItem: (fileItem: FileItem) => void;
   setTypingStatus: (status: TypingStatus) => void;
 };
 
-export default function TypingPanel({ fileItem, typingStatus, setFileItems, setTypingStatus }: TypingPanelProps) {
+export default function TypingPanel({
+  fileItem,
+  typingStatus,
+  setFileItems,
+  setSelectedFileItem,
+  setTypingStatus,
+}: TypingPanelProps) {
   const targetTextLines = fileItem?.content?.split(/(?<=\n)/) || [];
   const {
     cursorPositions,
@@ -26,6 +33,7 @@ export default function TypingPanel({ fileItem, typingStatus, setFileItems, setT
     typingStatus,
     fileItemId: fileItem.id,
     setFileItems,
+    setSelectedFileItem,
     setTypingStatus,
   });
   return (

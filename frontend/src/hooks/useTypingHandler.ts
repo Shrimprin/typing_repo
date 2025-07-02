@@ -12,6 +12,7 @@ type useTypingHandlerProps = {
   typingStatus: TypingStatus;
   fileItemId?: number;
   setFileItems: (fileItems: FileItem[]) => void;
+  setSelectedFileItem: (fileItem: FileItem) => void;
   setTypingStatus: (status: TypingStatus) => void;
 };
 
@@ -20,6 +21,7 @@ export function useTypingHandler({
   typingStatus,
   fileItemId,
   setFileItems,
+  setSelectedFileItem,
   setTypingStatus,
 }: useTypingHandlerProps) {
   const initialCursorPositions = targetTextLines.map((line) => line.indexOf(line.trimStart()));
@@ -38,8 +40,44 @@ export function useTypingHandler({
     setTypingStatus('typing');
   };
 
-  const pauseTyping = () => {
-    setTypingStatus('paused');
+  const pauseTyping = async () => {
+    try {
+      const url = `/api/repositories/${params.id}/file_items/${fileItemId}`;
+      const accessToken = session?.user?.accessToken;
+      const postData = {
+        fileItem: {
+          status: 'typing',
+          typing_progress: {
+            time: '00:00:00', // TODO: タイピング時間を計測する
+            typo: 0,
+            line: 0,
+            character: 0,
+            typoPositionsAttributes: [
+              {
+                line: 1,
+                character: 1,
+              },
+              {
+                line: 2,
+                character: 2,
+              },
+            ],
+          },
+        },
+      };
+
+      const res = await axiosPatch(url, accessToken, postData);
+
+      const fileItem: FileItem = res.data;
+      setSelectedFileItem(fileItem);
+      setTypingStatus('paused');
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('An error occurred. Please try again.');
+      }
+    }
   };
 
   const resumeTyping = () => {

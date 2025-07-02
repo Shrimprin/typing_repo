@@ -13,10 +13,17 @@ type FileItemViewProps = {
   typingStatus: TypingStatus;
   fileItem?: FileItem;
   setFileItems: (fileItems: FileItem[]) => void;
+  setSelectedFileItem: (fileItem: FileItem) => void;
   setTypingStatus: (status: TypingStatus) => void;
 };
 
-export default function FileItemView({ typingStatus, fileItem, setFileItems, setTypingStatus }: FileItemViewProps) {
+export default function FileItemView({
+  typingStatus,
+  fileItem,
+  setFileItems,
+  setSelectedFileItem,
+  setTypingStatus,
+}: FileItemViewProps) {
   const params = useParams();
   const url = fileItem ? `/api/repositories/${params.id}/file_items/${fileItem.id}` : null;
   const { data: session } = useSession();
@@ -32,17 +39,18 @@ export default function FileItemView({ typingStatus, fileItem, setFileItems, set
   return (
     <div className="flex flex-col">
       <Card className="m-4 overflow-hidden">
-        {!fileItemData ? (
-          <div className="p-6 text-center">Select a file to start typing.</div>
-        ) : isLoading ? (
+        {isLoading ? (
           <div className="p-6 text-center">Loading file...</div>
         ) : error ? (
           <div className="p-6 text-center">An error occurred. Please try again.</div>
+        ) : !fileItemData ? (
+          <div className="p-6 text-center">Select a file to start typing.</div>
         ) : (
           <TypingPanel
             fileItem={fileItemData as FileItem}
             typingStatus={typingStatus}
             setFileItems={setFileItems}
+            setSelectedFileItem={setSelectedFileItem}
             setTypingStatus={setTypingStatus}
           />
         )}
