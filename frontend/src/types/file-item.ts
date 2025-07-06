@@ -11,16 +11,16 @@ export type TypingProgress = {
   typo: number;
   line: number;
   character: number;
-  typoPositions: TypoPosition[];
+  typoPositions?: TypoPosition[];
 };
 
 export type FileItem = {
   id: number;
   fileItems: FileItem[] | [];
+  fullPath: string;
   name: string;
   status: FileItemStatus;
   type: FileItemType;
   content?: string;
-  fullPath?: string;
   typingProgress?: TypingProgress;
 };
