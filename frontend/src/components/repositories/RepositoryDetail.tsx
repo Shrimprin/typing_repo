@@ -51,7 +51,7 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
           <FileTree fileItems={fileItems} selectedFileItem={selectedFileItem} onSelectFileItem={handleFileSelect} />
         </div>
 
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col">
           <Card className="m-4">
             {isLoading ? (
               <div className="p-6 text-center">Loading file...</div>
