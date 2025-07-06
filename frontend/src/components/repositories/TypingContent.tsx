@@ -17,17 +17,17 @@ export default function TypingContent({
   typingStatus,
 }: TypingContentProps) {
   return (
-    <div className="overflow-x-auto px-4">
+    <div className="h-full overflow-auto px-4">
       {typingStatus === 'ready' ? (
         <pre className="font-mono">
           {targetTextLines.map((line, i) => (
-            <p key={i} className="h-[1.4em]">
+            <p key={i} className="h-[1.4em] whitespace-pre">
               {line}
             </p>
           ))}
         </pre>
       ) : typingStatus === 'typing' || typingStatus === 'paused' ? (
-        <div>
+        <div className="min-w-fit">
           {targetTextLines.map((targetTextLine, index) => (
             <TypingLine
               key={index}

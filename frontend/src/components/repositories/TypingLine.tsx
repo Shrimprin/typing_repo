@@ -29,13 +29,7 @@ const TypingLine = React.memo(function TypingLine({
     <pre className="h-[1.4em] font-mono">
       {targetTextLine.split('').map((char, index) => (
         <span key={index} className={getCharClass(index)}>
-          {char === '\n' ? (
-            <>
-              <IconCornerDownLeft stroke={1} size={8} className="inline" />
-            </>
-          ) : (
-            char
-          )}
+          {char === '\n' ? <IconCornerDownLeft stroke={1} size={8} className="inline" /> : char}
         </span>
       ))}
     </pre>

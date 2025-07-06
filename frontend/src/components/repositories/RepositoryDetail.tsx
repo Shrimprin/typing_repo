@@ -45,14 +45,14 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
   };
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-full flex-col">
       <div className="flex flex-1 overflow-hidden">
         <div className="w-1/4 min-w-[250px] overflow-y-auto border-r p-2">
           <FileTree fileItems={fileItems} selectedFileItem={selectedFileItem} onSelectFileItem={handleFileSelect} />
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <Card className="m-4">
+          <Card className="mx-4 my-2 flex-1 overflow-hidden">
             {isLoading ? (
               <div className="p-6 text-center">Loading file...</div>
             ) : typingHandler.errorMessage ? (

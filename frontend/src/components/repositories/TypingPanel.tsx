@@ -31,7 +31,7 @@ export default function TypingPanel({ fileItem, typingStatus, typingHandler }: T
   } = typingHandler;
 
   return (
-    <>
+    <div className="flex h-full flex-col">
       <TypingHeader
         fileItemName={fileItem.fullPath}
         typingStatus={typingStatus}
@@ -40,13 +40,15 @@ export default function TypingPanel({ fileItem, typingStatus, typingHandler }: T
         resumeTyping={resumeTyping}
         resetTyping={resetTyping}
       />
-      <TypingContent
-        cursorLine={cursorLine}
-        cursorPositions={cursorPositions}
-        targetTextLines={targetTextLines}
-        typedTextLines={typedTextLines}
-        typingStatus={typingStatus}
-      />
-    </>
+      <div className="flex-1 overflow-hidden">
+        <TypingContent
+          cursorLine={cursorLine}
+          cursorPositions={cursorPositions}
+          targetTextLines={targetTextLines}
+          typedTextLines={typedTextLines}
+          typingStatus={typingStatus}
+        />
+      </div>
+    </div>
   );
 }
