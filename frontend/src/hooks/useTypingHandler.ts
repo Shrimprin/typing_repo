@@ -5,44 +5,78 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FileItem, TypingStatus } from '@/types';
 import { axiosPatch } from '@/utils/axios';
+import { fetcher } from '@/utils/fetcher';
 import { sortFileItems } from '@/utils/sort';
 
 type useTypingHandlerProps = {
-  targetTextLines: string[];
   typingStatus: TypingStatus;
-  fileItemId?: number;
+  fileItem?: FileItem;
   setFileItems: (fileItems: FileItem[]) => void;
-  setSelectedFileItem: (fileItem: FileItem) => void;
   setTypingStatus: (status: TypingStatus) => void;
 };
 
-export function useTypingHandler({
-  targetTextLines,
-  typingStatus,
-  fileItemId,
-  setFileItems,
-  setSelectedFileItem,
-  setTypingStatus,
-}: useTypingHandlerProps) {
-  const initialCursorPositions = targetTextLines.map((line) => line.indexOf(line.trimStart()));
-  const [cursorPositions, setCursorPositions] = useState(initialCursorPositions);
-  const initialTypedTextLines = targetTextLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
-  const [typedTextLines, setTypedTextLines] = useState(initialTypedTextLines);
+export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypingStatus }: useTypingHandlerProps) {
+  const [targetTextLines, setTargetTextLines] = useState<string[]>([]);
+  const [cursorPositions, setCursorPositions] = useState<number[]>([]);
+  const [typedTextLines, setTypedTextLines] = useState<string[]>([]);
   const [cursorLine, setCursorLine] = useState(0);
-  const [errorMessage, setErrorMessage] = useState<string>();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { data: session } = useSession();
   const params = useParams();
 
+  const restoreTypingProgress = async (fileItemId: number) => {
+    setErrorMessage(null);
+    try {
+      const url = `/api/repositories/${params.id}/file_items/${fileItemId}`;
+      const accessToken = session?.user?.accessToken;
+      const fetchedFileItem: FileItem = await fetcher(url, accessToken);
+
+      const textLines = fetchedFileItem.content?.split(/(?<=\n)/) || [];
+      const initialCursorPositions = textLines.map((line) => line.indexOf(line.trimStart()));
+      const initialTypedTextLines = targetTextLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
+
+      setTargetTextLines(textLines);
+      if (!fetchedFileItem.typingProgress) {
+        setCursorPositions(initialCursorPositions);
+        setTypedTextLines(initialTypedTextLines);
+        setCursorLine(0);
+        return;
+      }
+
+      const typedLine = fetchedFileItem.typingProgress.line;
+      const typedCharacter = fetchedFileItem.typingProgress.character;
+      const restoredCursorPositions = [...initialCursorPositions];
+      const restoredTypedTextLines = textLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
+
+      textLines.slice(0, typedLine).forEach((textLine, i) => {
+        restoredTypedTextLines[i] = textLine;
+        restoredCursorPositions[i] = textLine.length;
+      });
+
+      const currentTextLine = textLines[typedLine];
+      const typedCharacters = currentTextLine.substring(0, typedCharacter);
+      restoredTypedTextLines[typedLine] = typedCharacters;
+      restoredCursorPositions[typedLine] = typedCharacter;
+
+      setCursorPositions(restoredCursorPositions);
+      setTypedTextLines(restoredTypedTextLines);
+      setCursorLine(typedLine);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('An error occurred. Please try again.');
+      }
+    }
+  };
+
   const startTyping = () => {
-    setTypedTextLines(initialTypedTextLines);
-    setCursorPositions(initialCursorPositions);
-    setCursorLine(0);
     setTypingStatus('typing');
   };
 
   const pauseTyping = async () => {
     try {
-      const url = `/api/repositories/${params.id}/file_items/${fileItemId}`;
+      const url = `/api/repositories/${params.id}/file_items/${fileItem?.id}`;
       const accessToken = session?.user?.accessToken;
       const postData = {
         fileItem: {
@@ -50,8 +84,8 @@ export function useTypingHandler({
           typing_progress: {
             time: '00:00:00', // TODO: タイピング時間を計測する
             typo: 0,
-            line: 0,
-            character: 0,
+            line: cursorLine,
+            character: cursorPositions[cursorLine],
             typoPositionsAttributes: [
               {
                 line: 1,
@@ -67,9 +101,8 @@ export function useTypingHandler({
       };
 
       const res = await axiosPatch(url, accessToken, postData);
-
-      const fileItem: FileItem = res.data;
-      setSelectedFileItem(fileItem);
+      const sortedFileItems: FileItem[] = sortFileItems(res.data);
+      setFileItems(sortedFileItems);
       setTypingStatus('paused');
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -85,6 +118,8 @@ export function useTypingHandler({
   };
 
   const resetTyping = () => {
+    const initialCursorPositions = targetTextLines.map((line) => line.indexOf(line.trimStart()));
+    const initialTypedTextLines = targetTextLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
     setCursorPositions(initialCursorPositions);
     setTypedTextLines(initialTypedTextLines);
     setCursorLine(0);
@@ -93,7 +128,7 @@ export function useTypingHandler({
 
   const handleComplete = useCallback(async () => {
     try {
-      const url = `/api/repositories/${params.id}/file_items/${fileItemId}`;
+      const url = `/api/repositories/${params.id}/file_items/${fileItem?.id}`;
       const accessToken = session?.user?.accessToken;
       const postData = {
         file_item: {
@@ -103,7 +138,7 @@ export function useTypingHandler({
 
       const res = await axiosPatch(url, accessToken, postData);
       setTypingStatus('completed');
-      const sortedFileItems = sortFileItems(res.data);
+      const sortedFileItems: FileItem[] = sortFileItems(res.data);
       setFileItems(sortedFileItems);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -112,7 +147,7 @@ export function useTypingHandler({
         setErrorMessage('An error occurred. Please try again.');
       }
     }
-  }, [fileItemId, params, session, setFileItems, setTypingStatus]);
+  }, [fileItem?.id, params, session, setFileItems, setTypingStatus]);
 
   const isComplete = useCallback(
     (newCursorPositions: number[]) => {
@@ -205,6 +240,7 @@ export function useTypingHandler({
   return {
     cursorLine,
     cursorPositions,
+    targetTextLines,
     typedTextLines,
     typingStatus,
     errorMessage,
@@ -212,5 +248,6 @@ export function useTypingHandler({
     resumeTyping,
     pauseTyping,
     resetTyping,
+    restoreTypingProgress,
   };
 }

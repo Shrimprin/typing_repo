@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 
+import { useTypingHandler } from '@/hooks/useTypingHandler';
 import { FileItem, TypingStatus } from '@/types';
-import FileItemView from './FileItemView';
+import { Card } from '../ui/card';
 import FileTree from './FileTree';
+import TypingPanel from './TypingPanel';
 
 type RepositoryDetailProps = {
   initialFileItems: FileItem[];
@@ -12,11 +14,19 @@ type RepositoryDetailProps = {
 
 export default function RepositoryDetail({ initialFileItems }: RepositoryDetailProps) {
   const [fileItems, setFileItems] = useState<FileItem[]>(initialFileItems);
-  const [selectedFileItem, setSelectedFileItem] = useState<FileItem>();
+  const [selectedFileItem, setSelectedFileItem] = useState<FileItem | undefined>();
   const [typingStatus, setTypingStatus] = useState<TypingStatus>('ready');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleFileSelect = (fileItem: FileItem) => {
-    if (typingStatus === 'typing' || typingStatus === 'paused') {
+  const typingHandler = useTypingHandler({
+    typingStatus,
+    fileItem: selectedFileItem,
+    setFileItems,
+    setTypingStatus,
+  });
+
+  const handleFileSelect = async (fileItem: FileItem) => {
+    if (typingStatus === 'typing') {
       const confirmSwitch = window.confirm(
         'Are you sure you want to switch files? The data you are typing will be lost.',
       );
@@ -24,8 +34,14 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
         return;
       }
     }
+
     setSelectedFileItem(fileItem);
-    setTypingStatus('ready');
+    setIsLoading(true);
+
+    await typingHandler.restoreTypingProgress(fileItem.id);
+
+    setTypingStatus(fileItem.status === 'typing' ? 'paused' : 'ready');
+    setIsLoading(false);
   };
 
   return (
@@ -35,14 +51,18 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
           <FileTree fileItems={fileItems} selectedFileItem={selectedFileItem} onSelectFileItem={handleFileSelect} />
         </div>
 
-        <div className="flex-1 overflow-y-auto">
-          <FileItemView
-            typingStatus={typingStatus}
-            fileItem={selectedFileItem}
-            setFileItems={setFileItems}
-            setSelectedFileItem={setSelectedFileItem}
-            setTypingStatus={setTypingStatus}
-          />
+        <div className="flex flex-1 flex-col">
+          <Card className="m-4">
+            {isLoading ? (
+              <div className="p-6 text-center">Loading file...</div>
+            ) : typingHandler.errorMessage ? (
+              <div className="p-6 text-center">{typingHandler.errorMessage}</div>
+            ) : !selectedFileItem ? (
+              <div className="p-6 text-center">Select a file to start typing.</div>
+            ) : (
+              <TypingPanel fileItem={selectedFileItem} typingStatus={typingStatus} typingHandler={typingHandler} />
+            )}
+          </Card>
         </div>
       </div>
     </div>

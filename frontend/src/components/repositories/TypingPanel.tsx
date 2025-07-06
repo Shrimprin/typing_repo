@@ -1,4 +1,3 @@
-import { useTypingHandler } from '@/hooks/useTypingHandler';
 import { FileItem, TypingStatus } from '@/types';
 import TypingContent from './TypingContent';
 import TypingHeader from './TypingHeader';
@@ -6,40 +5,35 @@ import TypingHeader from './TypingHeader';
 type TypingPanelProps = {
   fileItem: FileItem;
   typingStatus: TypingStatus;
-  setFileItems: (fileItems: FileItem[]) => void;
-  setSelectedFileItem: (fileItem: FileItem) => void;
-  setTypingStatus: (status: TypingStatus) => void;
+  typingHandler: {
+    cursorLine: number;
+    cursorPositions: number[];
+    targetTextLines: string[];
+    typedTextLines: string[];
+    typingStatus: TypingStatus;
+    startTyping: () => void;
+    resumeTyping: () => void;
+    pauseTyping: () => void;
+    resetTyping: () => void;
+  };
 };
 
-export default function TypingPanel({
-  fileItem,
-  typingStatus,
-  setFileItems,
-  setSelectedFileItem,
-  setTypingStatus,
-}: TypingPanelProps) {
-  const targetTextLines = fileItem?.content?.split(/(?<=\n)/) || [];
+export default function TypingPanel({ fileItem, typingStatus, typingHandler }: TypingPanelProps) {
   const {
-    cursorPositions,
     cursorLine,
+    cursorPositions,
+    targetTextLines,
     typedTextLines,
-    errorMessage,
     startTyping,
     resetTyping,
     pauseTyping,
     resumeTyping,
-  } = useTypingHandler({
-    targetTextLines,
-    typingStatus,
-    fileItemId: fileItem.id,
-    setFileItems,
-    setSelectedFileItem,
-    setTypingStatus,
-  });
+  } = typingHandler;
+
   return (
     <>
       <TypingHeader
-        fileItem={fileItem}
+        fileItemName={fileItem.fullPath}
         typingStatus={typingStatus}
         startTyping={startTyping}
         pauseTyping={pauseTyping}
@@ -47,13 +41,11 @@ export default function TypingPanel({
         resetTyping={resetTyping}
       />
       <TypingContent
-        content={fileItem.content || ''}
         cursorLine={cursorLine}
         cursorPositions={cursorPositions}
         targetTextLines={targetTextLines}
         typedTextLines={typedTextLines}
         typingStatus={typingStatus}
-        errorMessage={errorMessage}
       />
     </>
   );

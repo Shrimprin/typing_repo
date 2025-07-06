@@ -1,10 +1,10 @@
 import { Pause, Play, RotateCcw } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { FileItem, TypingStatus } from '@/types';
+import { TypingStatus } from '@/types';
 
 type TypingHeaderProps = {
-  fileItem: FileItem;
+  fileItemName: string;
   typingStatus: TypingStatus;
   startTyping: () => void;
   pauseTyping: () => void;
@@ -13,7 +13,7 @@ type TypingHeaderProps = {
 };
 
 export default function TypingHeader({
-  fileItem,
+  fileItemName,
   typingStatus,
   startTyping,
   pauseTyping,
@@ -59,7 +59,7 @@ export default function TypingHeader({
 
   return (
     <div className="flex items-center justify-between border-b px-4 pb-2">
-      <div className="truncate">{fileItem.fullPath || fileItem.name}</div>
+      <div className="truncate">{fileItemName}</div>
       <div className="flex gap-2">
         <Button variant="outline" size="sm" onClick={handleToggleTyping} aria-label={buttonLabel}>
           {buttonIcon}
