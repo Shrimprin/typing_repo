@@ -43,8 +43,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
         return;
       }
 
-      const typedLine = fetchedFileItem.typingProgress.line;
-      const typedCharacter = fetchedFileItem.typingProgress.character;
+      const typedLine = fetchedFileItem.typingProgress.row;
+      const typedCharacter = fetchedFileItem.typingProgress.column;
       const restoredCursorPositions = [...initialCursorPositions];
       const restoredTypedTextLines = textLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
 
@@ -83,17 +83,20 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
           status: 'typing',
           typing_progress: {
             time: '00:00:00', // TODO: タイピング時間を計測する
-            typo: 0,
-            line: cursorLine,
-            character: cursorPositions[cursorLine],
+            total_typo_count: 0, // TODO: タイポ数を計測する
+            row: cursorLine,
+            column: cursorPositions[cursorLine],
+            // TODO: ↓仮で入れている
             typoPositionsAttributes: [
               {
-                line: 1,
-                character: 1,
+                row: 1,
+                column: 1,
+                character: 'a',
               },
               {
-                line: 2,
-                character: 2,
+                row: 2,
+                column: 2,
+                character: 'b',
               },
             ],
           },

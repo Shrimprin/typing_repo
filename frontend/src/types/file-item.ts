@@ -1,18 +1,7 @@
-export type FileItemType = 'dir' | 'file';
-export type FileItemStatus = 'untyped' | 'typing' | 'typed';
+import { TypingProgress } from './typing-progress';
 
-export type TypoPosition = {
-  line: number;
-  character: number;
-};
-
-export type TypingProgress = {
-  time: string;
-  typo: number;
-  line: number;
-  character: number;
-  typoPositions?: TypoPosition[];
-};
+type FileItemType = 'dir' | 'file';
+type FileItemStatus = 'untyped' | 'typing' | 'typed';
 
 export type FileItem = {
   id: number;
