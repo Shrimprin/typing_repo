@@ -23,8 +23,8 @@ module Api
         end
       when 'typing'
         if @file_item.update_with_typing_progress(file_item_params) && @repository.update(last_typed_at: Time.zone.now)
-          top_level_file_items = @repository.file_items.roots
-          render json: FileItemSerializer.new(top_level_file_items, params: { children: true }), status: :ok
+          render json: FileItemSerializer.new(@file_item, params: { children: true, typing_progress: true }),
+                 status: :ok
         else
           render json: @file_item.errors, status: :unprocessable_entity
         end

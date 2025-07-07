@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 
 import { FileItem, TypingStatus } from '@/types';
 import { axiosPatch } from '@/utils/axios';
@@ -11,7 +11,7 @@ import { sortFileItems } from '@/utils/sort';
 type useTypingHandlerProps = {
   typingStatus: TypingStatus;
   fileItem?: FileItem;
-  setFileItems: (fileItems: FileItem[]) => void;
+  setFileItems: Dispatch<SetStateAction<FileItem[]>>;
   setTypingStatus: (status: TypingStatus) => void;
 };
 
@@ -100,9 +100,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
         },
       };
 
-      const res = await axiosPatch(url, accessToken, postData);
-      const sortedFileItems: FileItem[] = sortFileItems(res.data);
-      setFileItems(sortedFileItems);
+      const response = await axiosPatch(url, accessToken, postData);
+      setFileItems((prev) => updateFileItemRecursively(prev, response.data));
       setTypingStatus('paused');
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -250,4 +249,21 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
     resetTyping,
     restoreTypingProgress,
   };
+}
+
+function updateFileItemRecursively(fileItems: FileItem[], updatedFileItem: FileItem): FileItem[] {
+  return fileItems.map((fileItem) => {
+    if (fileItem.id === updatedFileItem.id) {
+      return updatedFileItem;
+    }
+
+    if (fileItem.fileItems && fileItem.fileItems.length > 0) {
+      return {
+        ...fileItem,
+        fileItems: updateFileItemRecursively(fileItem.fileItems, updatedFileItem),
+      };
+    }
+
+    return fileItem;
+  });
 }
