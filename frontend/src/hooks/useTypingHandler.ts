@@ -33,9 +33,9 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
 
       const textLines = fetchedFileItem.content?.split(/(?<=\n)/) || [];
       const initialCursorPositions = textLines.map((line) => line.indexOf(line.trimStart()));
-      const initialTypedTextLines = targetTextLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
-
+      const initialTypedTextLines = textLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
       setTargetTextLines(textLines);
+
       if (!fetchedFileItem.typingProgress) {
         setCursorPositions(initialCursorPositions);
         setTypedTextLines(initialTypedTextLines);
