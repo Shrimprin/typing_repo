@@ -30,6 +30,7 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
 
   const isSelected = selectedFileItem?.id === fileItem.id;
   const isTyped = fileItem.status === 'typed';
+  const isTyping = fileItem.status === 'typing';
   const fileItems: FileItem[] = fileItem.fileItems;
   const sortedFileItems = sortFileItems(fileItems);
   const isDir = fileItem.type === 'dir';
@@ -39,7 +40,7 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
       <button
         className={`
           hover:bg-accent
-          flex w-full cursor-pointer py-1
+          flex w-full cursor-pointer items-center py-1
         `}
         onClick={isDir ? toggleExpand : handleFileSelect}
       >
@@ -57,7 +58,7 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
             >
               {fileItem.name}
             </span>
-            {isTyped && <Check size={16} className="text-secondary ml-2 flex-shrink-0" />}
+            {isTyped && <Check size={16} className="text-secondary mr-2 ml-auto flex-shrink-0" />}
           </>
         ) : (
           <>
@@ -72,7 +73,13 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
             >
               {fileItem.name}
             </span>
-            {isTyped && <Check size={16} className="text-secondary ml-2 flex-shrink-0" />}
+            {isTyped ? (
+              <Check size={16} className="text-secondary mr-2 ml-auto flex-shrink-0" />
+            ) : isTyping ? (
+              <div className="mr-2 ml-auto flex h-4 w-4 flex-shrink-0 items-center justify-center">
+                <div className="bg-muted-foreground h-2 w-2 rounded-full shadow-lg" />
+              </div>
+            ) : null}
           </>
         )}
       </button>
