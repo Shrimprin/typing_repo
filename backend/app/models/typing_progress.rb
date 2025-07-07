@@ -2,12 +2,12 @@
 
 class TypingProgress < ApplicationRecord
   belongs_to :file_item
-  has_many :typo_positions, dependent: :destroy
+  has_many :typos, dependent: :destroy
 
-  accepts_nested_attributes_for :typo_positions, allow_destroy: true
+  accepts_nested_attributes_for :typos, allow_destroy: true
 
-  validates :character, presence: true
-  validates :line, presence: true
+  validates :row, presence: true
+  validates :column, presence: true
   validates :time, presence: true
-  validates :typo, presence: true
+  validates :total_typo_count, presence: true
 end
