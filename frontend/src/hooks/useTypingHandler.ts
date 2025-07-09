@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 
-import { FileItem, TypingStatus } from '@/types';
+import { FileItem, TypingStatus, Typo } from '@/types';
 import { axiosPatch } from '@/utils/axios';
 import { fetcher } from '@/utils/fetcher';
 import { sortFileItems } from '@/utils/sort';
@@ -45,17 +45,18 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
 
       const typedLine = fetchedFileItem.typingProgress.row;
       const typedCharacter = fetchedFileItem.typingProgress.column;
+      const typos = fetchedFileItem.typingProgress.typos || [];
       const restoredCursorPositions = [...initialCursorPositions];
       const restoredTypedTextLines = textLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
 
       textLines.slice(0, typedLine).forEach((textLine, i) => {
-        restoredTypedTextLines[i] = textLine;
+        restoredTypedTextLines[i] = restoreTypedText(textLine, i, typos);
         restoredCursorPositions[i] = textLine.length;
       });
 
       const currentTextLine = textLines[typedLine];
-      const typedCharacters = currentTextLine.substring(0, typedCharacter);
-      restoredTypedTextLines[typedLine] = typedCharacters;
+      const currentTargetText = currentTextLine.substring(0, typedCharacter);
+      restoredTypedTextLines[typedLine] = restoreTypedText(currentTargetText, typedLine, typos);
       restoredCursorPositions[typedLine] = typedCharacter;
 
       setCursorPositions(restoredCursorPositions);
@@ -82,23 +83,10 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
         fileItem: {
           status: 'typing',
           typing_progress: {
-            time: '00:00:00', // TODO: タイピング時間を計測する
-            total_typo_count: 0, // TODO: タイポ数を計測する
             row: cursorLine,
             column: cursorPositions[cursorLine],
-            // TODO: ↓仮で入れている
-            typoPositionsAttributes: [
-              {
-                row: 1,
-                column: 1,
-                character: 'a',
-              },
-              {
-                row: 2,
-                column: 2,
-                character: 'b',
-              },
-            ],
+            time: '00:00:00', // TODO: タイピング時間を計測する
+            typos_attributes: calculateTypos(typedTextLines, targetTextLines),
           },
         },
       };
@@ -254,19 +242,32 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
   };
 }
 
+function calculateTypos(typedLines: string[], targetLines: string[]): Typo[] {
+  return typedLines.flatMap((typedLine, lineIndex) => {
+    const targetLine = targetLines[lineIndex] || '';
+    return [...typedLine]
+      .map((typedChar, charIndex) => ({ typedChar, charIndex, targetChar: targetLine[charIndex] }))
+      .filter(({ typedChar, targetChar }) => typedChar !== targetChar)
+      .map(({ typedChar, charIndex }) => ({
+        row: lineIndex,
+        column: charIndex,
+        character: typedChar,
+      }));
+  });
+}
+
+function restoreTypedText(targetTextLine: string, lineIndex: number, typos: Typo[]): string {
+  const typoMap = new Map(typos.filter((typo) => typo.row === lineIndex).map((typo) => [typo.column, typo.character]));
+
+  return [...targetTextLine].map((char, index) => typoMap.get(index) ?? char).join('');
+}
+
 function updateFileItemRecursively(fileItems: FileItem[], updatedFileItem: FileItem): FileItem[] {
   return fileItems.map((fileItem) => {
-    if (fileItem.id === updatedFileItem.id) {
-      return updatedFileItem;
-    }
+    if (fileItem.id === updatedFileItem.id) return updatedFileItem;
 
-    if (fileItem.fileItems && fileItem.fileItems.length > 0) {
-      return {
-        ...fileItem,
-        fileItems: updateFileItemRecursively(fileItem.fileItems, updatedFileItem),
-      };
-    }
-
-    return fileItem;
+    return fileItem.fileItems?.length
+      ? { ...fileItem, fileItems: updateFileItemRecursively(fileItem.fileItems, updatedFileItem) }
+      : fileItem;
   });
 }
