@@ -85,7 +85,7 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
           typing_progress: {
             row: cursorLine,
             column: cursorPositions[cursorLine],
-            time: '00:00:00', // TODO: タイピング時間を計測する
+            time: 100.5, // TODO: タイピング時間を計測する
             typos_attributes: calculateTypos(typedTextLines, targetTextLines),
           },
         },

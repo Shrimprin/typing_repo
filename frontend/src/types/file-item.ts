@@ -10,7 +10,7 @@ export type Typo = {
 export type TypingProgress = {
   row: number;
   column: number;
-  time: string;
+  time: number; // 秒数（decimal型）
   total_typo_count: number;
   typos?: Typo[];
 };

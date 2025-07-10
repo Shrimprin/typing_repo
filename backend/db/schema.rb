@@ -47,7 +47,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_30_023552) do
 
   create_table "typing_progresses", force: :cascade do |t|
     t.bigint "file_item_id", null: false
-    t.time "time", null: false
+    t.decimal "time", precision: 8, scale: 1, null: false
     t.integer "row", null: false
     t.integer "column", null: false
     t.integer "total_typo_count", default: 0, null: false
