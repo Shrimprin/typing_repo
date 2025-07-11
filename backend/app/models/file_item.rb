@@ -46,7 +46,7 @@ class FileItem < ApplicationRecord
 
   def update_with_parent(params)
     transaction do
-      update(params) && update_parent_status
+      update_with_typing_progress(params) && update_parent_status
     end
   end
 

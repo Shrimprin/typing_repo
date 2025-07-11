@@ -86,6 +86,7 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
             row: cursorLine,
             column: cursorPositions[cursorLine],
             time: 100.5, // TODO: タイピング時間を計測する
+            totalTypoCount: 10, // TODO: タイポ数を計測する
             typos_attributes: calculateTypos(typedTextLines, targetTextLines),
           },
         },
@@ -123,6 +124,13 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
       const postData = {
         file_item: {
           status: 'typed',
+          typing_progress: {
+            row: cursorLine,
+            column: cursorPositions[cursorLine],
+            time: 100.5, // TODO: タイピング時間を計測する
+            totalTypoCount: 10, // TODO: タイポ数を計測する
+            typos_attributes: calculateTypos(typedTextLines, targetTextLines),
+          },
         },
       };
 
@@ -137,7 +145,17 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
         setErrorMessage('An error occurred. Please try again.');
       }
     }
-  }, [fileItem?.id, params, session, setFileItems, setTypingStatus]);
+  }, [
+    fileItem?.id,
+    params,
+    session,
+    cursorLine,
+    cursorPositions,
+    typedTextLines,
+    targetTextLines,
+    setFileItems,
+    setTypingStatus,
+  ]);
 
   const isComplete = useCallback(
     (newCursorPositions: number[]) => {

@@ -23,7 +23,7 @@ module Api
         end
       when 'typing'
         if @file_item.update_with_typing_progress(file_item_params) && @repository.update(last_typed_at: Time.zone.now)
-          render json: FileItemSerializer.new(@file_item, params: { children: true, typing_progress: true }),
+          render json: FileItemSerializer.new(@file_item, params: { children: true }),
                  status: :ok
         else
           render json: @file_item.errors, status: :unprocessable_entity
@@ -37,7 +37,7 @@ module Api
 
     def file_item_params
       params.expect(file_item: [:status, {
-                      typing_progress: [:time, :row, :column, {
+                      typing_progress: [:row, :column, :time, :total_typo_count, {
                         typos_attributes: [%i[row column character _destroy]]
                       }]
                     }])
