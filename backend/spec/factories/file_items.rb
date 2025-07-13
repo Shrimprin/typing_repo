@@ -24,8 +24,8 @@ FactoryBot.define do
     trait :with_typing_progress do
       after(:create) do |file_item|
         create(:typing_progress,
-               row: file_item.content.lines.count,
-               column: file_item.content.lines.first.length,
+               row: 0,
+               column: 0,
                time: 0,
                total_typo_count: 0,
                file_item:)
