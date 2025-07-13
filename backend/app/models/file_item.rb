@@ -61,6 +61,12 @@ class FileItem < ApplicationRecord
   def save_typing_progress(params)
     typing_progress&.destroy
     new_typing_progress = build_typing_progress(params[:typing_progress])
-    new_typing_progress.save!
+
+    return true if new_typing_progress.save
+
+    new_typing_progress.errors.each do |error|
+      errors.add("typing_progress.#{error.attribute}", error.message)
+    end
+    false
   end
 end

@@ -17,7 +17,18 @@ RSpec.describe FileItem, type: :model do
   describe '#update_with_parent' do
     let(:repository) { create(:repository) }
     let(:parent_dir) { create(:file_item, :directory, repository:) }
-    let(:untyped_file_item) { create(:file_item, repository:, parent: parent_dir) }
+    let(:untyped_file_item) { create(:file_item, :with_typing_progress, repository:, parent: parent_dir) }
+    let(:params) do
+      {
+        status: :typed,
+        typing_progress: {
+          row: untyped_file_item.content.lines.count,
+          column: untyped_file_item.content.lines.first.length,
+          time: 0,
+          total_typo_count: 0
+        }
+      }
+    end
 
     context 'when all siblings are typed after update' do
       before do
@@ -25,11 +36,11 @@ RSpec.describe FileItem, type: :model do
       end
 
       it 'returns true' do
-        expect(untyped_file_item.update_with_parent(status: :typed)).to be true
+        expect(untyped_file_item.update_with_parent(params)).to be true
       end
 
       it 'updates both file item and parent status' do
-        untyped_file_item.update_with_parent(status: :typed)
+        untyped_file_item.update_with_parent(params)
 
         expect(untyped_file_item.reload.status).to eq('typed')
         expect(parent_dir.reload.status).to eq('typed')
@@ -42,11 +53,11 @@ RSpec.describe FileItem, type: :model do
       end
 
       it 'returns true' do
-        expect(untyped_file_item.update_with_parent(status: :typed)).to be true
+        expect(untyped_file_item.update_with_parent(params)).to be true
       end
 
       it 'updates only the file item status but not parent status' do
-        untyped_file_item.update_with_parent(status: :typed)
+        untyped_file_item.update_with_parent(params)
 
         expect(untyped_file_item.reload.status).to eq('typed')
         expect(parent_dir.reload.status).to eq('untyped')
@@ -76,11 +87,11 @@ RSpec.describe FileItem, type: :model do
       end
 
       it 'returns nil' do
-        expect(untyped_file_item.update_with_parent(status: :typed)).to be_nil
+        expect(untyped_file_item.update_with_parent(params)).to be_nil
       end
 
       it 'does not update both file item and parent status' do
-        untyped_file_item.update_with_parent(status: :typed)
+        untyped_file_item.update_with_parent(params)
 
         expect(untyped_file_item.reload.status).to eq('untyped')
         expect(parent_dir.reload.status).to eq('untyped')
