@@ -41,18 +41,24 @@ class FileItem < ApplicationRecord
     is_all_typed = children.all?(&:typed?)
     return true unless is_all_typed
 
-    parent.update!(status: :typed) && parent.update_parent_status
+    parent.update(status: :typed) && parent.update_parent_status
   end
 
   def update_with_parent(params)
     transaction do
-      update_with_typing_progress(params) && update_parent_status
+      is_updated = update_with_typing_progress(params) && update_parent_status
+      raise ActiveRecord::Rollback unless is_updated
+
+      true
     end
   end
 
   def update_with_typing_progress(params)
     transaction do
-      update(params.except(:typing_progress)) && save_typing_progress(params)
+      is_updated = update(params.except(:typing_progress)) && save_typing_progress(params)
+      raise ActiveRecord::Rollback unless is_updated
+
+      true
     end
   end
 
