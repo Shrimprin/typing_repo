@@ -137,6 +137,15 @@ RSpec.describe 'Api::FileItems', type: :request do
       end
     end
 
+    context 'when repository does not exist' do
+      it 'returns not found status' do
+        patch api_repository_file_item_path(repository_id: 0, id: file_item.id),
+              params: { file_item: { status: :typed } }, headers: headers
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
     context 'when invalid params is given' do
       it 'returns unprocessable entity status for both typed and typing status' do
         # typedとtypingの両方のパターンをテストする
