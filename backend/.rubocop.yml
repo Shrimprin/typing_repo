@@ -53,6 +53,10 @@ RSpecRails/InferredSpecType:
 RSpec/MultipleExpectations:
   Enabled: false
 
+# letの数
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+
 # instance_doubleを必須としない(doubleを許可する)
 RSpec/VerifiedDoubles:
   Enabled: false
