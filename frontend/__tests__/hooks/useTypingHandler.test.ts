@@ -9,18 +9,6 @@ import { sortFileItems } from '@/utils/sort';
 import { useParams } from 'next/navigation';
 import { mockAuth, mockUseSession } from '../mocks/auth';
 
-jest.mock('next/navigation', () => ({
-  useParams: jest.fn(),
-}));
-
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(),
-}));
-
-jest.mock('@/auth', () => ({
-  auth: jest.fn(),
-}));
-
 jest.mock('@/utils/sort', () => ({
   sortFileItems: jest.fn(),
 }));
