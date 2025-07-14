@@ -21,6 +21,7 @@ describe('RepositoryDetailPage', () => {
           name: 'file1.ts',
           type: 'file',
           status: 'untyped',
+          fullPath: 'file1.ts',
           fileItems: [],
         },
         {
@@ -28,6 +29,7 @@ describe('RepositoryDetailPage', () => {
           name: 'file2.ts',
           type: 'file',
           status: 'typed',
+          fullPath: 'file2.ts',
           fileItems: [],
         },
         {
@@ -35,12 +37,14 @@ describe('RepositoryDetailPage', () => {
           name: 'dir1',
           type: 'dir',
           status: 'untyped',
+          fullPath: 'dir1',
           fileItems: [
             {
               id: 4,
               name: 'nested-file1.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir1/nested-file1.ts',
               fileItems: [],
             },
             {
@@ -48,6 +52,7 @@ describe('RepositoryDetailPage', () => {
               name: 'nested-file2.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir1/nested-file2.ts',
               fileItems: [],
             },
           ],
@@ -57,12 +62,14 @@ describe('RepositoryDetailPage', () => {
           name: 'dir2',
           type: 'dir',
           status: 'untyped',
+          fullPath: 'dir2',
           fileItems: [
             {
               id: 7,
               name: 'nested-file3.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir2/nested-file3.ts',
               fileItems: [],
             },
           ],
@@ -72,6 +79,7 @@ describe('RepositoryDetailPage', () => {
           name: 'file3.ts',
           type: 'file',
           status: 'untyped',
+          fullPath: 'file3.ts',
           fileItems: [],
         },
       ],
@@ -212,6 +220,21 @@ describe('RepositoryDetailPage', () => {
     });
 
     it('pauses typing when PAUSE button is clicked', async () => {
+      const mockFileItems = [
+        {
+          id: 1,
+          name: 'file1.ts',
+          type: 'file',
+          status: 'untyped',
+          fullPath: 'file1.ts',
+          fileItems: [],
+        },
+      ];
+
+      jest.spyOn(axios, 'patch').mockImplementation(() => {
+        return Promise.resolve({ data: mockFileItems });
+      });
+
       await clickButton('PAUSE');
 
       expect(screen.getByRole('button', { name: 'RESUME' })).toBeInTheDocument();
@@ -223,6 +246,21 @@ describe('RepositoryDetailPage', () => {
     });
 
     it('resumes typing when RESUME button is clicked', async () => {
+      const mockFileItems = [
+        {
+          id: 1,
+          name: 'file1.ts',
+          type: 'file',
+          status: 'untyped',
+          fullPath: 'file1.ts',
+          fileItems: [],
+        },
+      ];
+
+      jest.spyOn(axios, 'patch').mockImplementation(() => {
+        return Promise.resolve({ data: mockFileItems });
+      });
+
       await clickButton('PAUSE');
       await clickButton('RESUME');
 
@@ -250,6 +288,7 @@ describe('RepositoryDetailPage', () => {
           name: 'file1.ts',
           type: 'file',
           status: 'untyped',
+          fullPath: 'file1.ts',
           fileItems: [],
         },
         {
@@ -257,6 +296,7 @@ describe('RepositoryDetailPage', () => {
           name: 'file2.ts',
           type: 'file',
           status: 'typed',
+          fullPath: 'file2.ts',
           fileItems: [],
         },
         {
@@ -264,12 +304,14 @@ describe('RepositoryDetailPage', () => {
           name: 'dir1',
           type: 'dir',
           status: 'untyped',
+          fullPath: 'dir1',
           fileItems: [
             {
               id: 4,
               name: 'nested-file1.ts',
               type: 'file',
               status: 'typed',
+              fullPath: 'dir1/nested-file1.ts',
               fileItems: [],
             },
           ],
