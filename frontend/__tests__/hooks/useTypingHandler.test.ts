@@ -12,6 +12,7 @@ import { mockAuth, mockUseSession } from '../mocks/auth';
 jest.mock('@/utils/sort', () => ({
   sortFileItems: jest.fn(),
 }));
+
 describe('useTypingHandler', () => {
   const mockFileItemData = {
     id: 1,
@@ -21,7 +22,7 @@ describe('useTypingHandler', () => {
     status: 'untyped',
     type: 'file',
     fileItems: [],
-  } as FileItem;
+  };
   const mockSetFileItems = jest.fn();
   const mockSetTypingStatus = jest.fn();
 
@@ -49,7 +50,7 @@ describe('useTypingHandler', () => {
 
   const typeEntireContent = async () => {
     await userEvent.keyboard('def hello_world{Enter}');
-    await userEvent.keyboard("puts 'Hello, World!'{Enter}");
+    await userEvent.keyboard("pust 'Hello, World!'{Enter}"); // タイポを含む
     await userEvent.keyboard('end{Enter}');
   };
 
@@ -247,7 +248,7 @@ describe('useTypingHandler', () => {
       await typeEntireContent();
 
       expect(mockSetTypingStatus).toHaveBeenCalledWith('completed');
-      expect(result.current.typedTextLines).toEqual(['def hello_world\n', "  puts 'Hello, World!'\n", 'end\n']);
+      expect(result.current.typedTextLines).toEqual(['def hello_world\n', "  pust 'Hello, World!'\n", 'end\n']);
       expect(result.current.cursorPositions).toEqual([16, 23, 4]);
       expect(result.current.cursorLine).toBe(2);
     });
@@ -328,6 +329,81 @@ describe('useTypingHandler', () => {
     });
   });
 
+  describe('restoreTypingProgress', () => {
+    beforeEach(() => {
+      jest.spyOn(axios, 'get').mockResolvedValue({ data: mockFileItemData });
+    });
+
+    describe('when does not exist typing progress', () => {
+      it('sets initial values', async () => {
+        const result = await setupHook(defaultProps);
+
+        expect(result.current.typedTextLines).toEqual(['', '  ', '']);
+        expect(result.current.cursorPositions).toEqual([0, 2, 0]);
+        expect(result.current.cursorLine).toBe(0);
+      });
+    });
+
+    describe('when typing progress exists', () => {
+      beforeEach(() => {
+        const mockTypingProgress = {
+          row: 1,
+          column: 6,
+          time: 100.5,
+          totalTypoCount: 10,
+          typos: [
+            {
+              row: 1,
+              column: 4,
+              character: 's',
+            },
+            {
+              row: 1,
+              column: 5,
+              character: 't',
+            },
+          ],
+        };
+        const fileItemWithProgress = {
+          ...mockFileItemData,
+          typingProgress: mockTypingProgress,
+        };
+        (axios.get as jest.Mock).mockResolvedValueOnce({ data: fileItemWithProgress });
+      });
+
+      it('restores typing progress correctly', async () => {
+        const result = await setupHook(defaultProps);
+
+        expect(result.current.typedTextLines).toEqual(['def hello_world\n', '  pust', '']);
+        expect(result.current.cursorPositions).toEqual([16, 6, 0]);
+        expect(result.current.cursorLine).toBe(1);
+      });
+    });
+
+    describe('error handling', () => {
+      it('shows error message when occur axios error', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValueOnce({
+          message: 'Network Error',
+          name: 'AxiosError',
+          code: 'ERR_NETWORK',
+          isAxiosError: true,
+        } as AxiosError);
+
+        const result = await setupHook(defaultProps);
+
+        expect(result.current.errorMessage).toBe('Network Error');
+      });
+
+      it('shows error message when occur server error', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Server Error'));
+
+        const result = await setupHook(defaultProps);
+
+        expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
+      });
+    });
+  });
+
   describe('handleComplete', () => {
     const typingProps = {
       ...defaultProps,
@@ -341,6 +417,7 @@ describe('useTypingHandler', () => {
           name: 'file1.ts',
           type: 'file',
           status: 'typed',
+          fullPath: 'file1.ts',
           fileItems: [],
         },
         {
@@ -348,6 +425,7 @@ describe('useTypingHandler', () => {
           name: 'file2.ts',
           type: 'file',
           status: 'typed',
+          fullPath: 'file2.ts',
           fileItems: [],
         },
         {
@@ -355,12 +433,14 @@ describe('useTypingHandler', () => {
           name: 'dir1',
           type: 'dir',
           status: 'untyped',
+          fullPath: 'dir1',
           fileItems: [
             {
               id: 4,
               name: 'nested-file1.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir1/nested-file1.ts',
               fileItems: [],
             },
             {
@@ -368,6 +448,7 @@ describe('useTypingHandler', () => {
               name: 'nested-file2.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir1/nested-file2.ts',
               fileItems: [],
             },
           ],
@@ -377,12 +458,14 @@ describe('useTypingHandler', () => {
           name: 'dir2',
           type: 'dir',
           status: 'untyped',
+          fullPath: 'dir2',
           fileItems: [
             {
               id: 7,
               name: 'nested-file3.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir2/nested-file3.ts',
               fileItems: [],
             },
           ],
@@ -392,6 +475,7 @@ describe('useTypingHandler', () => {
           name: 'file3.ts',
           type: 'file',
           status: 'untyped',
+          fullPath: 'file3.ts',
           fileItems: [],
         },
       ];
@@ -402,12 +486,14 @@ describe('useTypingHandler', () => {
           name: 'dir1',
           type: 'dir',
           status: 'untyped',
+          fullPath: 'dir1',
           fileItems: [
             {
               id: 4,
               name: 'nested-file1.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir1/nested-file1.ts',
               fileItems: [],
             },
             {
@@ -415,6 +501,7 @@ describe('useTypingHandler', () => {
               name: 'nested-file2.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir1/nested-file2.ts',
               fileItems: [],
             },
           ],
@@ -424,12 +511,14 @@ describe('useTypingHandler', () => {
           name: 'dir2',
           type: 'dir',
           status: 'untyped',
+          fullPath: 'dir2',
           fileItems: [
             {
               id: 7,
               name: 'nested-file3.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir2/nested-file3.ts',
               fileItems: [],
             },
           ],
@@ -439,6 +528,7 @@ describe('useTypingHandler', () => {
           name: 'file1.ts',
           type: 'file',
           status: 'typed',
+          fullPath: 'file1.ts',
           fileItems: [],
         },
         {
@@ -446,6 +536,7 @@ describe('useTypingHandler', () => {
           name: 'file2.ts',
           type: 'file',
           status: 'typed',
+          fullPath: 'file2.ts',
           fileItems: [],
         },
         {
@@ -453,6 +544,7 @@ describe('useTypingHandler', () => {
           name: 'file3.ts',
           type: 'file',
           status: 'untyped',
+          fullPath: 'file3.ts',
           fileItems: [],
         },
       ];
@@ -465,7 +557,7 @@ describe('useTypingHandler', () => {
         await typeEntireContent();
       });
 
-      it('updates file item status to typed', () => {
+      it('calls api to update file item status to typed, and updates typing progress', () => {
         const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
         expect(axios.patch).toHaveBeenCalledWith(
@@ -478,7 +570,18 @@ describe('useTypingHandler', () => {
                 column: 3,
                 time: 100.5,
                 totalTypoCount: 10,
-                typosAttributes: [],
+                typosAttributes: [
+                  {
+                    row: 1,
+                    column: 4,
+                    character: 's',
+                  },
+                  {
+                    row: 1,
+                    column: 5,
+                    character: 't',
+                  },
+                ],
               },
             },
           },
@@ -501,29 +604,31 @@ describe('useTypingHandler', () => {
       });
     });
 
-    it('shows error message when occur axios error', async () => {
-      jest.spyOn(axios, 'patch').mockRejectedValueOnce({
-        message: 'Network Error',
-        name: 'AxiosError',
-        code: 'ERR_NETWORK',
-        isAxiosError: true,
-      } as AxiosError);
+    describe('error handling', () => {
+      it('shows error message when occur axios error', async () => {
+        jest.spyOn(axios, 'patch').mockRejectedValueOnce({
+          message: 'Network Error',
+          name: 'AxiosError',
+          code: 'ERR_NETWORK',
+          isAxiosError: true,
+        } as AxiosError);
 
-      const result = await setupHook(typingProps);
-      await typeEntireContent();
+        const result = await setupHook(typingProps);
+        await typeEntireContent();
 
-      expect(result.current.errorMessage).toBe('Network Error');
-      expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
-    });
+        expect(result.current.errorMessage).toBe('Network Error');
+        expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
+      });
 
-    it('shows error message when occur server error', async () => {
-      jest.spyOn(axios, 'patch').mockRejectedValueOnce(new Error('Server Error'));
+      it('shows error message when occur server error', async () => {
+        jest.spyOn(axios, 'patch').mockRejectedValueOnce(new Error('Server Error'));
 
-      const result = await setupHook(typingProps);
-      await typeEntireContent();
+        const result = await setupHook(typingProps);
+        await typeEntireContent();
 
-      expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
-      expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
+        expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
+        expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
+      });
     });
   });
 });
