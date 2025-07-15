@@ -81,7 +81,7 @@ describe('useTypingHandler', () => {
       expect(result.current.cursorLine).toBe(0);
     });
 
-    it('does not type when key is pressed', async () => {
+    it('can not type when key is pressed', async () => {
       const result = await setupHook();
 
       await userEvent.keyboard('A');
