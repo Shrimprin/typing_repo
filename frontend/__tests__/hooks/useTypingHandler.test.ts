@@ -23,6 +23,7 @@ describe('useTypingHandler', () => {
     type: 'file',
     fileItems: [],
   };
+
   const mockSetFileItems = jest.fn();
   const mockSetTypingStatus = jest.fn();
 

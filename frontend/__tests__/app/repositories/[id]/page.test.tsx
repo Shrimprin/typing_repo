@@ -9,6 +9,9 @@ import { mockAuth, mockUseSession } from '../../../mocks/auth';
 import { clickButton } from '../../../utils/testUtils';
 
 describe('RepositoryDetailPage', () => {
+  const CORRECT_CHARS_SELECTOR = '[class*="bg-secondary"]';
+  const INCORRECT_CHARS_SELECTOR = '[class*="bg-destructive"]';
+
   const mockRepository = {
     data: {
       id: 1,
@@ -97,6 +100,15 @@ describe('RepositoryDetailPage', () => {
     },
   };
 
+  const mockUpdatedFileItem = {
+    id: 4,
+    name: 'nested-file1.ts',
+    type: 'file',
+    status: 'typing',
+    fullPath: 'dir1/nested-file1.ts',
+    fileItems: [],
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
     mockAuth();
@@ -152,7 +164,7 @@ describe('RepositoryDetailPage', () => {
   });
 
   describe('when file is clicked', () => {
-    it('renders full path, play button and file content', async () => {
+    it('calls api to get file item', async () => {
       await clickButton('dir1');
       await clickButton('nested-file1.ts');
 
@@ -163,17 +175,29 @@ describe('RepositoryDetailPage', () => {
           'Content-Type': 'application/json',
         },
       });
+    });
+
+    it('renders full path, play button and file content', async () => {
+      await clickButton('dir1');
+      await clickButton('nested-file1.ts');
 
       expect(screen.getByText('dir1/nested-file1.ts')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
       expect(screen.getByText('console.log("Hello, world!");')).toBeInTheDocument();
     });
+
+    it('does not render highlight text', async () => {
+      await clickButton('dir1');
+      await clickButton('nested-file1.ts');
+
+      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
+      const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
+      expect(correctChars.length).toBe(0);
+      expect(incorrectChars.length).toBe(0);
+    });
   });
 
   describe('start typing', () => {
-    const CORRECT_CHARS_SELECTOR = '[class*="bg-secondary"]';
-    const INCORRECT_CHARS_SELECTOR = '[class*="bg-destructive"]';
-
     beforeEach(async () => {
       await clickButton('dir1');
       await clickButton('nested-file1.ts');
@@ -217,58 +241,6 @@ describe('RepositoryDetailPage', () => {
         .map((span) => span.textContent)
         .join('');
       expect(typedText).toBe('co');
-    });
-
-    it('pauses typing when PAUSE button is clicked', async () => {
-      const mockFileItems = [
-        {
-          id: 1,
-          name: 'file1.ts',
-          type: 'file',
-          status: 'untyped',
-          fullPath: 'file1.ts',
-          fileItems: [],
-        },
-      ];
-
-      jest.spyOn(axios, 'patch').mockImplementation(() => {
-        return Promise.resolve({ data: mockFileItems });
-      });
-
-      await clickButton('PAUSE');
-
-      expect(screen.getByRole('button', { name: 'RESUME' })).toBeInTheDocument();
-
-      await userEvent.keyboard('c');
-
-      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(0);
-    });
-
-    it('resumes typing when RESUME button is clicked', async () => {
-      const mockFileItems = [
-        {
-          id: 1,
-          name: 'file1.ts',
-          type: 'file',
-          status: 'untyped',
-          fullPath: 'file1.ts',
-          fileItems: [],
-        },
-      ];
-
-      jest.spyOn(axios, 'patch').mockImplementation(() => {
-        return Promise.resolve({ data: mockFileItems });
-      });
-
-      await clickButton('PAUSE');
-      await clickButton('RESUME');
-
-      await userEvent.keyboard('c');
-
-      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBeGreaterThan(0);
-      expect(correctChars[0].textContent).toBe('c');
     });
 
     it('resets typing when RESET button is clicked', async () => {
@@ -325,6 +297,96 @@ describe('RepositoryDetailPage', () => {
       await userEvent.keyboard('console.log("Hello, world!");');
 
       expect(screen.getByText('Completed!!')).toBeInTheDocument(); // TODO: 完了画面を作ったら修正する
+    });
+  });
+
+  describe('pause typing', () => {
+    beforeEach(async () => {
+      jest.spyOn(axios, 'patch').mockImplementation(() => {
+        return Promise.resolve({ data: mockUpdatedFileItem });
+      });
+
+      await clickButton('dir1');
+      await clickButton('nested-file1.ts');
+      await clickButton('PLAY');
+      await userEvent.keyboard('consoel');
+      await clickButton('PAUSE');
+    });
+
+    it('renders correct and incorrect characters', async () => {
+      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
+      const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
+      expect(correctChars.length).toBe(5);
+      expect(incorrectChars.length).toBe(2);
+    });
+
+    it('renders resume button', async () => {
+      expect(screen.getByRole('button', { name: 'RESUME' })).toBeInTheDocument();
+    });
+
+    it('can not type', async () => {
+      await userEvent.keyboard('.log');
+
+      const afterPausedCorrectChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
+      const afterPausedIncorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
+      expect(afterPausedCorrectChars.length).toBe(5);
+      expect(afterPausedIncorrectChars.length).toBe(2);
+    });
+
+    it('resumes typing when RESUME button is clicked', async () => {
+      await clickButton('RESUME');
+      await userEvent.keyboard('.log');
+
+      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
+      const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
+      expect(correctChars.length).toBe(9);
+      expect(incorrectChars.length).toBe(2);
+    });
+
+    it('restore typing progress when switch file', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValueOnce({
+        data: {
+          id: 5,
+          name: 'nested-file2.ts',
+          type: 'file',
+          status: 'untyped',
+          content: 'console.log("This is a test!");',
+          fullPath: 'dir1/nested-file2.ts',
+        },
+      });
+
+      await clickButton('nested-file2.ts');
+
+      expect(screen.getByText('dir1/nested-file2.ts')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
+      expect(screen.getByText('console.log("This is a test!");')).toBeInTheDocument();
+
+      jest.spyOn(axios, 'get').mockResolvedValueOnce({
+        data: {
+          ...mockFileItem.data,
+          status: 'typing',
+          typingProgress: {
+            row: 0,
+            column: 7,
+            time: 100.5,
+            totalTypoCount: 2,
+            typos: [
+              { row: 0, column: 5, character: 'e' },
+              { row: 0, column: 6, character: 'l' },
+            ],
+          },
+        },
+      });
+
+      await clickButton('nested-file1.ts');
+
+      expect(screen.getByText('dir1/nested-file1.ts')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'RESUME' })).toBeInTheDocument();
+
+      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
+      const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
+      expect(correctChars.length).toBe(5);
+      expect(incorrectChars.length).toBe(2);
     });
   });
 });
