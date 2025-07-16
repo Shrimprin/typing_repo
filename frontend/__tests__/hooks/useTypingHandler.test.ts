@@ -346,29 +346,28 @@ describe('useTypingHandler', () => {
 
     describe('when typing progress exists', () => {
       beforeEach(() => {
-        const mockTypingProgress = {
-          row: 1,
-          column: 6,
-          time: 100.5,
-          totalTypoCount: 10,
-          typos: [
-            {
-              row: 1,
-              column: 4,
-              character: 's',
-            },
-            {
-              row: 1,
-              column: 5,
-              character: 't',
-            },
-          ],
-        };
-        const fileItemWithProgress = {
+        const mockFileItemWithProgress = {
           ...mockFileItemData,
-          typingProgress: mockTypingProgress,
+          typingProgress: {
+            row: 1,
+            column: 6,
+            time: 100.5,
+            totalTypoCount: 10,
+            typos: [
+              {
+                row: 1,
+                column: 4,
+                character: 's',
+              },
+              {
+                row: 1,
+                column: 5,
+                character: 't',
+              },
+            ],
+          },
         };
-        (axios.get as jest.Mock).mockResolvedValueOnce({ data: fileItemWithProgress });
+        (axios.get as jest.Mock).mockResolvedValueOnce({ data: mockFileItemWithProgress });
       });
 
       it('restores typing progress correctly', async () => {
@@ -400,6 +399,144 @@ describe('useTypingHandler', () => {
         const result = await setupHook(defaultProps);
 
         expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
+      });
+    });
+  });
+
+  describe('pauseTyping', () => {
+    const typingProps = {
+      ...defaultProps,
+      typingStatus: 'typing' as TypingStatus,
+    };
+
+    describe('when success', () => {
+      const mockResponse = {
+        data: {
+          id: 1,
+          name: 'test-file-name',
+          type: 'file',
+          status: 'typing',
+          fullPath: 'test-file-path',
+          fileItems: [],
+        },
+      };
+
+      beforeEach(async () => {
+        jest.spyOn(axios, 'patch').mockResolvedValueOnce(mockResponse);
+
+        const result = await setupHook(typingProps);
+        await userEvent.keyboard('def hello_world{Enter}');
+        await userEvent.keyboard('pust');
+
+        await act(async () => {
+          await result.current.pauseTyping();
+        });
+      });
+
+      it('calls api to update file item status to typing, and updates typing progress', async () => {
+        const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+        expect(axios.patch).toHaveBeenCalledWith(
+          `${BASE_URL}/api/repositories/1/file_items/1`,
+          {
+            fileItem: {
+              status: 'typing',
+              typingProgress: {
+                row: 1,
+                column: 6,
+                time: 100.5,
+                totalTypoCount: 10,
+                typosAttributes: [
+                  {
+                    row: 1,
+                    column: 4,
+                    character: 's',
+                  },
+                  {
+                    row: 1,
+                    column: 5,
+                    character: 't',
+                  },
+                ],
+              },
+            },
+          },
+          {
+            headers: {
+              Authorization: 'Bearer token_1234567890',
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+      });
+
+      it('calls setFileItems once and updates file item', () => {
+        expect(mockSetFileItems).toHaveBeenCalledTimes(1);
+
+        const prevFileItems = [
+          {
+            id: 1,
+            name: 'test-file-name',
+            type: 'file',
+            status: 'untyped',
+            fullPath: 'test-file-path',
+            fileItems: [],
+          },
+          {
+            id: 2,
+            name: 'dir1',
+            type: 'dir',
+            status: 'untyped',
+            fullPath: 'dir1',
+            fileItems: [
+              {
+                id: 3,
+                name: 'nested-file.ts',
+                type: 'file',
+                status: 'untyped',
+                fullPath: 'dir1/nested-file.ts',
+                fileItems: [],
+              },
+            ],
+          },
+        ] as FileItem[];
+
+        const updateFunction = mockSetFileItems.mock.calls[0][0]; // (prev) => updateFileItemRecursively(prev, response.data)が格納される
+        const result = updateFunction(prevFileItems); // updateFileItemRecursively(prevFileItems, updatedFileItem)が呼ばれる
+
+        expect(result[0].status).toBe('typing');
+        expect(result[1].fileItems?.[0].status).toBe('untyped');
+      });
+
+      it('updates typing status to paused', () => {
+        expect(mockSetTypingStatus).toHaveBeenCalledWith('paused');
+      });
+    });
+
+    describe('error handling', () => {
+      it('shows error message when occur axios error', async () => {
+        jest.spyOn(axios, 'patch').mockRejectedValueOnce({
+          message: 'Network Error',
+          name: 'AxiosError',
+          code: 'ERR_NETWORK',
+          isAxiosError: true,
+        } as AxiosError);
+
+        const result = await setupHook(typingProps);
+        await typeEntireContent();
+
+        expect(result.current.errorMessage).toBe('Network Error');
+        expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
+      });
+
+      it('shows error message when occur server error', async () => {
+        jest.spyOn(axios, 'patch').mockRejectedValueOnce(new Error('Server Error'));
+
+        const result = await setupHook(typingProps);
+        await typeEntireContent();
+
+        expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
+        expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
       });
     });
   });
@@ -594,7 +731,7 @@ describe('useTypingHandler', () => {
         );
       });
 
-      it('sorts file items', () => {
+      it('calls setFileItems with sorted file items', () => {
         expect(sortFileItems).toHaveBeenCalledWith(mockResponse);
         expect(mockSetFileItems).toHaveBeenCalledWith(sortedResponse);
       });
