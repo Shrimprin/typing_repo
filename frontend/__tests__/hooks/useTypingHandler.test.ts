@@ -44,7 +44,7 @@ describe('useTypingHandler', () => {
   const setupHook = async (props = defaultProps) => {
     const { result } = renderHook(() => useTypingHandler(props));
     await act(async () => {
-      await result.current.restoreTypingProgress(1);
+      await result.current.setupTypingState(1);
     });
     return result;
   };
@@ -330,7 +330,7 @@ describe('useTypingHandler', () => {
     });
   });
 
-  describe('restoreTypingProgress', () => {
+  describe('setupTypingState', () => {
     beforeEach(() => {
       jest.spyOn(axios, 'get').mockResolvedValue({ data: mockFileItemData });
     });

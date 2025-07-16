@@ -24,16 +24,17 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
   const { data: session } = useSession();
   const params = useParams();
 
-  const restoreTypingProgress = async (fileItemId: number) => {
+  const setupTypingState = async (fileItemId: number) => {
     setErrorMessage(null);
+
     try {
       const url = `/api/repositories/${params.id}/file_items/${fileItemId}`;
       const accessToken = session?.user?.accessToken;
       const fetchedFileItem: FileItem = await fetcher(url, accessToken);
 
-      const textLines = fetchedFileItem.content?.split(/(?<=\n)/) || [];
-      const initialCursorPositions = textLines.map((line) => line.indexOf(line.trimStart()));
-      const initialTypedTextLines = textLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
+      const { textLines, initialCursorPositions, initialTypedTextLines } = initializeTextState(
+        fetchedFileItem.content || '',
+      );
       setTargetTextLines(textLines);
 
       if (!fetchedFileItem.typingProgress) {
@@ -43,21 +44,23 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
         return;
       }
 
-      const typedLine = fetchedFileItem.typingProgress.row;
-      const typedCharacter = fetchedFileItem.typingProgress.column;
-      const typos = fetchedFileItem.typingProgress.typos || [];
-      const restoredCursorPositions = [...initialCursorPositions];
-      const restoredTypedTextLines = textLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
+      const { row: typedLine, column: typedCharacter, typos = [] } = fetchedFileItem.typingProgress;
 
-      textLines.slice(0, typedLine).forEach((textLine, i) => {
-        restoredTypedTextLines[i] = restoreTypedText(textLine, i, typos);
-        restoredCursorPositions[i] = textLine.length;
-      });
+      let { restoredCursorPositions, restoredTypedTextLines } = restoreCompletedLines(
+        textLines,
+        typedLine,
+        typos,
+        initialCursorPositions,
+      );
 
-      const currentTextLine = textLines[typedLine];
-      const currentTargetText = currentTextLine.substring(0, typedCharacter);
-      restoredTypedTextLines[typedLine] = restoreTypedText(currentTargetText, typedLine, typos);
-      restoredCursorPositions[typedLine] = typedCharacter;
+      ({ restoredCursorPositions, restoredTypedTextLines } = restoreCurrentLine(
+        textLines,
+        typedLine,
+        typedCharacter,
+        typos,
+        restoredCursorPositions,
+        restoredTypedTextLines,
+      ));
 
       setCursorPositions(restoredCursorPositions);
       setTypedTextLines(restoredTypedTextLines);
@@ -256,7 +259,7 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
     resumeTyping,
     pauseTyping,
     resetTyping,
-    restoreTypingProgress,
+    setupTypingState,
   };
 }
 
@@ -272,6 +275,51 @@ function calculateTypos(typedLines: string[], targetLines: string[]): Typo[] {
         character: typedChar,
       }));
   });
+}
+
+function initializeTextState(content: string) {
+  const textLines = content?.split(/(?<=\n)/) || [];
+  const initialCursorPositions = textLines.map((line) => line.indexOf(line.trimStart()));
+  const initialTypedTextLines = textLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
+
+  return {
+    textLines,
+    initialCursorPositions,
+    initialTypedTextLines,
+  };
+}
+
+function restoreCompletedLines(
+  textLines: string[],
+  typedLine: number,
+  typos: Typo[],
+  initialCursorPositions: number[],
+) {
+  const restoredCursorPositions = [...initialCursorPositions];
+  const restoredTypedTextLines = textLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
+
+  textLines.slice(0, typedLine).forEach((textLine, i) => {
+    restoredTypedTextLines[i] = restoreTypedText(textLine, i, typos);
+    restoredCursorPositions[i] = textLine.length;
+  });
+
+  return { restoredCursorPositions, restoredTypedTextLines };
+}
+
+function restoreCurrentLine(
+  textLines: string[],
+  typedLine: number,
+  typedCharacter: number,
+  typos: Typo[],
+  restoredCursorPositions: number[],
+  restoredTypedTextLines: string[],
+) {
+  const currentTextLine = textLines[typedLine];
+  const currentTargetText = currentTextLine.substring(0, typedCharacter);
+  restoredTypedTextLines[typedLine] = restoreTypedText(currentTargetText, typedLine, typos);
+  restoredCursorPositions[typedLine] = typedCharacter;
+
+  return { restoredCursorPositions, restoredTypedTextLines };
 }
 
 function restoreTypedText(targetTextLine: string, lineIndex: number, typos: Typo[]): string {
