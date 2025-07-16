@@ -82,12 +82,12 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
       const postData = {
         fileItem: {
           status: 'typing',
-          typing_progress: {
+          typingProgress: {
             row: cursorLine,
             column: cursorPositions[cursorLine],
             time: 100.5, // TODO: タイピング時間を計測する
             totalTypoCount: 10, // TODO: タイポ数を計測する
-            typos_attributes: calculateTypos(typedTextLines, targetTextLines),
+            typosAttributes: calculateTypos(typedTextLines, targetTextLines),
           },
         },
       };
