@@ -50,7 +50,7 @@ module Api
     end
 
     def set_file_item
-      repository = @current_user.repositories.find(params[:repository_id])
+      repository = @repository || @current_user.repositories.find(params[:repository_id])
       @file_item = repository.file_items.find(params[:id])
     rescue ActiveRecord::RecordNotFound
       render json: { error: 'File not found' }, status: :not_found
