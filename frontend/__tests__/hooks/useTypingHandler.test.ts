@@ -4,41 +4,55 @@ import axios, { AxiosError } from 'axios';
 
 import { useTypingHandler } from '@/hooks/useTypingHandler';
 import { TypingStatus } from '@/types';
+import { FileItem } from '@/types/file-item';
 import { sortFileItems } from '@/utils/sort';
 import { useParams } from 'next/navigation';
 import { mockAuth, mockUseSession } from '../mocks/auth';
-
-jest.mock('next/navigation', () => ({
-  useParams: jest.fn(),
-}));
-
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(),
-}));
-
-jest.mock('@/auth', () => ({
-  auth: jest.fn(),
-}));
 
 jest.mock('@/utils/sort', () => ({
   sortFileItems: jest.fn(),
 }));
 
-const typeEntireContent = async () => {
-  await userEvent.keyboard('def hello_world{Enter}');
-  await userEvent.keyboard("puts 'Hello, World!'{Enter}");
-  await userEvent.keyboard('end{Enter}');
-};
 describe('useTypingHandler', () => {
-  const targetTextLines = ['def hello_world\n', "  puts 'Hello, World!'\n", 'end\n'];
-  const mockSetTypingStatus = jest.fn();
+  const mockFileItemData = {
+    id: 1,
+    content: "def hello_world\n  puts 'Hello, World!'\nend\n",
+    fullPath: 'test-file-path',
+    name: 'test-file-name',
+    status: 'untyped',
+    type: 'file',
+    fileItems: [],
+  };
+
   const mockSetFileItems = jest.fn();
+  const mockSetTypingStatus = jest.fn();
+
   const defaultProps = {
-    targetTextLines,
     typingStatus: 'ready' as TypingStatus,
-    setTypingStatus: mockSetTypingStatus,
+    fileItem: {
+      id: 1,
+      fullPath: 'test-file-path',
+      name: 'test-file-name',
+      status: 'untyped',
+      type: 'file',
+      fileItems: [],
+    } as FileItem,
     setFileItems: mockSetFileItems,
-    fileItemId: 1,
+    setTypingStatus: mockSetTypingStatus,
+  };
+
+  const setupHook = async (props = defaultProps) => {
+    const { result } = renderHook(() => useTypingHandler(props));
+    await act(async () => {
+      await result.current.setupTypingState(1);
+    });
+    return result;
+  };
+
+  const typeEntireContent = async () => {
+    await userEvent.keyboard('def hello_world{Enter}');
+    await userEvent.keyboard("pust 'Hello, World!'{Enter}"); // タイポを含む
+    await userEvent.keyboard('end{Enter}');
   };
 
   beforeEach(() => {
@@ -46,6 +60,7 @@ describe('useTypingHandler', () => {
     mockAuth();
     mockUseSession();
     (useParams as jest.Mock).mockReturnValue({ id: '1' });
+    jest.spyOn(axios, 'get').mockResolvedValue({ data: mockFileItemData });
   });
 
   describe('initial state', () => {
@@ -55,27 +70,27 @@ describe('useTypingHandler', () => {
       expect(result.current.typingStatus).toBe('ready');
     });
 
-    it('has leading spaces are typed', () => {
-      const { result } = renderHook(() => useTypingHandler(defaultProps));
+    it('has leading spaces are typed', async () => {
+      const result = await setupHook();
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
     });
 
-    it('start with cursor line is first', () => {
-      const { result } = renderHook(() => useTypingHandler(defaultProps));
+    it('start with cursor line is first', async () => {
+      const result = await setupHook();
 
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorRow).toBe(0);
     });
 
-    it('does not type when key is pressed', async () => {
-      const { result } = renderHook(() => useTypingHandler(defaultProps));
+    it('can not type when key is pressed', async () => {
+      const result = await setupHook();
 
       await userEvent.keyboard('A');
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
+      expect(result.current.cursorRow).toBe(0);
     });
 
     it('can start typing', () => {
@@ -95,144 +110,158 @@ describe('useTypingHandler', () => {
       typingStatus: 'typing' as TypingStatus,
     };
     it('can type the key', async () => {
-      const { result } = renderHook(() => useTypingHandler(typingProps));
+      const result = await setupHook(typingProps);
 
       await userEvent.keyboard('d');
 
       expect(result.current.typedTextLines).toEqual(['d', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([1, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([1, 2, 0]);
     });
 
     it('can type the enter key', async () => {
-      const { result } = renderHook(() => useTypingHandler(typingProps));
+      const result = await setupHook(typingProps);
 
       await userEvent.keyboard('{Enter}');
 
       expect(result.current.typedTextLines).toEqual(['\n', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([1, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([1, 2, 0]);
     });
 
     it('can line break with the enter key', async () => {
-      const { result } = renderHook(() => useTypingHandler(typingProps));
+      const result = await setupHook(typingProps);
 
       await userEvent.keyboard('def hello_world');
 
       expect(result.current.typedTextLines).toEqual(['def hello_world', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([15, 2, 0]);
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorColumns).toEqual([15, 2, 0]);
+      expect(result.current.cursorRow).toBe(0);
 
       await userEvent.keyboard('{Enter}');
 
       expect(result.current.typedTextLines).toEqual(['def hello_world\n', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([16, 2, 0]);
-      expect(result.current.cursorLine).toBe(1);
+      expect(result.current.cursorColumns).toEqual([16, 2, 0]);
+      expect(result.current.cursorRow).toBe(1);
     });
 
     it('can delete the input with the backspace key', async () => {
-      const { result } = renderHook(() => useTypingHandler(typingProps));
+      const result = await setupHook(typingProps);
 
       await userEvent.keyboard('d');
 
       expect(result.current.typedTextLines).toEqual(['d', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([1, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([1, 2, 0]);
 
       await userEvent.keyboard('{Backspace}');
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
     });
 
     it('can delete the line break with the backspace key', async () => {
-      const { result } = renderHook(() => useTypingHandler(typingProps));
+      const result = await setupHook(typingProps);
 
       await userEvent.keyboard('def hello_world{Enter}');
 
       expect(result.current.typedTextLines).toEqual(['def hello_world\n', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([16, 2, 0]);
-      expect(result.current.cursorLine).toBe(1);
+      expect(result.current.cursorColumns).toEqual([16, 2, 0]);
+      expect(result.current.cursorRow).toBe(1);
 
       // スペースがあるため3回バックスペースキーを入力する
       await userEvent.keyboard('{Backspace}{Backspace}{Backspace}');
 
       expect(result.current.typedTextLines).toEqual(['def hello_world', '', '']);
-      expect(result.current.cursorPositions).toEqual([15, 0, 0]);
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorColumns).toEqual([15, 0, 0]);
+      expect(result.current.cursorRow).toBe(0);
     });
 
     it('cannot type the tab key', async () => {
-      const { result } = renderHook(() => useTypingHandler(typingProps));
+      const result = await setupHook(typingProps);
 
       await userEvent.keyboard('{Tab}');
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
     });
 
     it('does not delete when first line and first character with backspace key', async () => {
-      const { result } = renderHook(() => useTypingHandler(typingProps));
+      const result = await setupHook(typingProps);
 
       // カーソルが最初の行と最初の文字の位置にあることを確認
-      expect(result.current.cursorLine).toBe(0);
-      expect(result.current.cursorPositions[0]).toBe(0);
+      expect(result.current.cursorRow).toBe(0);
+      expect(result.current.cursorColumns[0]).toBe(0);
 
       await userEvent.keyboard('{Backspace}');
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
+      expect(result.current.cursorRow).toBe(0);
     });
 
     it('can pause typing', async () => {
-      const { result } = renderHook(() => useTypingHandler(typingProps));
+      jest.spyOn(axios, 'patch').mockResolvedValueOnce({
+        data: {
+          id: 1,
+          fullPath: 'test-file-path',
+          name: 'test-file-name',
+          status: 'typing',
+          type: 'file',
+          fileItems: [],
+        },
+      });
+
+      const result = await setupHook(typingProps);
 
       await userEvent.keyboard('def hello_world{Enter}');
       await userEvent.keyboard("puts 'Hello, World!'{Enter}");
 
       expect(result.current.typedTextLines).toEqual(['def hello_world\n', "  puts 'Hello, World!'\n", '']);
-      expect(result.current.cursorPositions).toEqual([16, 23, 0]);
-      expect(result.current.cursorLine).toBe(2);
+      expect(result.current.cursorColumns).toEqual([16, 23, 0]);
+      expect(result.current.cursorRow).toBe(2);
 
-      act(() => {
-        result.current.pauseTyping();
+      await act(async () => {
+        await result.current.pauseTyping();
       });
 
       expect(mockSetTypingStatus).toHaveBeenCalledWith('paused');
       expect(result.current.typedTextLines).toEqual(['def hello_world\n', "  puts 'Hello, World!'\n", '']);
-      expect(result.current.cursorPositions).toEqual([16, 23, 0]);
-      expect(result.current.cursorLine).toBe(2);
+      expect(result.current.cursorColumns).toEqual([16, 23, 0]);
+      expect(result.current.cursorRow).toBe(2);
     });
 
     it('can complete typing', async () => {
+      const mockResponse = [
+        {
+          id: '1',
+          fullPath: 'test-file-path',
+          name: 'test-file-name',
+          status: 'typed',
+          type: 'file',
+          fileItems: [],
+        },
+      ];
+
       jest.spyOn(axios, 'patch').mockResolvedValueOnce({
-        data: [
-          {
-            id: '1',
-            name: 'test-file-name',
-            status: 'typed',
-            type: 'file',
-            fileItems: [],
-          },
-        ],
+        data: mockResponse,
       });
 
-      const { result } = renderHook(() => useTypingHandler(typingProps));
+      const result = await setupHook(typingProps);
 
       await typeEntireContent();
 
       expect(mockSetTypingStatus).toHaveBeenCalledWith('completed');
-      expect(result.current.typedTextLines).toEqual(['def hello_world\n', "  puts 'Hello, World!'\n", 'end\n']);
-      expect(result.current.cursorPositions).toEqual([16, 23, 4]);
-      expect(result.current.cursorLine).toBe(2);
+      expect(result.current.typedTextLines).toEqual(['def hello_world\n', "  pust 'Hello, World!'\n", 'end\n']);
+      expect(result.current.cursorColumns).toEqual([16, 23, 4]);
+      expect(result.current.cursorRow).toBe(2);
     });
 
     it('can reset typing', async () => {
-      const { result } = renderHook(() => useTypingHandler(typingProps));
+      const result = await setupHook(typingProps);
 
       await userEvent.keyboard('def hello_world{Enter}');
 
       expect(result.current.typedTextLines).toEqual(['def hello_world\n', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([16, 2, 0]);
-      expect(result.current.cursorLine).toBe(1);
+      expect(result.current.cursorColumns).toEqual([16, 2, 0]);
+      expect(result.current.cursorRow).toBe(1);
       expect(result.current.typingStatus).toBe('typing');
 
       act(() => {
@@ -241,8 +270,8 @@ describe('useTypingHandler', () => {
 
       expect(mockSetTypingStatus).toHaveBeenCalledWith('ready');
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
+      expect(result.current.cursorRow).toBe(0);
     });
   });
 
@@ -253,12 +282,12 @@ describe('useTypingHandler', () => {
     };
 
     it('cannot type the key', async () => {
-      const { result } = renderHook(() => useTypingHandler(pausedProps));
+      const result = await setupHook(pausedProps);
 
       await userEvent.keyboard('d');
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
     });
 
     it('can resume typing', async () => {
@@ -279,16 +308,16 @@ describe('useTypingHandler', () => {
     };
 
     it('cannot type the key', async () => {
-      const { result } = renderHook(() => useTypingHandler(completedProps));
+      const result = await setupHook(completedProps);
 
       await userEvent.keyboard('d');
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
     });
 
     it('can replay typing', async () => {
-      const { result } = renderHook(() => useTypingHandler(completedProps));
+      const result = await setupHook(completedProps);
 
       act(() => {
         result.current.resetTyping();
@@ -296,8 +325,220 @@ describe('useTypingHandler', () => {
 
       expect(mockSetTypingStatus).toHaveBeenCalledWith('ready');
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
+      expect(result.current.cursorRow).toBe(0);
+    });
+  });
+
+  describe('setupTypingState', () => {
+    beforeEach(() => {
+      jest.spyOn(axios, 'get').mockResolvedValue({ data: mockFileItemData });
+    });
+
+    describe('when does not exist typing progress', () => {
+      it('sets initial values', async () => {
+        const result = await setupHook(defaultProps);
+
+        expect(result.current.typedTextLines).toEqual(['', '  ', '']);
+        expect(result.current.cursorColumns).toEqual([0, 2, 0]);
+        expect(result.current.cursorRow).toBe(0);
+      });
+    });
+
+    describe('when typing progress exists', () => {
+      beforeEach(() => {
+        const mockFileItemWithProgress = {
+          ...mockFileItemData,
+          typingProgress: {
+            row: 1,
+            column: 6,
+            time: 100.5,
+            totalTypoCount: 10,
+            typos: [
+              {
+                row: 1,
+                column: 4,
+                character: 's',
+              },
+              {
+                row: 1,
+                column: 5,
+                character: 't',
+              },
+            ],
+          },
+        };
+        (axios.get as jest.Mock).mockResolvedValueOnce({ data: mockFileItemWithProgress });
+      });
+
+      it('restores typing progress correctly', async () => {
+        const result = await setupHook(defaultProps);
+
+        expect(result.current.typedTextLines).toEqual(['def hello_world\n', '  pust', '']);
+        expect(result.current.cursorColumns).toEqual([16, 6, 0]);
+        expect(result.current.cursorRow).toBe(1);
+      });
+    });
+
+    describe('error handling', () => {
+      it('shows error message when occur axios error', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValueOnce({
+          message: 'Network Error',
+          name: 'AxiosError',
+          code: 'ERR_NETWORK',
+          isAxiosError: true,
+        } as AxiosError);
+
+        const result = await setupHook(defaultProps);
+
+        expect(result.current.errorMessage).toBe('Network Error');
+      });
+
+      it('shows error message when occur server error', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Server Error'));
+
+        const result = await setupHook(defaultProps);
+
+        expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
+      });
+    });
+  });
+
+  describe('pauseTyping', () => {
+    const typingProps = {
+      ...defaultProps,
+      typingStatus: 'typing' as TypingStatus,
+    };
+
+    describe('when success', () => {
+      const mockResponse = {
+        data: {
+          id: 1,
+          name: 'test-file-name',
+          type: 'file',
+          status: 'typing',
+          fullPath: 'test-file-path',
+          fileItems: [],
+        },
+      };
+
+      beforeEach(async () => {
+        jest.spyOn(axios, 'patch').mockResolvedValueOnce(mockResponse);
+
+        const result = await setupHook(typingProps);
+        await userEvent.keyboard('def hello_world{Enter}');
+        await userEvent.keyboard('pust');
+
+        await act(async () => {
+          await result.current.pauseTyping();
+        });
+      });
+
+      it('calls api to update file item status to typing, and updates typing progress', async () => {
+        const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+        expect(axios.patch).toHaveBeenCalledWith(
+          `${BASE_URL}/api/repositories/1/file_items/1`,
+          {
+            fileItem: {
+              status: 'typing',
+              typingProgress: {
+                row: 1,
+                column: 6,
+                time: 100.5,
+                totalTypoCount: 10,
+                typosAttributes: [
+                  {
+                    row: 1,
+                    column: 4,
+                    character: 's',
+                  },
+                  {
+                    row: 1,
+                    column: 5,
+                    character: 't',
+                  },
+                ],
+              },
+            },
+          },
+          {
+            headers: {
+              Authorization: 'Bearer token_1234567890',
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+      });
+
+      it('calls setFileItems once and updates file item', () => {
+        expect(mockSetFileItems).toHaveBeenCalledTimes(1);
+
+        const prevFileItems = [
+          {
+            id: 1,
+            name: 'test-file-name',
+            type: 'file',
+            status: 'untyped',
+            fullPath: 'test-file-path',
+            fileItems: [],
+          },
+          {
+            id: 2,
+            name: 'dir1',
+            type: 'dir',
+            status: 'untyped',
+            fullPath: 'dir1',
+            fileItems: [
+              {
+                id: 3,
+                name: 'nested-file.ts',
+                type: 'file',
+                status: 'untyped',
+                fullPath: 'dir1/nested-file.ts',
+                fileItems: [],
+              },
+            ],
+          },
+        ] as FileItem[];
+
+        const updateFunction = mockSetFileItems.mock.calls[0][0]; // (prev) => updateFileItemRecursively(prev, response.data)が格納される
+        const result = updateFunction(prevFileItems); // updateFileItemRecursively(prevFileItems, updatedFileItem)が呼ばれる
+
+        expect(result[0].status).toBe('typing');
+        expect(result[1].fileItems?.[0].status).toBe('untyped');
+      });
+
+      it('updates typing status to paused', () => {
+        expect(mockSetTypingStatus).toHaveBeenCalledWith('paused');
+      });
+    });
+
+    describe('error handling', () => {
+      it('shows error message when occur axios error', async () => {
+        jest.spyOn(axios, 'patch').mockRejectedValueOnce({
+          message: 'Network Error',
+          name: 'AxiosError',
+          code: 'ERR_NETWORK',
+          isAxiosError: true,
+        } as AxiosError);
+
+        const result = await setupHook(typingProps);
+        await typeEntireContent();
+
+        expect(result.current.errorMessage).toBe('Network Error');
+        expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
+      });
+
+      it('shows error message when occur server error', async () => {
+        jest.spyOn(axios, 'patch').mockRejectedValueOnce(new Error('Server Error'));
+
+        const result = await setupHook(typingProps);
+        await typeEntireContent();
+
+        expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
+        expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
+      });
     });
   });
 
@@ -314,6 +555,7 @@ describe('useTypingHandler', () => {
           name: 'file1.ts',
           type: 'file',
           status: 'typed',
+          fullPath: 'file1.ts',
           fileItems: [],
         },
         {
@@ -321,6 +563,7 @@ describe('useTypingHandler', () => {
           name: 'file2.ts',
           type: 'file',
           status: 'typed',
+          fullPath: 'file2.ts',
           fileItems: [],
         },
         {
@@ -328,12 +571,14 @@ describe('useTypingHandler', () => {
           name: 'dir1',
           type: 'dir',
           status: 'untyped',
+          fullPath: 'dir1',
           fileItems: [
             {
               id: 4,
               name: 'nested-file1.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir1/nested-file1.ts',
               fileItems: [],
             },
             {
@@ -341,6 +586,7 @@ describe('useTypingHandler', () => {
               name: 'nested-file2.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir1/nested-file2.ts',
               fileItems: [],
             },
           ],
@@ -350,12 +596,14 @@ describe('useTypingHandler', () => {
           name: 'dir2',
           type: 'dir',
           status: 'untyped',
+          fullPath: 'dir2',
           fileItems: [
             {
               id: 7,
               name: 'nested-file3.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir2/nested-file3.ts',
               fileItems: [],
             },
           ],
@@ -365,6 +613,7 @@ describe('useTypingHandler', () => {
           name: 'file3.ts',
           type: 'file',
           status: 'untyped',
+          fullPath: 'file3.ts',
           fileItems: [],
         },
       ];
@@ -375,12 +624,14 @@ describe('useTypingHandler', () => {
           name: 'dir1',
           type: 'dir',
           status: 'untyped',
+          fullPath: 'dir1',
           fileItems: [
             {
               id: 4,
               name: 'nested-file1.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir1/nested-file1.ts',
               fileItems: [],
             },
             {
@@ -388,6 +639,7 @@ describe('useTypingHandler', () => {
               name: 'nested-file2.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir1/nested-file2.ts',
               fileItems: [],
             },
           ],
@@ -397,12 +649,14 @@ describe('useTypingHandler', () => {
           name: 'dir2',
           type: 'dir',
           status: 'untyped',
+          fullPath: 'dir2',
           fileItems: [
             {
               id: 7,
               name: 'nested-file3.ts',
               type: 'file',
               status: 'untyped',
+              fullPath: 'dir2/nested-file3.ts',
               fileItems: [],
             },
           ],
@@ -412,6 +666,7 @@ describe('useTypingHandler', () => {
           name: 'file1.ts',
           type: 'file',
           status: 'typed',
+          fullPath: 'file1.ts',
           fileItems: [],
         },
         {
@@ -419,6 +674,7 @@ describe('useTypingHandler', () => {
           name: 'file2.ts',
           type: 'file',
           status: 'typed',
+          fullPath: 'file2.ts',
           fileItems: [],
         },
         {
@@ -426,6 +682,7 @@ describe('useTypingHandler', () => {
           name: 'file3.ts',
           type: 'file',
           status: 'untyped',
+          fullPath: 'file3.ts',
           fileItems: [],
         },
       ];
@@ -434,17 +691,37 @@ describe('useTypingHandler', () => {
         jest.spyOn(axios, 'patch').mockResolvedValueOnce({ data: mockResponse });
         (sortFileItems as jest.Mock).mockReturnValue(sortedResponse);
 
-        renderHook(() => useTypingHandler(typingProps));
-
+        await setupHook(typingProps);
         await typeEntireContent();
       });
 
-      it('updates file item status to typed', () => {
+      it('calls api to update file item status to typed, and updates typing progress', () => {
         const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
         expect(axios.patch).toHaveBeenCalledWith(
           `${BASE_URL}/api/repositories/1/file_items/1`,
           {
-            file_item: { status: 'typed' },
+            fileItem: {
+              status: 'typed',
+              typingProgress: {
+                row: 2,
+                column: 3,
+                time: 100.5,
+                totalTypoCount: 10,
+                typosAttributes: [
+                  {
+                    row: 1,
+                    column: 4,
+                    character: 's',
+                  },
+                  {
+                    row: 1,
+                    column: 5,
+                    character: 't',
+                  },
+                ],
+              },
+            },
           },
           {
             headers: {
@@ -455,7 +732,7 @@ describe('useTypingHandler', () => {
         );
       });
 
-      it('sorts file items', () => {
+      it('calls setFileItems with sorted file items', () => {
         expect(sortFileItems).toHaveBeenCalledWith(mockResponse);
         expect(mockSetFileItems).toHaveBeenCalledWith(sortedResponse);
       });
@@ -465,30 +742,31 @@ describe('useTypingHandler', () => {
       });
     });
 
-    it('shows error message when occur axios error', async () => {
-      jest.spyOn(axios, 'patch').mockRejectedValueOnce({
-        message: 'Network Error',
-        name: 'AxiosError',
-        code: 'ERR_NETWORK',
-        isAxiosError: true,
-      } as AxiosError);
+    describe('error handling', () => {
+      it('shows error message when occur axios error', async () => {
+        jest.spyOn(axios, 'patch').mockRejectedValueOnce({
+          message: 'Network Error',
+          name: 'AxiosError',
+          code: 'ERR_NETWORK',
+          isAxiosError: true,
+        } as AxiosError);
 
-      const { result } = renderHook(() => useTypingHandler(typingProps));
+        const result = await setupHook(typingProps);
+        await typeEntireContent();
 
-      await typeEntireContent();
+        expect(result.current.errorMessage).toBe('Network Error');
+        expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
+      });
 
-      expect(result.current.errorMessage).toBe('Network Error');
-      expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
-    });
+      it('shows error message when occur server error', async () => {
+        jest.spyOn(axios, 'patch').mockRejectedValueOnce(new Error('Server Error'));
 
-    it('shows error message when occur server error', async () => {
-      jest.spyOn(axios, 'patch').mockRejectedValueOnce(new Error('Server Error'));
+        const result = await setupHook(typingProps);
+        await typeEntireContent();
 
-      const { result } = renderHook(() => useTypingHandler(typingProps));
-
-      await typeEntireContent();
-      expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
-      expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
+        expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
+        expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
+      });
     });
   });
 });

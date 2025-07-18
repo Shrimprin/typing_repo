@@ -20,5 +20,16 @@ FactoryBot.define do
     trait :typed do
       status { :typed }
     end
+
+    trait :with_typing_progress do
+      after(:create) do |file_item|
+        create(:typing_progress,
+               row: 0,
+               column: 0,
+               time: 0,
+               total_typo_count: 0,
+               file_item:)
+      end
+    end
   end
 end

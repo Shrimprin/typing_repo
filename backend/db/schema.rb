@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_08_114402) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_30_023552) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -45,6 +45,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_114402) do
     t.index ["user_id"], name: "index_repositories_on_user_id"
   end
 
+  create_table "typing_progresses", force: :cascade do |t|
+    t.bigint "file_item_id", null: false
+    t.decimal "time", precision: 8, scale: 1, null: false
+    t.integer "row", null: false
+    t.integer "column", null: false
+    t.integer "total_typo_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["file_item_id"], name: "index_typing_progresses_on_file_item_id"
+  end
+
+  create_table "typos", force: :cascade do |t|
+    t.bigint "typing_progress_id", null: false
+    t.integer "row", null: false
+    t.integer "column", null: false
+    t.string "character", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["typing_progress_id"], name: "index_typos_on_typing_progress_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name", null: false
     t.string "github_id", null: false
@@ -56,4 +77,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_114402) do
 
   add_foreign_key "file_items", "repositories"
   add_foreign_key "repositories", "users"
+  add_foreign_key "typing_progresses", "file_items"
+  add_foreign_key "typos", "typing_progresses"
 end

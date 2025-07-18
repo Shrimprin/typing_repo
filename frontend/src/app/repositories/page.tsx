@@ -24,12 +24,14 @@ export default async function RepositoriesPage() {
   const sortedRepositories = sortRepositories(repositories);
 
   return (
-    <>
+    <div className="flex h-screen flex-col">
       <Header title="Repositories" />
-      <div className="flex min-h-screen flex-col px-2">
-        <RepositoryList repositories={sortedRepositories} />
-        <RepositoryFooter />
+      <div className="flex-1 overflow-hidden">
+        <div className="flex min-h-full flex-col px-2">
+          <RepositoryList repositories={sortedRepositories} />
+          <RepositoryFooter />
+        </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -44,9 +44,11 @@ export default async function RepositoryDetailPage({ params }: RepositoryDetailP
   );
 
   return (
-    <>
+    <div className="flex h-screen flex-col">
       <Header title={repository.name} moreComponent={moreComponent} />
-      <RepositoryDetail initialFileItems={sortedFileItems} />
-    </>
+      <div className="flex-1 overflow-hidden">
+        <RepositoryDetail initialFileItems={sortedFileItems} />
+      </div>
+    </div>
   );
 }

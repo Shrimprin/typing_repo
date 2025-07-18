@@ -2,54 +2,44 @@ import TypingLine from '@/components/repositories/TypingLine';
 import { TypingStatus } from '@/types';
 
 type TypingContentProps = {
-  content: string;
-  cursorLine: number;
-  cursorPositions: number[];
+  cursorRow: number;
+  cursorColumns: number[];
   targetTextLines: string[];
   typedTextLines: string[];
   typingStatus: TypingStatus;
-  errorMessage?: string;
 };
 
 export default function TypingContent({
-  content,
-  cursorLine,
-  cursorPositions,
+  cursorRow,
+  cursorColumns,
   targetTextLines,
   typedTextLines,
   typingStatus,
-  errorMessage,
 }: TypingContentProps) {
   return (
-    <div className="overflow-x-auto px-4">
-      {errorMessage ? (
-        <div className="p-6 text-center">{errorMessage}</div>
+    <div className="h-full overflow-auto px-4">
+      {typingStatus === 'ready' ? (
+        <pre className="font-mono">
+          {targetTextLines.map((textLine, row) => (
+            <p key={row} className="h-[1.4em] whitespace-pre">
+              {textLine}
+            </p>
+          ))}
+        </pre>
+      ) : typingStatus === 'typing' || typingStatus === 'paused' ? (
+        <div className="min-w-fit">
+          {targetTextLines.map((targetTextLine, row) => (
+            <TypingLine
+              key={row}
+              cursorColumn={cursorColumns[row]}
+              isUntypedLine={row > cursorRow}
+              targetTextLine={targetTextLine}
+              typedText={typedTextLines[row]}
+            />
+          ))}
+        </div>
       ) : (
-        <>
-          {typingStatus === 'ready' ? (
-            <pre className="font-mono">
-              {content.split('\n').map((line, i) => (
-                <p key={i} className="h-[1.4em]">
-                  {line}
-                </p>
-              ))}
-            </pre>
-          ) : typingStatus === 'typing' || typingStatus === 'paused' ? (
-            <div>
-              {targetTextLines.map((targetTextLine, index) => (
-                <TypingLine
-                  key={index}
-                  cursorPosition={cursorPositions[index]}
-                  isUntypedLine={index > cursorLine}
-                  targetTextLine={targetTextLine}
-                  typedText={typedTextLines[index]}
-                />
-              ))}
-            </div>
-          ) : (
-            <div>Completed!!</div>
-          )}
-        </>
+        <div>Completed!!</div>
       )}
     </div>
   );
