@@ -60,7 +60,7 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
             ) : !selectedFileItem ? (
               <div className="p-6 text-center">Select a file to start typing.</div>
             ) : (
-              <TypingPanel fileItem={selectedFileItem} typingStatus={typingStatus} typingHandler={typingHandler} />
+              <TypingPanel fileItem={selectedFileItem} typingHandler={typingHandler} />
             )}
           </Card>
         </div>

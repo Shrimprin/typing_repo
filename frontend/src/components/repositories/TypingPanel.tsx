@@ -4,7 +4,6 @@ import TypingHeader from './TypingHeader';
 
 type TypingPanelProps = {
   fileItem: FileItem;
-  typingStatus: TypingStatus;
   typingHandler: {
     cursorRow: number;
     cursorColumns: number[];
@@ -18,12 +17,13 @@ type TypingPanelProps = {
   };
 };
 
-export default function TypingPanel({ fileItem, typingStatus, typingHandler }: TypingPanelProps) {
+export default function TypingPanel({ fileItem, typingHandler }: TypingPanelProps) {
   const {
     cursorRow,
     cursorColumns,
     targetTextLines,
     typedTextLines,
+    typingStatus,
     startTyping,
     resetTyping,
     pauseTyping,
