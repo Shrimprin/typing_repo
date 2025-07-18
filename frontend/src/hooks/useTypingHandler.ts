@@ -17,9 +17,9 @@ type useTypingHandlerProps = {
 
 export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypingStatus }: useTypingHandlerProps) {
   const [targetTextLines, setTargetTextLines] = useState<string[]>([]);
-  const [cursorPositions, setCursorPositions] = useState<number[]>([]);
+  const [cursorColumns, setCursorColumns] = useState<number[]>([]);
   const [typedTextLines, setTypedTextLines] = useState<string[]>([]);
-  const [cursorLine, setCursorLine] = useState(0);
+  const [cursorRow, setCursorRow] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { data: session } = useSession();
   const params = useParams();
@@ -32,39 +32,39 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
       const accessToken = session?.user?.accessToken;
       const fetchedFileItem: FileItem = await fetcher(url, accessToken);
 
-      const { textLines, initialCursorPositions, initialTypedTextLines } = initializeTextState(
+      const { textLines, initialCursorColumns, initialTypedTextLines } = initializeTextState(
         fetchedFileItem.content || '',
       );
       setTargetTextLines(textLines);
 
       if (!fetchedFileItem.typingProgress) {
-        setCursorPositions(initialCursorPositions);
+        setCursorColumns(initialCursorColumns);
         setTypedTextLines(initialTypedTextLines);
-        setCursorLine(0);
+        setCursorRow(0);
         return;
       }
 
-      const { row: typedLine, column: typedCharacter, typos = [] } = fetchedFileItem.typingProgress;
+      const { row: currentRow, column: currentColumn, typos = [] } = fetchedFileItem.typingProgress;
 
-      let { restoredCursorPositions, restoredTypedTextLines } = restoreCompletedLines(
+      let { restoredCursorColumns, restoredTypedTextLines } = restoreCompletedRows(
+        currentRow,
         textLines,
-        typedLine,
         typos,
-        initialCursorPositions,
+        initialCursorColumns,
       );
 
-      ({ restoredCursorPositions, restoredTypedTextLines } = restoreCurrentLine(
+      ({ restoredCursorColumns, restoredTypedTextLines } = restoreCurrentRow(
+        currentRow,
+        currentColumn,
         textLines,
-        typedLine,
-        typedCharacter,
         typos,
-        restoredCursorPositions,
+        restoredCursorColumns,
         restoredTypedTextLines,
       ));
 
-      setCursorPositions(restoredCursorPositions);
+      setCursorColumns(restoredCursorColumns);
       setTypedTextLines(restoredTypedTextLines);
-      setCursorLine(typedLine);
+      setCursorRow(currentRow);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.message);
@@ -86,8 +86,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
         fileItem: {
           status: 'typing',
           typingProgress: {
-            row: cursorLine,
-            column: cursorPositions[cursorLine],
+            row: cursorRow,
+            column: cursorColumns[cursorRow],
             time: 100.5, // TODO: タイピング時間を計測する
             totalTypoCount: 10, // TODO: タイポ数を計測する
             typosAttributes: calculateTypos(typedTextLines, targetTextLines),
@@ -112,11 +112,11 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
   };
 
   const resetTyping = () => {
-    const initialCursorPositions = targetTextLines.map((line) => line.indexOf(line.trimStart()));
-    const initialTypedTextLines = targetTextLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
-    setCursorPositions(initialCursorPositions);
+    const initialCursorColumns = targetTextLines.map((line) => line.indexOf(line.trimStart()));
+    const initialTypedTextLines = targetTextLines.map((_, index) => ' '.repeat(initialCursorColumns[index]));
+    setCursorColumns(initialCursorColumns);
     setTypedTextLines(initialTypedTextLines);
-    setCursorLine(0);
+    setCursorRow(0);
     setTypingStatus('ready');
   };
 
@@ -128,8 +128,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
         fileItem: {
           status: 'typed',
           typingProgress: {
-            row: cursorLine,
-            column: cursorPositions[cursorLine],
+            row: cursorRow,
+            column: cursorColumns[cursorRow],
             time: 100.5, // TODO: タイピング時間を計測する
             totalTypoCount: 10, // TODO: タイポ数を計測する
             typosAttributes: calculateTypos(typedTextLines, targetTextLines),
@@ -152,8 +152,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
     fileItem?.id,
     params,
     session,
-    cursorLine,
-    cursorPositions,
+    cursorRow,
+    cursorColumns,
     typedTextLines,
     targetTextLines,
     setFileItems,
@@ -161,49 +161,48 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
   ]);
 
   const isComplete = useCallback(
-    (newCursorPositions: number[]) => {
+    (newCursorColumns: number[]) => {
       return (
-        cursorLine === targetTextLines.length - 1 &&
-        newCursorPositions[cursorLine] === targetTextLines[cursorLine].length
+        cursorRow === targetTextLines.length - 1 && newCursorColumns[cursorRow] === targetTextLines[cursorRow].length
       );
     },
-    [cursorLine, targetTextLines],
+    [cursorRow, targetTextLines],
   );
 
   const handleCharacterInput = useCallback(
     (character: string) => {
       const newTypedTextLines = [...typedTextLines];
-      const newCursorPositions = [...cursorPositions];
+      const newCursorColumns = [...cursorColumns];
 
-      newTypedTextLines[cursorLine] += character;
-      newCursorPositions[cursorLine] = Math.min(targetTextLines[cursorLine].length, cursorPositions[cursorLine] + 1);
-      const newCursorLine =
-        newCursorPositions[cursorLine] === targetTextLines[cursorLine].length
-          ? Math.min(targetTextLines.length - 1, cursorLine + 1)
-          : cursorLine;
+      newTypedTextLines[cursorRow] += character;
+      newCursorColumns[cursorRow] = Math.min(targetTextLines[cursorRow].length, cursorColumns[cursorRow] + 1);
+      const newCursorRow =
+        newCursorColumns[cursorRow] === targetTextLines[cursorRow].length
+          ? Math.min(targetTextLines.length - 1, cursorRow + 1)
+          : cursorRow;
 
-      return { newTypedTextLines, newCursorPositions, newCursorLine };
+      return { newTypedTextLines, newCursorColumns, newCursorRow };
     },
-    [typedTextLines, cursorPositions, cursorLine, targetTextLines],
+    [typedTextLines, cursorColumns, cursorRow, targetTextLines],
   );
 
   const handleBackspace = useCallback(() => {
     const newTypedTextLines = [...typedTextLines];
-    const newCursorPositions = [...cursorPositions];
-    const backspacedCursorPosition = cursorPositions[cursorLine] - 1;
-    const newCursorLine = backspacedCursorPosition < 0 ? Math.max(0, cursorLine - 1) : cursorLine;
+    const newCursorColumns = [...cursorColumns];
+    const backspacedCursorColumn = cursorColumns[cursorRow] - 1;
+    const newCursorRow = backspacedCursorColumn < 0 ? Math.max(0, cursorRow - 1) : cursorRow;
 
     // 最初の行かつ最初の文字の場合は何もしない
-    if (cursorLine === 0 && backspacedCursorPosition < 0) {
-      return { newTypedTextLines, newCursorPositions, newCursorLine };
+    if (cursorRow === 0 && backspacedCursorColumn < 0) {
+      return { newTypedTextLines, newCursorColumns, newCursorRow };
     }
 
-    newTypedTextLines[newCursorLine] = typedTextLines[newCursorLine].slice(0, -1);
-    newCursorPositions[newCursorLine] =
-      backspacedCursorPosition < 0 ? newCursorPositions[newCursorLine] - 1 : backspacedCursorPosition;
+    newTypedTextLines[newCursorRow] = typedTextLines[newCursorRow].slice(0, -1);
+    newCursorColumns[newCursorRow] =
+      backspacedCursorColumn < 0 ? newCursorColumns[newCursorRow] - 1 : backspacedCursorColumn;
 
-    return { newTypedTextLines, newCursorPositions, newCursorLine };
-  }, [typedTextLines, cursorPositions, cursorLine]);
+    return { newTypedTextLines, newCursorColumns, newCursorRow };
+  }, [typedTextLines, cursorColumns, cursorRow]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -211,8 +210,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
 
       let result: {
         newTypedTextLines: string[];
-        newCursorPositions: number[];
-        newCursorLine: number;
+        newCursorColumns: number[];
+        newCursorRow: number;
       };
 
       if (e.key.length === 1) {
@@ -230,10 +229,10 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
       }
 
       setTypedTextLines(result.newTypedTextLines);
-      setCursorPositions(result.newCursorPositions);
-      setCursorLine(result.newCursorLine);
+      setCursorColumns(result.newCursorColumns);
+      setCursorRow(result.newCursorRow);
 
-      if (isComplete(result.newCursorPositions)) {
+      if (isComplete(result.newCursorColumns)) {
         handleComplete();
       }
     },
@@ -249,8 +248,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
   }, [handleKeyDown]);
 
   return {
-    cursorLine,
-    cursorPositions,
+    cursorRow,
+    cursorColumns,
     targetTextLines,
     typedTextLines,
     typingStatus,
@@ -263,15 +262,15 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
   };
 }
 
-function calculateTypos(typedLines: string[], targetLines: string[]): Typo[] {
-  return typedLines.flatMap((typedLine, lineIndex) => {
-    const targetLine = targetLines[lineIndex] || '';
-    return [...typedLine]
-      .map((typedChar, charIndex) => ({ typedChar, charIndex, targetChar: targetLine[charIndex] }))
+function calculateTypos(typedTextLines: string[], targetTextLines: string[]): Typo[] {
+  return typedTextLines.flatMap((typedTextLine, row) => {
+    const targetTextLine = targetTextLines[row] || '';
+    return [...typedTextLine]
+      .map((typedChar, column) => ({ typedChar, column, targetChar: targetTextLine[column] }))
       .filter(({ typedChar, targetChar }) => typedChar !== targetChar)
-      .map(({ typedChar, charIndex }) => ({
-        row: lineIndex,
-        column: charIndex,
+      .map(({ typedChar, column }) => ({
+        row,
+        column,
         character: typedChar,
       }));
   });
@@ -279,51 +278,46 @@ function calculateTypos(typedLines: string[], targetLines: string[]): Typo[] {
 
 function initializeTextState(content: string) {
   const textLines = content?.split(/(?<=\n)/) || [];
-  const initialCursorPositions = textLines.map((line) => line.indexOf(line.trimStart()));
-  const initialTypedTextLines = textLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
+  const initialCursorColumns = textLines.map((textLine) => textLine.indexOf(textLine.trimStart()));
+  const initialTypedTextLines = textLines.map((_, row) => ' '.repeat(initialCursorColumns[row]));
 
   return {
     textLines,
-    initialCursorPositions,
+    initialCursorColumns,
     initialTypedTextLines,
   };
 }
 
-function restoreCompletedLines(
-  textLines: string[],
-  typedLine: number,
-  typos: Typo[],
-  initialCursorPositions: number[],
-) {
-  const restoredCursorPositions = [...initialCursorPositions];
-  const restoredTypedTextLines = textLines.map((_, index) => ' '.repeat(initialCursorPositions[index]));
+function restoreCompletedRows(currentRow: number, textLines: string[], typos: Typo[], initialCursorColumns: number[]) {
+  const restoredCursorColumns = [...initialCursorColumns];
+  const restoredTypedTextLines = textLines.map((_, row) => ' '.repeat(initialCursorColumns[row]));
 
-  textLines.slice(0, typedLine).forEach((textLine, i) => {
-    restoredTypedTextLines[i] = restoreTypedText(textLine, i, typos);
-    restoredCursorPositions[i] = textLine.length;
+  textLines.slice(0, currentRow).forEach((textLine, row) => {
+    restoredTypedTextLines[row] = restoreTypedTextLine(row, textLine, typos);
+    restoredCursorColumns[row] = textLine.length;
   });
 
-  return { restoredCursorPositions, restoredTypedTextLines };
+  return { restoredCursorColumns, restoredTypedTextLines };
 }
 
-function restoreCurrentLine(
+function restoreCurrentRow(
+  currentRow: number,
+  currentColumn: number,
   textLines: string[],
-  typedLine: number,
-  typedCharacter: number,
   typos: Typo[],
-  restoredCursorPositions: number[],
+  restoredCursorColumns: number[],
   restoredTypedTextLines: string[],
 ) {
-  const currentTextLine = textLines[typedLine];
-  const currentTargetText = currentTextLine.substring(0, typedCharacter);
-  restoredTypedTextLines[typedLine] = restoreTypedText(currentTargetText, typedLine, typos);
-  restoredCursorPositions[typedLine] = typedCharacter;
+  const currentTextLine = textLines[currentRow];
+  const currentTargetText = currentTextLine.substring(0, currentColumn);
+  restoredTypedTextLines[currentRow] = restoreTypedTextLine(currentRow, currentTargetText, typos);
+  restoredCursorColumns[currentRow] = currentColumn;
 
-  return { restoredCursorPositions, restoredTypedTextLines };
+  return { restoredCursorColumns, restoredTypedTextLines };
 }
 
-function restoreTypedText(targetTextLine: string, lineIndex: number, typos: Typo[]): string {
-  const typoMap = new Map(typos.filter((typo) => typo.row === lineIndex).map((typo) => [typo.column, typo.character]));
+function restoreTypedTextLine(row: number, targetTextLine: string, typos: Typo[]): string {
+  const typoMap = new Map(typos.filter((typo) => typo.row === row).map((typo) => [typo.column, typo.character]));
 
   return [...targetTextLine].map((char, index) => typoMap.get(index) ?? char).join('');
 }

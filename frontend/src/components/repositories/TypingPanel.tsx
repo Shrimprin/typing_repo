@@ -6,8 +6,8 @@ type TypingPanelProps = {
   fileItem: FileItem;
   typingStatus: TypingStatus;
   typingHandler: {
-    cursorLine: number;
-    cursorPositions: number[];
+    cursorRow: number;
+    cursorColumns: number[];
     targetTextLines: string[];
     typedTextLines: string[];
     typingStatus: TypingStatus;
@@ -20,8 +20,8 @@ type TypingPanelProps = {
 
 export default function TypingPanel({ fileItem, typingStatus, typingHandler }: TypingPanelProps) {
   const {
-    cursorLine,
-    cursorPositions,
+    cursorRow,
+    cursorColumns,
     targetTextLines,
     typedTextLines,
     startTyping,
@@ -42,8 +42,8 @@ export default function TypingPanel({ fileItem, typingStatus, typingHandler }: T
       />
       <div className="flex-1 overflow-hidden">
         <TypingContent
-          cursorLine={cursorLine}
-          cursorPositions={cursorPositions}
+          cursorRow={cursorRow}
+          cursorColumns={cursorColumns}
           targetTextLines={targetTextLines}
           typedTextLines={typedTextLines}
           typingStatus={typingStatus}

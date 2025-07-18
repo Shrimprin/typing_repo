@@ -2,16 +2,16 @@ import TypingLine from '@/components/repositories/TypingLine';
 import { TypingStatus } from '@/types';
 
 type TypingContentProps = {
-  cursorLine: number;
-  cursorPositions: number[];
+  cursorRow: number;
+  cursorColumns: number[];
   targetTextLines: string[];
   typedTextLines: string[];
   typingStatus: TypingStatus;
 };
 
 export default function TypingContent({
-  cursorLine,
-  cursorPositions,
+  cursorRow,
+  cursorColumns,
   targetTextLines,
   typedTextLines,
   typingStatus,
@@ -20,21 +20,21 @@ export default function TypingContent({
     <div className="h-full overflow-auto px-4">
       {typingStatus === 'ready' ? (
         <pre className="font-mono">
-          {targetTextLines.map((line, i) => (
-            <p key={i} className="h-[1.4em] whitespace-pre">
-              {line}
+          {targetTextLines.map((textLine, row) => (
+            <p key={row} className="h-[1.4em] whitespace-pre">
+              {textLine}
             </p>
           ))}
         </pre>
       ) : typingStatus === 'typing' || typingStatus === 'paused' ? (
         <div className="min-w-fit">
-          {targetTextLines.map((targetTextLine, index) => (
+          {targetTextLines.map((targetTextLine, row) => (
             <TypingLine
-              key={index}
-              cursorPosition={cursorPositions[index]}
-              isUntypedLine={index > cursorLine}
+              key={row}
+              cursorColumn={cursorColumns[row]}
+              isUntypedLine={row > cursorRow}
               targetTextLine={targetTextLine}
-              typedText={typedTextLines[index]}
+              typedText={typedTextLines[row]}
             />
           ))}
         </div>

@@ -2,33 +2,33 @@ import { IconCornerDownLeft } from '@tabler/icons-react';
 import React from 'react';
 
 type TypingLineProps = {
-  cursorPosition: number;
+  cursorColumn: number;
   isUntypedLine: boolean;
   targetTextLine: string;
   typedText: string;
 };
 
 const TypingLine = React.memo(function TypingLine({
-  cursorPosition,
+  cursorColumn,
   isUntypedLine,
   targetTextLine,
   typedText,
 }: TypingLineProps) {
-  const getCharClass = (index: number) => {
-    const isUntypedText = index > typedText.length;
-    const isTypingText = index === cursorPosition;
-    const isCorrectTypedText = typedText[index] === targetTextLine[index];
+  const getCharClass = (column: number) => {
+    const isUntypedChar = column > typedText.length;
+    const isTypingChar = column === cursorColumn;
+    const isCorrectTypedChar = typedText[column] === targetTextLine[column];
 
-    if (isUntypedText || isUntypedLine) return 'text-muted-foreground';
-    if (isTypingText) return 'border-b border-foreground';
-    if (isCorrectTypedText) return 'bg-secondary/10 text-secondary';
+    if (isUntypedChar || isUntypedLine) return 'text-muted-foreground';
+    if (isTypingChar) return 'border-b border-foreground';
+    if (isCorrectTypedChar) return 'bg-secondary/10 text-secondary';
     return 'bg-destructive/10 text-destructive'; // タイポした文字
   };
 
   return (
     <pre className="h-[1.4em] font-mono">
-      {targetTextLine.split('').map((char, index) => (
-        <span key={index} className={getCharClass(index)}>
+      {targetTextLine.split('').map((char, column) => (
+        <span key={column} className={getCharClass(column)}>
           {char === '\n' ? <IconCornerDownLeft stroke={1} size={8} className="inline" /> : char}
         </span>
       ))}

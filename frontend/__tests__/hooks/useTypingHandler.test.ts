@@ -74,13 +74,13 @@ describe('useTypingHandler', () => {
       const result = await setupHook();
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
     });
 
     it('start with cursor line is first', async () => {
       const result = await setupHook();
 
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorRow).toBe(0);
     });
 
     it('can not type when key is pressed', async () => {
@@ -89,8 +89,8 @@ describe('useTypingHandler', () => {
       await userEvent.keyboard('A');
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
+      expect(result.current.cursorRow).toBe(0);
     });
 
     it('can start typing', () => {
@@ -115,7 +115,7 @@ describe('useTypingHandler', () => {
       await userEvent.keyboard('d');
 
       expect(result.current.typedTextLines).toEqual(['d', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([1, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([1, 2, 0]);
     });
 
     it('can type the enter key', async () => {
@@ -124,7 +124,7 @@ describe('useTypingHandler', () => {
       await userEvent.keyboard('{Enter}');
 
       expect(result.current.typedTextLines).toEqual(['\n', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([1, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([1, 2, 0]);
     });
 
     it('can line break with the enter key', async () => {
@@ -133,14 +133,14 @@ describe('useTypingHandler', () => {
       await userEvent.keyboard('def hello_world');
 
       expect(result.current.typedTextLines).toEqual(['def hello_world', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([15, 2, 0]);
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorColumns).toEqual([15, 2, 0]);
+      expect(result.current.cursorRow).toBe(0);
 
       await userEvent.keyboard('{Enter}');
 
       expect(result.current.typedTextLines).toEqual(['def hello_world\n', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([16, 2, 0]);
-      expect(result.current.cursorLine).toBe(1);
+      expect(result.current.cursorColumns).toEqual([16, 2, 0]);
+      expect(result.current.cursorRow).toBe(1);
     });
 
     it('can delete the input with the backspace key', async () => {
@@ -149,12 +149,12 @@ describe('useTypingHandler', () => {
       await userEvent.keyboard('d');
 
       expect(result.current.typedTextLines).toEqual(['d', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([1, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([1, 2, 0]);
 
       await userEvent.keyboard('{Backspace}');
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
     });
 
     it('can delete the line break with the backspace key', async () => {
@@ -163,15 +163,15 @@ describe('useTypingHandler', () => {
       await userEvent.keyboard('def hello_world{Enter}');
 
       expect(result.current.typedTextLines).toEqual(['def hello_world\n', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([16, 2, 0]);
-      expect(result.current.cursorLine).toBe(1);
+      expect(result.current.cursorColumns).toEqual([16, 2, 0]);
+      expect(result.current.cursorRow).toBe(1);
 
       // スペースがあるため3回バックスペースキーを入力する
       await userEvent.keyboard('{Backspace}{Backspace}{Backspace}');
 
       expect(result.current.typedTextLines).toEqual(['def hello_world', '', '']);
-      expect(result.current.cursorPositions).toEqual([15, 0, 0]);
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorColumns).toEqual([15, 0, 0]);
+      expect(result.current.cursorRow).toBe(0);
     });
 
     it('cannot type the tab key', async () => {
@@ -180,21 +180,21 @@ describe('useTypingHandler', () => {
       await userEvent.keyboard('{Tab}');
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
     });
 
     it('does not delete when first line and first character with backspace key', async () => {
       const result = await setupHook(typingProps);
 
       // カーソルが最初の行と最初の文字の位置にあることを確認
-      expect(result.current.cursorLine).toBe(0);
-      expect(result.current.cursorPositions[0]).toBe(0);
+      expect(result.current.cursorRow).toBe(0);
+      expect(result.current.cursorColumns[0]).toBe(0);
 
       await userEvent.keyboard('{Backspace}');
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
+      expect(result.current.cursorRow).toBe(0);
     });
 
     it('can pause typing', async () => {
@@ -215,8 +215,8 @@ describe('useTypingHandler', () => {
       await userEvent.keyboard("puts 'Hello, World!'{Enter}");
 
       expect(result.current.typedTextLines).toEqual(['def hello_world\n', "  puts 'Hello, World!'\n", '']);
-      expect(result.current.cursorPositions).toEqual([16, 23, 0]);
-      expect(result.current.cursorLine).toBe(2);
+      expect(result.current.cursorColumns).toEqual([16, 23, 0]);
+      expect(result.current.cursorRow).toBe(2);
 
       await act(async () => {
         await result.current.pauseTyping();
@@ -224,8 +224,8 @@ describe('useTypingHandler', () => {
 
       expect(mockSetTypingStatus).toHaveBeenCalledWith('paused');
       expect(result.current.typedTextLines).toEqual(['def hello_world\n', "  puts 'Hello, World!'\n", '']);
-      expect(result.current.cursorPositions).toEqual([16, 23, 0]);
-      expect(result.current.cursorLine).toBe(2);
+      expect(result.current.cursorColumns).toEqual([16, 23, 0]);
+      expect(result.current.cursorRow).toBe(2);
     });
 
     it('can complete typing', async () => {
@@ -250,8 +250,8 @@ describe('useTypingHandler', () => {
 
       expect(mockSetTypingStatus).toHaveBeenCalledWith('completed');
       expect(result.current.typedTextLines).toEqual(['def hello_world\n', "  pust 'Hello, World!'\n", 'end\n']);
-      expect(result.current.cursorPositions).toEqual([16, 23, 4]);
-      expect(result.current.cursorLine).toBe(2);
+      expect(result.current.cursorColumns).toEqual([16, 23, 4]);
+      expect(result.current.cursorRow).toBe(2);
     });
 
     it('can reset typing', async () => {
@@ -260,8 +260,8 @@ describe('useTypingHandler', () => {
       await userEvent.keyboard('def hello_world{Enter}');
 
       expect(result.current.typedTextLines).toEqual(['def hello_world\n', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([16, 2, 0]);
-      expect(result.current.cursorLine).toBe(1);
+      expect(result.current.cursorColumns).toEqual([16, 2, 0]);
+      expect(result.current.cursorRow).toBe(1);
       expect(result.current.typingStatus).toBe('typing');
 
       act(() => {
@@ -270,8 +270,8 @@ describe('useTypingHandler', () => {
 
       expect(mockSetTypingStatus).toHaveBeenCalledWith('ready');
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
+      expect(result.current.cursorRow).toBe(0);
     });
   });
 
@@ -287,7 +287,7 @@ describe('useTypingHandler', () => {
       await userEvent.keyboard('d');
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
     });
 
     it('can resume typing', async () => {
@@ -313,7 +313,7 @@ describe('useTypingHandler', () => {
       await userEvent.keyboard('d');
 
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
     });
 
     it('can replay typing', async () => {
@@ -325,8 +325,8 @@ describe('useTypingHandler', () => {
 
       expect(mockSetTypingStatus).toHaveBeenCalledWith('ready');
       expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-      expect(result.current.cursorPositions).toEqual([0, 2, 0]);
-      expect(result.current.cursorLine).toBe(0);
+      expect(result.current.cursorColumns).toEqual([0, 2, 0]);
+      expect(result.current.cursorRow).toBe(0);
     });
   });
 
@@ -340,8 +340,8 @@ describe('useTypingHandler', () => {
         const result = await setupHook(defaultProps);
 
         expect(result.current.typedTextLines).toEqual(['', '  ', '']);
-        expect(result.current.cursorPositions).toEqual([0, 2, 0]);
-        expect(result.current.cursorLine).toBe(0);
+        expect(result.current.cursorColumns).toEqual([0, 2, 0]);
+        expect(result.current.cursorRow).toBe(0);
       });
     });
 
@@ -375,8 +375,8 @@ describe('useTypingHandler', () => {
         const result = await setupHook(defaultProps);
 
         expect(result.current.typedTextLines).toEqual(['def hello_world\n', '  pust', '']);
-        expect(result.current.cursorPositions).toEqual([16, 6, 0]);
-        expect(result.current.cursorLine).toBe(1);
+        expect(result.current.cursorColumns).toEqual([16, 6, 0]);
+        expect(result.current.cursorRow).toBe(1);
       });
     });
 
