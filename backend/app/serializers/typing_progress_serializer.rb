@@ -3,7 +3,7 @@
 class TypingProgressSerializer
   include Alba::Serializer
 
-  attributes :row, :column, :time, :total_typo_count, :typos
+  attributes :row, :column, :time, :total_typo_count
 
   attribute :typos do |typing_progress|
     typing_progress.typos.map do |typo|
