@@ -1,8 +1,11 @@
 import { IconCornerDownLeft } from '@tabler/icons-react';
 import React from 'react';
 
+import { useAutoScroll } from '@/hooks/useAutoScroll';
+
 type TypingLineProps = {
   cursorColumn: number;
+  isCursorLine: boolean;
   isUntypedLine: boolean;
   targetTextLine: string;
   typedText: string;
@@ -10,10 +13,16 @@ type TypingLineProps = {
 
 const TypingLine = React.memo(function TypingLine({
   cursorColumn,
+  isCursorLine,
   isUntypedLine,
   targetTextLine,
   typedText,
 }: TypingLineProps) {
+  const scrollToElement = useAutoScroll({
+    coolTime: 150,
+    scrollMargin: 0.1,
+  });
+
   const getCharClass = (column: number) => {
     const isUntypedChar = column > typedText.length;
     const isTypingChar = column === cursorColumn;
@@ -27,11 +36,18 @@ const TypingLine = React.memo(function TypingLine({
 
   return (
     <pre className="h-[1.4em] font-mono">
-      {targetTextLine.split('').map((char, column) => (
-        <span key={column} className={getCharClass(column)}>
-          {char === '\n' ? <IconCornerDownLeft stroke={1} size={8} className="inline" /> : char}
-        </span>
-      ))}
+      {targetTextLine.split('').map((char, column) => {
+        const isCursorChar = column === cursorColumn;
+        return (
+          <span
+            key={column}
+            className={getCharClass(column)}
+            ref={isCursorLine && isCursorChar ? scrollToElement : null}
+          >
+            {char === '\n' ? <IconCornerDownLeft stroke={1} size={8} className="inline" /> : char}
+          </span>
+        );
+      })}
     </pre>
   );
 });
