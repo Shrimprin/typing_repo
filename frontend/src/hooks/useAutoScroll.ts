@@ -16,7 +16,7 @@ export function useAutoScroll({ coolTime = 150, scrollMargin = 0.1 }: UseAutoScr
 
       if (now - lastScrollTimeRef.current < coolTime) return;
 
-      const container = element.closest('[class*="overflow-auto"]') as HTMLElement;
+      const container = element.closest('.overflow-auto') as HTMLElement;
       if (!container) return;
 
       const elementRect = element.getBoundingClientRect();
