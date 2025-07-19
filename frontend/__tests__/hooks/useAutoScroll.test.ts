@@ -61,8 +61,8 @@ describe('useAutoScroll', () => {
     const mockElement: Partial<HTMLElement> = {
       scrollIntoView: mockScrollIntoView,
       getBoundingClientRect: jest.fn().mockReturnValue({
-        left: 50,
-        right: 60,
+        left: 480,
+        right: 490,
         width: 10,
         height: 20,
       }),
