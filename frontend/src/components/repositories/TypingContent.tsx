@@ -32,6 +32,7 @@ export default function TypingContent({
             <TypingLine
               key={row}
               cursorColumn={cursorColumns[row]}
+              isCursorLine={row === cursorRow}
               isUntypedLine={row > cursorRow}
               targetTextLine={targetTextLine}
               typedText={typedTextLines[row]}
