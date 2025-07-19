@@ -1,5 +1,7 @@
 import { IconCornerDownLeft } from '@tabler/icons-react';
-import React, { useRef } from 'react';
+import React from 'react';
+
+import { useAutoScroll } from '@/hooks/useAutoScroll';
 
 type TypingLineProps = {
   cursorColumn: number;
@@ -16,9 +18,10 @@ const TypingLine = React.memo(function TypingLine({
   targetTextLine,
   typedText,
 }: TypingLineProps) {
-  const lastScrollTimeRef = useRef<number>(0);
-  const SCROLL_COOL_TIME = 150; // タイピングが早すぎるとスクロールが重複してしまうので、150 ms間隔でスクロールを制限する
-  const SCROLL_MARGIN = 0.1;
+  const scrollToElement = useAutoScroll({
+    coolTime: 150,
+    scrollMargin: 0.1,
+  });
 
   const getCharClass = (column: number) => {
     const isUntypedChar = column > typedText.length;
@@ -29,32 +32,6 @@ const TypingLine = React.memo(function TypingLine({
     if (isTypingChar) return 'border-b border-foreground';
     if (isCorrectTypedChar) return 'bg-secondary/10 text-secondary';
     return 'bg-destructive/10 text-destructive'; // タイポした文字
-  };
-
-  const scrollToElement = (element: HTMLSpanElement | null) => {
-    if (!element) return;
-
-    const now = Date.now();
-
-    if (now - lastScrollTimeRef.current < SCROLL_COOL_TIME) return;
-
-    const container = element.closest('[class*="overflow-auto"]') as HTMLElement;
-    if (!container) return;
-
-    const elementRect = element.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-    const leftThreshold = containerRect.left + containerRect.width * SCROLL_MARGIN;
-    const rightThreshold = containerRect.right - containerRect.width * SCROLL_MARGIN;
-
-    if (elementRect.left < leftThreshold || elementRect.right > rightThreshold) {
-      lastScrollTimeRef.current = now;
-
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'center',
-      });
-    }
   };
 
   return (
