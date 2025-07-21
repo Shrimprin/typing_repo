@@ -2,14 +2,22 @@
 
 module Api
   class FileItemsController < ApplicationController
-    before_action :set_repository, only: %i[update]
+    before_action :set_repository, only: %i[show update]
     before_action :set_file_item, only: %i[show update]
 
     def show
+      fetch_file_content
       render json: FileItemSerializer.new(
         @file_item,
         params: { content: true, typing_progress: true, children: true }
       ), status: :ok
+    rescue Octokit::TooManyRequests
+      render json: { error: 'Too many requests. Please try again later.' }, status: :too_many_requests
+    rescue Octokit::Unauthorized
+      render json: { error: 'Invalid access token' }, status: :unauthorized
+    rescue StandardError => e
+      Rails.logger.error "Unexpected error in file_items#show: #{e.message}"
+      render json: { error: 'An error occurred. Please try again.' }, status: :internal_server_error
     end
 
     def update
@@ -54,6 +62,17 @@ module Api
       @file_item = repository.file_items.find(params[:id])
     rescue ActiveRecord::RecordNotFound
       render json: { error: 'File not found' }, status: :not_found
+    end
+
+    def fetch_file_content
+      return if @file_item.content.present? || @file_item.dir?
+
+      client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
+      file_content = client.contents(@repository.url, path: @file_item.github_path, ref: @repository.commit_hash)[
+        :content
+      ]
+      decoded_file_content = FileItem.decode_file_content(file_content)
+      @file_item.update(content: decoded_file_content)
     end
   end
 end
