@@ -17,25 +17,47 @@ class Repository < ApplicationRecord
   private
 
   def save_file_items(client)
-    tree = client.tree(url, commit_hash, recursive: true)
-    created_file_items_map = {} # 作成済みfile_itemのマップ（path => FileItem）
-    sorted_items = tree.tree.sort_by { |item| item.path.count('/') }
+    file_tree_data = client.tree(url, commit_hash, recursive: true)
+    create_file_items_by_depth(file_tree_data.tree)
+  end
 
-    sorted_items.each do |item|
-      parent_path = File.dirname(item.path)
+  def create_file_items_by_depth(file_tree)
+    file_items_grouped_by_depth = file_tree.group_by { |file_item| file_item.path.count('/') }
+    created_file_items_map = {} # typeがtreeで作成済みfile_itemのマップ（path => FileItem）
+
+    file_items_grouped_by_depth.keys.sort.each do |depth|
+      file_items_at_depth = file_items_grouped_by_depth[depth]
+      created_file_items = create_file_items_batch(file_items_at_depth, created_file_items_map)
+      new_file_items_map = build_file_items_map(file_items_at_depth, created_file_items)
+      created_file_items_map.merge!(new_file_items_map)
+    end
+  end
+
+  def create_file_items_batch(file_items, created_file_items_map)
+    file_items_to_import = file_items.map do |file_item|
+      parent_path = File.dirname(file_item.path)
       parent_item = parent_path == '.' ? nil : created_file_items_map[parent_path]
-      file_item_scope = parent_item ? parent_item.children : file_items
-      file_name = File.basename(item.path)
-      file_type = item.type == 'tree' ? :dir : :file
 
-      file_item = file_item_scope.create!(
+      FileItem.new(
         repository: self,
-        name: file_name,
-        type: file_type,
+        parent: parent_item,
+        name: File.basename(file_item.path),
+        type: file_item.type == 'tree' ? :dir : :file,
         content: nil,
         status: :untyped
       )
-      created_file_items_map[item.path] = file_item
     end
+
+    FileItem.import(file_items_to_import, batch_size: 1000, timestamps: true)
+
+    file_items_to_import
+  end
+
+  def build_file_items_map(file_items, created_file_items)
+    file_items_map = {}
+    file_items.each_with_index do |file_item, index|
+      file_items_map[file_item.path] = created_file_items[index] if file_item.type == 'tree'
+    end
+    file_items_map
   end
 end
