@@ -56,48 +56,24 @@ RSpec.describe Repository, type: :model do
 
   describe '#save_file_items' do
     let(:github_client_mock) { instance_double(Octokit::Client) }
+    let(:tree_response) { double('tree_response', tree: tree_items) }
+    let(:tree_items) do
+      [
+        double('tree_item', path: 'file1.rb', type: 'blob'),
+        double('tree_item', path: 'file2.rb', type: 'blob'),
+        double('tree_item', path: 'directory1', type: 'tree'),
+        double('tree_item', path: 'directory1/file3.rb', type: 'blob'),
+        double('tree_item', path: 'directory1/directory2', type: 'tree'),
+        double('tree_item', path: 'directory1/directory2/file4.rb', type: 'blob')
+      ]
+    end
 
     before do
-      allow(github_client_mock).to receive(:contents)
-        .with(repository.url, path: '')
-        .and_return([
-                      { name: 'file1.rb', type: 'file', path: 'file1.rb' },
-                      { name: 'file2.rb', type: 'file', path: 'file2.rb' },
-                      { name: 'directory1', type: 'dir', path: 'directory1' }
-                    ])
+      allow(github_client_mock).to receive(:tree)
+        .with(repository.url, repository.commit_hash, recursive: true)
+        .and_return(tree_response)
 
-      allow(github_client_mock).to receive(:contents).with(repository.url, path: 'file1.rb').and_return(
-        { content: Base64.encode64('file1 content') }
-      )
-
-      allow(github_client_mock).to receive(:contents).with(repository.url, path: 'file2.rb').and_return(
-        { content: Base64.encode64('file2 content') }
-      )
-
-      allow(github_client_mock).to receive(:contents)
-        .with(repository.url, path: 'directory1')
-        .and_return([
-                      { name: 'file3.rb', type: 'file', path: 'directory1/file3.rb' },
-                      { name: 'directory2', type: 'dir', path: 'directory1/directory2' }
-                    ])
-
-      allow(github_client_mock).to receive(:contents)
-        .with(repository.url, path: 'directory1/file3.rb')
-        .and_return(
-          { content: Base64.encode64('file3 content') }
-        )
-
-      allow(github_client_mock).to receive(:contents)
-        .with(repository.url, path: 'directory1/directory2')
-        .and_return([
-                      { name: 'file4.rb', type: 'file', path: 'directory1/directory2/file4.rb' }
-                    ])
-
-      allow(github_client_mock).to receive(:contents)
-        .with(repository.url, path: 'directory1/directory2/file4.rb')
-        .and_return(
-          { content: Base64.encode64('file4 content') }
-        )
+      repository.save!
     end
 
     it 'saves repository and file_items' do

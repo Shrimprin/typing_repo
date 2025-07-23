@@ -16,16 +16,26 @@ class Repository < ApplicationRecord
 
   private
 
-  def save_file_items(client, parent_file_item = nil, file_path = '')
-    files = client.contents(url, path: file_path)
-    files.each do |file|
-      file_item_scope = parent_file_item ? parent_file_item.children : FileItem
-      file_name = file[:name]
-      file_type = file[:type]
+  def save_file_items(client)
+    tree = client.tree(url, commit_hash, recursive: true)
+    created_file_items_map = {} # 作成済みfile_itemのマップ（path => FileItem）
+    sorted_items = tree.tree.sort_by { |item| item.path.count('/') }
 
-      file_item = file_item_scope.create!(repository: self, name: file_name, type: file_type, content: nil,
-                                          status: :untyped)
-      save_file_items(client, file_item, file[:path]) if file_type == 'dir'
+    sorted_items.each do |item|
+      parent_path = File.dirname(item.path)
+      parent_item = parent_path == '.' ? nil : created_file_items_map[parent_path]
+      file_item_scope = parent_item ? parent_item.children : file_items
+      file_name = File.basename(item.path)
+      file_type = item.type == 'tree' ? :dir : :file
+
+      file_item = file_item_scope.create!(
+        repository: self,
+        name: file_name,
+        type: file_type,
+        content: nil,
+        status: :untyped
+      )
+      created_file_items_map[item.path] = file_item
     end
   end
 end
