@@ -8,6 +8,8 @@ class Repository < ApplicationRecord
   validates :name, presence: true
   validates :url, presence: true
 
+  BATCH_SIZE = 1000
+
   def save_with_file_items(client)
     transaction do
       save && save_file_items(client)
@@ -22,42 +24,58 @@ class Repository < ApplicationRecord
   end
 
   def create_file_items_by_depth(file_tree)
-    file_items_grouped_by_depth = file_tree.group_by { |file_item| file_item.path.count('/') }
-    created_file_items_map = {} # typeがtreeで作成済みfile_itemのマップ（path => FileItem）
+    file_items_grouped_by_depth = file_tree.group_by { |file_item| depth_of(file_item.path) }
+    directory_items_map = {} # typeがtreeで作成済みfile_itemのマップ（path => FileItem）
 
     file_items_grouped_by_depth.keys.sort.each do |depth|
       file_items_at_depth = file_items_grouped_by_depth[depth]
-      created_file_items = create_file_items_batch(file_items_at_depth, created_file_items_map)
-      new_file_items_map = build_file_items_map(file_items_at_depth, created_file_items)
-      created_file_items_map.merge!(new_file_items_map)
+      created_file_items = create_file_items_batch(file_items_at_depth, directory_items_map)
+      new_directory_items = extract_directory_items(file_items_at_depth, created_file_items)
+      directory_items_map.merge!(new_directory_items)
     end
   end
 
-  def create_file_items_batch(file_items, created_file_items_map)
+  def create_file_items_batch(file_items, directory_items_map)
     file_items_to_import = file_items.map do |file_item|
-      parent_path = File.dirname(file_item.path)
-      parent_item = parent_path == '.' ? nil : created_file_items_map[parent_path]
+      parent_item = find_parent_item(file_item.path, directory_items_map)
 
       FileItem.new(
         repository: self,
         parent: parent_item,
         name: File.basename(file_item.path),
-        type: file_item.type == 'tree' ? :dir : :file,
+        type: directory?(file_item) ? :dir : :file,
         content: nil,
         status: :untyped
       )
     end
 
-    FileItem.import(file_items_to_import, batch_size: 1000, timestamps: true)
+    FileItem.import(file_items_to_import, batch_size: BATCH_SIZE, timestamps: true)
 
     file_items_to_import
   end
 
-  def build_file_items_map(file_items, created_file_items)
-    file_items_map = {}
-    file_items.each_with_index do |file_item, index|
-      file_items_map[file_item.path] = created_file_items[index] if file_item.type == 'tree'
-    end
-    file_items_map
+  def extract_directory_items(file_items, created_file_items)
+    file_items.filter_map.with_index do |file_item, index|
+      [file_item.path, created_file_items[index]] if directory?(file_item)
+    end.to_h
+  end
+
+  def depth_of(path)
+    path.count('/')
+  end
+
+  def directory?(file_item)
+    file_item.type == 'tree'
+  end
+
+  def find_parent_item(path, directory_items_map)
+    parent_path = File.dirname(path)
+    return nil if root_directory?(parent_path)
+
+    directory_items_map[parent_path]
+  end
+
+  def root_directory?(path)
+    path == '.'
   end
 end
