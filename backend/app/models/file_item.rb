@@ -22,7 +22,19 @@ class FileItem < ApplicationRecord
     typed: 2
   }
 
-  def full_path
+  def self.decode_file_content(file_content)
+    decoded_file_content = Base64.decode64(file_content).force_encoding('UTF-8')
+
+    # UTF-8エンコーディングの確認と修正
+    unless decoded_file_content.valid_encoding?
+      decoded_file_content = decoded_file_content.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
+    end
+
+    # nullバイトを削除
+    decoded_file_content.delete("\0")
+  end
+
+  def github_path
     path = name
     current_parent = parent
 
@@ -31,7 +43,11 @@ class FileItem < ApplicationRecord
       current_parent = current_parent.parent
     end
 
-    "#{repository.name}/#{path}"
+    path
+  end
+
+  def full_path
+    "#{repository.name}/#{github_path}"
   end
 
   def update_parent_status

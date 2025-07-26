@@ -99,9 +99,10 @@ RSpec.describe 'Api::Repositories', type: :request do
         allow(github_client_mock).to receive(:repository).with(valid_repository_url).and_return(repository_info)
         allow(github_client_mock).to receive(:commits).with(valid_repository_url).and_return([commit])
 
-        allow(github_client_mock).to receive(:contents)
-          .with(valid_repository_url, path: '')
-          .and_return([])
+        tree_response = double('tree_response', tree: [])
+        allow(github_client_mock).to receive(:tree)
+          .with(valid_repository_url, 'commit_hash', recursive: true)
+          .and_return(tree_response)
       end
 
       it 'creates repository' do
