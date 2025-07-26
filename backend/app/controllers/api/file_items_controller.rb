@@ -15,8 +15,7 @@ module Api
       render json: { error: 'Too many requests. Please try again later.' }, status: :too_many_requests
     rescue Octokit::Unauthorized
       render json: { error: 'Invalid access token' }, status: :unauthorized
-    rescue StandardError => e
-      Rails.logger.error "Unexpected error in file_items#show: #{e.message}"
+    rescue StandardError
       render json: { error: 'An error occurred. Please try again.' }, status: :internal_server_error
     end
 
@@ -24,8 +23,15 @@ module Api
       case file_item_params[:status]
       when 'typed'
         if @file_item.update_with_parent(file_item_params) && @repository.update(last_typed_at: Time.zone.now)
-          top_level_file_items = @repository.file_items.roots
-          render json: FileItemSerializer.new(top_level_file_items, params: { children: true }), status: :ok
+          file_items_grouped_by_parent = @repository.file_items_grouped_by_parent
+          top_level_file_items = file_items_grouped_by_parent[nil] || []
+
+          render json:
+                 FileItemSerializer.new(
+                   top_level_file_items,
+                   params: { children: true, file_items_grouped_by_parent: }
+                 ),
+                 status: :ok
         else
           render json: @file_item.errors, status: :unprocessable_entity
         end

@@ -10,12 +10,27 @@ class Repository < ApplicationRecord
 
   BATCH_SIZE = 1000
 
+  def file_items_grouped_by_parent
+    file_items = self.file_items.to_a
+    file_items.group_by(&:parent_id)
+  end
+
   def save_with_file_items(client)
     transaction do
       is_saved = save && save_file_items?(client)
       raise ActiveRecord::Rollback unless is_saved
 
       true
+    end
+  end
+
+  def progress
+    files = file_items.where(type: :file)
+    if files.empty?
+      1.0
+    else
+      typed_count = files.where(status: :typed).count
+      typed_count.to_f / files.count
     end
   end
 
