@@ -11,7 +11,7 @@ RSpec.describe Repository, type: :model do
     context 'when saved successfully' do
       before do
         allow(repository).to receive(:save).and_return(true)
-        allow(repository).to receive(:save_file_items).with(github_client_mock).and_return(true)
+        allow(repository).to receive(:save_file_items?).with(github_client_mock).and_return(true)
       end
 
       it 'returns true' do
@@ -22,11 +22,11 @@ RSpec.describe Repository, type: :model do
     context 'when save failed' do
       before do
         allow(repository).to receive(:save).and_return(false)
-        allow(repository).to receive(:save_file_items).with(github_client_mock).and_return(true)
+        allow(repository).to receive(:save_file_items?).with(github_client_mock).and_return(true)
       end
 
-      it 'returns false' do
-        expect(repository.save_with_file_items(github_client_mock)).to be false
+      it 'returns nil' do
+        expect(repository.save_with_file_items(github_client_mock)).to be_nil
       end
 
       it 'does not create a repository' do
@@ -36,14 +36,14 @@ RSpec.describe Repository, type: :model do
       end
     end
 
-    context 'when save_file_items failed' do
+    context 'when save_file_items? failed' do
       before do
         allow(repository).to receive(:save).and_return(true)
-        allow(repository).to receive(:save_file_items).with(github_client_mock).and_return(false)
+        allow(repository).to receive(:save_file_items?).with(github_client_mock).and_return(false)
       end
 
-      it 'returns false' do
-        expect(repository.save_with_file_items(github_client_mock)).to be false
+      it 'returns nil' do
+        expect(repository.save_with_file_items(github_client_mock)).to be_nil
       end
 
       it 'rolls backs the transaction and does not create a repository' do
@@ -54,7 +54,7 @@ RSpec.describe Repository, type: :model do
     end
   end
 
-  describe '#save_file_items' do
+  describe '#save_file_items?' do
     let(:github_client_mock) { instance_double(Octokit::Client) }
     let(:tree_response) { double('tree_response', tree: tree_items) }
     let(:tree_items) do
@@ -78,7 +78,7 @@ RSpec.describe Repository, type: :model do
 
     it 'saves repository and file_items' do
       expect(repository.file_items.count).to eq(0)
-      repository.send(:save_file_items, github_client_mock)
+      repository.send(:save_file_items?, github_client_mock)
 
       expect(repository.file_items.count).to eq(6)
       expect(repository.file_items.where(type: 'file').count).to eq(4)
