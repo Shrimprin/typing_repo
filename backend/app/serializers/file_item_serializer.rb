@@ -10,7 +10,21 @@ class FileItemSerializer
   end
 
   attribute :file_items, if: proc { params[:children] } do |file_item|
-    file_item.children.map { |child| FileItemSerializer.new(child, params: { children: true }) }
+    file_items_grouped_by_parent = params[:file_items_grouped_by_parent]
+    if file_items_grouped_by_parent
+      child_file_items = file_items_grouped_by_parent[file_item.id] || []
+      child_file_items.map do |child|
+        FileItemSerializer.new(
+          child,
+          params: {
+            children: true,
+            file_items_grouped_by_parent:
+          }
+        )
+      end
+    else
+      file_item.children.map { |child| FileItemSerializer.new(child, params: { children: true }) }
+    end
   end
 
   attribute :full_path, &:full_path
