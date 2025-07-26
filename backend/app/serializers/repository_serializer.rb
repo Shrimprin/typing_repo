@@ -10,9 +10,7 @@ class RepositorySerializer
     file_items_grouped_by_parent = file_items.group_by(&:parent_id)
 
     top_level_file_items = file_items_grouped_by_parent[nil] || []
-    top_level_file_items.map do |file_item|
-      FileItemSerializer.new(file_item, params: { children: true, file_items_grouped_by_parent: })
-    end
+    FileItemSerializer.new(top_level_file_items, params: { children: true, file_items_grouped_by_parent: })
   end
 
   attribute :progress, if: proc { params[:progress] } do |repository|
