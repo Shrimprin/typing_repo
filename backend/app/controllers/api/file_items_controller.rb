@@ -23,22 +23,13 @@ module Api
       case file_item_params[:status]
       when 'typed'
         if @file_item.update_with_parent(file_item_params) && @repository.update(last_typed_at: Time.zone.now)
-          file_items_grouped_by_parent = @repository.file_items_grouped_by_parent
-          top_level_file_items = file_items_grouped_by_parent[nil] || []
-
-          render json:
-                 FileItemSerializer.new(
-                   top_level_file_items,
-                   params: { children: true, file_items_grouped_by_parent: }
-                 ),
-                 status: :ok
+          render json: typed_file_items_response, status: :ok
         else
           render json: @file_item.errors, status: :unprocessable_entity
         end
       when 'typing'
         if @file_item.update_with_typing_progress(file_item_params) && @repository.update(last_typed_at: Time.zone.now)
-          render json: FileItemSerializer.new(@file_item, params: { children: true }),
-                 status: :ok
+          render json: FileItemSerializer.new(@file_item, params: { children: true }), status: :ok
         else
           render json: @file_item.errors, status: :unprocessable_entity
         end
@@ -79,6 +70,16 @@ module Api
       ]
       decoded_file_content = FileItem.decode_file_content(file_content)
       @file_item.update(content: decoded_file_content)
+    end
+
+    def typed_file_items_response
+      file_items_grouped_by_parent = @repository.file_items_grouped_by_parent
+      top_level_file_items = file_items_grouped_by_parent[nil] || []
+
+      FileItemSerializer.new(
+        top_level_file_items,
+        params: { children: true, file_items_grouped_by_parent: }
+      )
     end
   end
 end
