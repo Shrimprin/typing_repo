@@ -65,7 +65,7 @@ module Api
       return if @file_item.content.present? || @file_item.dir?
 
       client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
-      file_content = client.contents(@repository.url, path: @file_item.github_path, ref: @repository.commit_hash)[
+      file_content = client.contents(@repository.url, path: @file_item.path, ref: @repository.commit_hash)[
         :content
       ]
       decoded_file_content = FileItem.decode_file_content(file_content)

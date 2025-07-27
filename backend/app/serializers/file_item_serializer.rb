@@ -3,7 +3,7 @@
 class FileItemSerializer
   include Alba::Serializer
 
-  attributes :id, :name, :status, :type
+  attributes :id, :name, :path, :status, :type
 
   attribute :content, if: proc { params[:content] } do |file_item|
     file_item.content || ''
@@ -18,8 +18,6 @@ class FileItemSerializer
       file_item.children.map { |child| FileItemSerializer.new(child, params: { children: true }) }
     end
   end
-
-  # attribute :full_path, &:full_path #  TODO: これも高速化する or showアクションの時のみ呼ぶ
 
   attribute :typing_progress, if: proc { params[:typing_progress] } do |file_item|
     file_item.typing_progress ? TypingProgressSerializer.new(file_item.typing_progress) : nil

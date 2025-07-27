@@ -10,6 +10,7 @@ class FileItem < ApplicationRecord
   validates :name, presence: true
   validates :status, presence: true
   validates :type, presence: true
+  validates :path, presence: true
 
   enum :type, {
     file: 0,
@@ -34,20 +35,8 @@ class FileItem < ApplicationRecord
     decoded_file_content.delete("\0")
   end
 
-  def github_path
-    path = name
-    current_parent = parent
-
-    while current_parent
-      path = "#{current_parent.name}/#{path}"
-      current_parent = current_parent.parent
-    end
-
-    path
-  end
-
   def full_path
-    "#{repository.name}/#{github_path}"
+    "#{repository.name}/#{path}"
   end
 
   def update_parent_status

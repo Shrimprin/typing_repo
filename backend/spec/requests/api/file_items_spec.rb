@@ -17,10 +17,10 @@ RSpec.describe 'Api::FileItems', type: :request do
         json = response.parsed_body
         expect(json['id']).to eq(file_item.id)
         expect(json['name']).to eq(file_item.name)
-        expect(json['type']).to eq(file_item.type)
+        expect(json['path']).to eq(file_item.path)
         expect(json['status']).to eq(file_item.status)
+        expect(json['type']).to eq(file_item.type)
         expect(json['content']).to eq(file_item.content)
-        expect(json['full_path']).to eq(file_item.full_path)
       end
     end
 

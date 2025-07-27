@@ -75,6 +75,7 @@ class Repository < ApplicationRecord
         repository: self,
         parent: parent_item,
         name: File.basename(file_item.path),
+        path: file_item.path,
         type: directory?(file_item) ? :dir : :file,
         content: nil,
         status: :untyped

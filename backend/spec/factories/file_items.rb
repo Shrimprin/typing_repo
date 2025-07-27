@@ -4,9 +4,10 @@ FactoryBot.define do
   factory :file_item do
     repository
     sequence(:name) { |n| "file_item_#{n}" }
-    type { :file }
     content { Faker::Lorem.paragraphs(number: 3) }
+    path { parent.present? ? "#{parent.path}/#{name}" : name }
     status { :untyped }
+    type { :file }
 
     trait :directory do
       type { :dir }
