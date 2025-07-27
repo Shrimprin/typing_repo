@@ -17,7 +17,7 @@ describe('useTypingHandler', () => {
   const mockFileItemData = {
     id: 1,
     content: "def hello_world\n  puts 'Hello, World!'\nend\n",
-    fullPath: 'test-file-path',
+    path: 'test-file-path',
     name: 'test-file-name',
     status: 'untyped',
     type: 'file',
@@ -31,7 +31,7 @@ describe('useTypingHandler', () => {
     typingStatus: 'ready' as TypingStatus,
     fileItem: {
       id: 1,
-      fullPath: 'test-file-path',
+      path: 'test-file-path',
       name: 'test-file-name',
       status: 'untyped',
       type: 'file',
@@ -201,7 +201,7 @@ describe('useTypingHandler', () => {
       jest.spyOn(axios, 'patch').mockResolvedValueOnce({
         data: {
           id: 1,
-          fullPath: 'test-file-path',
+          path: 'test-file-path',
           name: 'test-file-name',
           status: 'typing',
           type: 'file',
@@ -232,7 +232,7 @@ describe('useTypingHandler', () => {
       const mockResponse = [
         {
           id: '1',
-          fullPath: 'test-file-path',
+          path: 'test-file-path',
           name: 'test-file-name',
           status: 'typed',
           type: 'file',
@@ -417,7 +417,7 @@ describe('useTypingHandler', () => {
           name: 'test-file-name',
           type: 'file',
           status: 'typing',
-          fullPath: 'test-file-path',
+          path: 'test-file-path',
           fileItems: [],
         },
       };
@@ -480,7 +480,7 @@ describe('useTypingHandler', () => {
             name: 'test-file-name',
             type: 'file',
             status: 'untyped',
-            fullPath: 'test-file-path',
+            path: 'test-file-path',
             fileItems: [],
           },
           {
@@ -488,14 +488,14 @@ describe('useTypingHandler', () => {
             name: 'dir1',
             type: 'dir',
             status: 'untyped',
-            fullPath: 'dir1',
+            path: 'dir1',
             fileItems: [
               {
                 id: 3,
                 name: 'nested-file.ts',
                 type: 'file',
                 status: 'untyped',
-                fullPath: 'dir1/nested-file.ts',
+                path: 'dir1/nested-file.ts',
                 fileItems: [],
               },
             ],
@@ -555,7 +555,7 @@ describe('useTypingHandler', () => {
           name: 'file1.ts',
           type: 'file',
           status: 'typed',
-          fullPath: 'file1.ts',
+          path: 'file1.ts',
           fileItems: [],
         },
         {
@@ -563,7 +563,7 @@ describe('useTypingHandler', () => {
           name: 'file2.ts',
           type: 'file',
           status: 'typed',
-          fullPath: 'file2.ts',
+          path: 'file2.ts',
           fileItems: [],
         },
         {
@@ -571,14 +571,14 @@ describe('useTypingHandler', () => {
           name: 'dir1',
           type: 'dir',
           status: 'untyped',
-          fullPath: 'dir1',
+          path: 'dir1',
           fileItems: [
             {
               id: 4,
               name: 'nested-file1.ts',
               type: 'file',
               status: 'untyped',
-              fullPath: 'dir1/nested-file1.ts',
+              path: 'dir1/nested-file1.ts',
               fileItems: [],
             },
             {
@@ -586,7 +586,7 @@ describe('useTypingHandler', () => {
               name: 'nested-file2.ts',
               type: 'file',
               status: 'untyped',
-              fullPath: 'dir1/nested-file2.ts',
+              path: 'dir1/nested-file2.ts',
               fileItems: [],
             },
           ],
@@ -596,14 +596,14 @@ describe('useTypingHandler', () => {
           name: 'dir2',
           type: 'dir',
           status: 'untyped',
-          fullPath: 'dir2',
+          path: 'dir2',
           fileItems: [
             {
               id: 7,
               name: 'nested-file3.ts',
               type: 'file',
               status: 'untyped',
-              fullPath: 'dir2/nested-file3.ts',
+              path: 'dir2/nested-file3.ts',
               fileItems: [],
             },
           ],
@@ -613,7 +613,7 @@ describe('useTypingHandler', () => {
           name: 'file3.ts',
           type: 'file',
           status: 'untyped',
-          fullPath: 'file3.ts',
+          path: 'file3.ts',
           fileItems: [],
         },
       ];
@@ -624,14 +624,14 @@ describe('useTypingHandler', () => {
           name: 'dir1',
           type: 'dir',
           status: 'untyped',
-          fullPath: 'dir1',
+          path: 'dir1',
           fileItems: [
             {
               id: 4,
               name: 'nested-file1.ts',
               type: 'file',
               status: 'untyped',
-              fullPath: 'dir1/nested-file1.ts',
+              path: 'dir1/nested-file1.ts',
               fileItems: [],
             },
             {
@@ -639,7 +639,7 @@ describe('useTypingHandler', () => {
               name: 'nested-file2.ts',
               type: 'file',
               status: 'untyped',
-              fullPath: 'dir1/nested-file2.ts',
+              path: 'dir1/nested-file2.ts',
               fileItems: [],
             },
           ],
@@ -649,14 +649,14 @@ describe('useTypingHandler', () => {
           name: 'dir2',
           type: 'dir',
           status: 'untyped',
-          fullPath: 'dir2',
+          path: 'dir2',
           fileItems: [
             {
               id: 7,
               name: 'nested-file3.ts',
               type: 'file',
               status: 'untyped',
-              fullPath: 'dir2/nested-file3.ts',
+              path: 'dir2/nested-file3.ts',
               fileItems: [],
             },
           ],
@@ -666,7 +666,7 @@ describe('useTypingHandler', () => {
           name: 'file1.ts',
           type: 'file',
           status: 'typed',
-          fullPath: 'file1.ts',
+          path: 'file1.ts',
           fileItems: [],
         },
         {
@@ -674,7 +674,7 @@ describe('useTypingHandler', () => {
           name: 'file2.ts',
           type: 'file',
           status: 'typed',
-          fullPath: 'file2.ts',
+          path: 'file2.ts',
           fileItems: [],
         },
         {
@@ -682,7 +682,7 @@ describe('useTypingHandler', () => {
           name: 'file3.ts',
           type: 'file',
           status: 'untyped',
-          fullPath: 'file3.ts',
+          path: 'file3.ts',
           fileItems: [],
         },
       ];

@@ -33,7 +33,7 @@ export default function TypingPanel({ fileItem, typingHandler }: TypingPanelProp
   return (
     <div className="flex h-full flex-col">
       <TypingHeader
-        fileItemName={fileItem.fullPath}
+        fileItemName={fileItem.path}
         typingStatus={typingStatus}
         startTyping={startTyping}
         pauseTyping={pauseTyping}
