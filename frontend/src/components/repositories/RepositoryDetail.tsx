@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useTypingHandler } from '@/hooks/useTypingHandler';
 import { FileItem, TypingStatus } from '@/types';
 import { Card } from '../ui/card';
+import Loading from '../ui/loading';
 import FileTree from './FileTree';
 import TypingPanel from './TypingPanel';
 
@@ -54,7 +55,7 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
         <div className="flex min-w-0 flex-1 flex-col">
           <Card className="mx-4 my-2 flex-1 overflow-hidden">
             {isLoading ? (
-              <div className="p-6 text-center">Loading file...</div>
+              <Loading text="Loading file..." />
             ) : typingHandler.errorMessage ? (
               <div className="p-6 text-center">{typingHandler.errorMessage}</div>
             ) : !selectedFileItem ? (

@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
+import { LoaderCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -73,7 +74,7 @@ export default function RepositoryForm() {
           )}
         />
         <Button type="submit" variant="outline" disabled={form.formState.isSubmitting}>
-          <Plus />
+          {form.formState.isSubmitting ? <LoaderCircle className="animate-spin" /> : <Plus />}
           Add Repository
         </Button>
       </form>
