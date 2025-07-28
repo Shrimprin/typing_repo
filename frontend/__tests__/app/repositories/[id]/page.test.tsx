@@ -24,7 +24,7 @@ describe('RepositoryDetailPage', () => {
           name: 'file1.ts',
           type: 'file',
           status: 'untyped',
-          fullPath: 'file1.ts',
+          path: 'file1.ts',
           fileItems: [],
         },
         {
@@ -32,7 +32,7 @@ describe('RepositoryDetailPage', () => {
           name: 'file2.ts',
           type: 'file',
           status: 'typed',
-          fullPath: 'file2.ts',
+          path: 'file2.ts',
           fileItems: [],
         },
         {
@@ -40,14 +40,14 @@ describe('RepositoryDetailPage', () => {
           name: 'dir1',
           type: 'dir',
           status: 'untyped',
-          fullPath: 'dir1',
+          path: 'dir1',
           fileItems: [
             {
               id: 4,
               name: 'nested-file1.ts',
               type: 'file',
               status: 'untyped',
-              fullPath: 'dir1/nested-file1.ts',
+              path: 'dir1/nested-file1.ts',
               fileItems: [],
             },
             {
@@ -55,7 +55,7 @@ describe('RepositoryDetailPage', () => {
               name: 'nested-file2.ts',
               type: 'file',
               status: 'untyped',
-              fullPath: 'dir1/nested-file2.ts',
+              path: 'dir1/nested-file2.ts',
               fileItems: [],
             },
           ],
@@ -65,14 +65,14 @@ describe('RepositoryDetailPage', () => {
           name: 'dir2',
           type: 'dir',
           status: 'untyped',
-          fullPath: 'dir2',
+          path: 'dir2',
           fileItems: [
             {
               id: 7,
               name: 'nested-file3.ts',
               type: 'file',
               status: 'untyped',
-              fullPath: 'dir2/nested-file3.ts',
+              path: 'dir2/nested-file3.ts',
               fileItems: [],
             },
           ],
@@ -82,7 +82,7 @@ describe('RepositoryDetailPage', () => {
           name: 'file3.ts',
           type: 'file',
           status: 'untyped',
-          fullPath: 'file3.ts',
+          path: 'file3.ts',
           fileItems: [],
         },
       ],
@@ -96,7 +96,7 @@ describe('RepositoryDetailPage', () => {
       type: 'file',
       status: 'untyped',
       content: 'console.log("Hello, world!");',
-      fullPath: 'dir1/nested-file1.ts',
+      path: 'dir1/nested-file1.ts',
     },
   };
 
@@ -105,7 +105,7 @@ describe('RepositoryDetailPage', () => {
     name: 'nested-file1.ts',
     type: 'file',
     status: 'typing',
-    fullPath: 'dir1/nested-file1.ts',
+    path: 'dir1/nested-file1.ts',
     fileItems: [],
   };
 
@@ -260,7 +260,7 @@ describe('RepositoryDetailPage', () => {
           name: 'file1.ts',
           type: 'file',
           status: 'untyped',
-          fullPath: 'file1.ts',
+          path: 'file1.ts',
           fileItems: [],
         },
         {
@@ -268,7 +268,7 @@ describe('RepositoryDetailPage', () => {
           name: 'file2.ts',
           type: 'file',
           status: 'typed',
-          fullPath: 'file2.ts',
+          path: 'file2.ts',
           fileItems: [],
         },
         {
@@ -276,14 +276,14 @@ describe('RepositoryDetailPage', () => {
           name: 'dir1',
           type: 'dir',
           status: 'untyped',
-          fullPath: 'dir1',
+          path: 'dir1',
           fileItems: [
             {
               id: 4,
               name: 'nested-file1.ts',
               type: 'file',
               status: 'typed',
-              fullPath: 'dir1/nested-file1.ts',
+              path: 'dir1/nested-file1.ts',
               fileItems: [],
             },
           ],
@@ -351,7 +351,7 @@ describe('RepositoryDetailPage', () => {
           type: 'file',
           status: 'untyped',
           content: 'console.log("This is a test!");',
-          fullPath: 'dir1/nested-file2.ts',
+          path: 'dir1/nested-file2.ts',
         },
       });
 

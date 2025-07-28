@@ -10,6 +10,7 @@ class FileItem < ApplicationRecord
   validates :name, presence: true
   validates :status, presence: true
   validates :type, presence: true
+  validates :path, presence: true
 
   enum :type, {
     file: 0,
@@ -22,15 +23,19 @@ class FileItem < ApplicationRecord
     typed: 2
   }
 
-  def full_path
-    path = name
-    current_parent = parent
+  def self.decode_file_content(file_content)
+    decoded_file_content = Base64.decode64(file_content).force_encoding('UTF-8')
 
-    while current_parent
-      path = "#{current_parent.name}/#{path}"
-      current_parent = current_parent.parent
+    # UTF-8エンコーディングの確認と修正
+    unless decoded_file_content.valid_encoding?
+      decoded_file_content = decoded_file_content.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
     end
 
+    # nullバイトを削除
+    decoded_file_content.delete("\0")
+  end
+
+  def full_path
     "#{repository.name}/#{path}"
   end
 

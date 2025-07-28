@@ -8,43 +8,99 @@ class Repository < ApplicationRecord
   validates :name, presence: true
   validates :url, presence: true
 
+  BATCH_SIZE = 1000
+
+  def file_items_grouped_by_parent
+    file_items = self.file_items.to_a
+    file_items.group_by(&:parent_id)
+  end
+
   def save_with_file_items(client)
     transaction do
-      save && save_file_items(client)
+      is_saved = save && save_file_items?(client)
+      raise ActiveRecord::Rollback unless is_saved
+
+      true
+    end
+  end
+
+  def progress
+    files = file_items.where(type: :file)
+    if files.empty?
+      1.0
+    else
+      typed_count = files.where(status: :typed).count
+      typed_count.to_f / files.count
     end
   end
 
   private
 
-  def save_file_items(client, parent_file_item = nil, file_path = '')
-    files = client.contents(url, path: file_path)
-    files.each do |file|
-      file_item_scope = parent_file_item ? parent_file_item.children : FileItem
-      file_name = file[:name]
-      file_type = file[:type]
+  def save_file_items?(client)
+    file_tree_data = client.tree(url, commit_hash, recursive: true)
+    create_file_items_by_depth?(file_tree_data.tree)
+  end
 
-      if file_type == 'dir'
-        file_item = file_item_scope.create!(repository: self, name: file_name, type: file_type, content: nil,
-                                            status: :untyped)
-        save_file_items(client, file_item, file[:path])
-      else
-        file_content = client.contents(url, path: file[:path])[:content]
-        decoded_file_content = decode_file_content(file_content)
-        file_item_scope.create!(repository: self, name: file_name, type: file_type, content: decoded_file_content,
-                                status: :untyped)
+  def create_file_items_by_depth?(file_tree)
+    file_tree_grouped_by_depth = file_tree.group_by { |file_item| depth_of(file_item.path) }
+    directory_items_map = {} # typeがtreeで作成済みfile_itemのマップ（path => FileItem）
+
+    file_tree_grouped_by_depth.keys.sort.each do |depth|
+      file_tree_at_depth = file_tree_grouped_by_depth[depth]
+      file_items_batch = build_file_items_batch(file_tree_at_depth, directory_items_map)
+      import_result = FileItem.import(file_items_batch, batch_size: BATCH_SIZE, timestamps: true)
+
+      if import_result.failed_instances.any?
+        import_result.failed_instances.each do |failed_item|
+          failed_item.errors.each do |error|
+            errors.add("file_item.#{error.attribute}", error.message)
+          end
+        end
+
+        return false
       end
+
+      new_directory_items = extract_directory_items(file_tree_at_depth, file_items_batch)
+      directory_items_map.merge!(new_directory_items)
+    end
+
+    true
+  end
+
+  def build_file_items_batch(file_items, directory_items_map)
+    file_items.map do |file_item|
+      parent_item = find_parent_item(file_item.path, directory_items_map)
+
+      FileItem.new(
+        repository: self,
+        parent: parent_item,
+        name: File.basename(file_item.path),
+        path: file_item.path,
+        type: directory?(file_item) ? :dir : :file,
+        content: nil,
+        status: :untyped
+      )
     end
   end
 
-  def decode_file_content(file_content)
-    decoded_file_content = Base64.decode64(file_content).force_encoding('UTF-8')
+  def extract_directory_items(file_items, created_file_items)
+    file_items.filter_map.with_index do |file_item, index|
+      [file_item.path, created_file_items[index]] if directory?(file_item)
+    end.to_h
+  end
 
-    # UTF-8エンコーディングの確認と修正
-    unless decoded_file_content.valid_encoding?
-      decoded_file_content = decoded_file_content.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
-    end
+  def depth_of(path)
+    path.count('/')
+  end
 
-    # nullバイトを削除
-    decoded_file_content.delete("\0")
+  def directory?(file_item)
+    file_item.type == 'tree'
+  end
+
+  def find_parent_item(path, directory_items_map)
+    parent_path = File.dirname(path)
+    return nil if parent_path == '.'
+
+    directory_items_map[parent_path]
   end
 end

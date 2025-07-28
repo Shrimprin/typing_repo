@@ -26,12 +26,14 @@ RSpec.describe FileItem, type: :model do
       ]
     }
   end
+
   let(:valid_params) do
     {
       status: :typed,
       typing_progress: valid_typing_progress_params
     }
   end
+
   let(:invalid_params) do
     {
       status: :typed,
@@ -95,6 +97,27 @@ RSpec.describe FileItem, type: :model do
       subject
       non_updated_typing_progress = untyped_file_item.typing_progress
       expect_initial_typing_progress_attributes(non_updated_typing_progress)
+    end
+  end
+
+  describe '.decode_file_content' do
+    it 'correctly decodes Base64 text' do
+      base64_text = '44GT44KT44Gr44Gh44Gv44CB5LiW55WM77yB'
+      decoded_text = described_class.decode_file_content(base64_text)
+
+      expect(decoded_text).to eq('こんにちは、世界！')
+      expect(decoded_text.encoding.name).to eq('UTF-8')
+    end
+
+    it 'handles invalid UTF-8 encoding' do
+      # 無効なUTF-8シーケンスを含むBase64エンコードされたテキスト
+      invalid_bytes = [0xFF, 0xFE, 0xFD].pack('C*') + 'こんにちは、世界！'.dup.force_encoding('ASCII-8BIT')
+      invalid_base64_text = Base64.strict_encode64(invalid_bytes)
+      decoded_text = described_class.decode_file_content(invalid_base64_text)
+
+      expect(decoded_text).to include('こんにちは、世界！')
+      expect(decoded_text.encoding.name).to eq('UTF-8')
+      expect(decoded_text.valid_encoding?).to be true
     end
   end
 

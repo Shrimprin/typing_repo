@@ -6,10 +6,11 @@ RSpec.describe 'Api::FileItems', type: :request do
   include_context 'with authenticated user'
 
   let!(:repository) { create(:repository, :with_file_items, user: user) }
-  let!(:file_item) { repository.file_items.where(type: :file).first }
+  let(:file_item) { repository.file_items.where(type: :file).first }
+  let(:nil_content_file_item) { create(:file_item, :nil_content, repository:) }
 
   describe 'GET /api/repositories/:repository_id/file_items/:id' do
-    context 'when file item exists' do
+    context 'when content exists' do
       it 'returns the file item and success status' do
         get api_repository_file_item_path(repository_id: repository.id, id: file_item.id), headers: headers
 
@@ -17,10 +18,29 @@ RSpec.describe 'Api::FileItems', type: :request do
         json = response.parsed_body
         expect(json['id']).to eq(file_item.id)
         expect(json['name']).to eq(file_item.name)
-        expect(json['type']).to eq(file_item.type)
+        expect(json['path']).to eq(file_item.path)
         expect(json['status']).to eq(file_item.status)
+        expect(json['type']).to eq(file_item.type)
         expect(json['content']).to eq(file_item.content)
-        expect(json['full_path']).to eq(file_item.full_path)
+      end
+    end
+
+    context 'when content is nil' do
+      before do
+        github_client_mock = instance_double(Octokit::Client)
+        allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
+        allow(github_client_mock)
+          .to receive(:contents)
+          .with(repository.url, path: nil_content_file_item.path, ref: repository.commit_hash)
+          .and_return({ content: '44GT44KT44Gr44Gh44Gv44CB5LiW55WM77yB' })
+      end
+
+      it 'updates the file item content' do
+        expect(FileItem.find(nil_content_file_item.id).content).to be_nil
+
+        get api_repository_file_item_path(repository_id: repository.id, id: nil_content_file_item.id), headers: headers
+
+        expect(FileItem.find(nil_content_file_item.id).content).to eq('こんにちは、世界！')
       end
     end
 
@@ -29,6 +49,63 @@ RSpec.describe 'Api::FileItems', type: :request do
         get api_repository_file_item_path(repository_id: repository.id, id: 0), headers: headers
 
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'when too many requests' do
+      before do
+        github_client_mock = instance_double(Octokit::Client)
+        allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
+        allow(github_client_mock)
+          .to receive(:contents)
+          .with(repository.url, path: nil_content_file_item.path, ref: repository.commit_hash)
+          .and_raise(Octokit::TooManyRequests)
+      end
+
+      it 'returns too many requests status' do
+        get api_repository_file_item_path(repository_id: repository.id, id: nil_content_file_item.id), headers: headers
+
+        expect(response).to have_http_status(:too_many_requests)
+        json = response.parsed_body
+        expect(json['error']).to eq('Too many requests. Please try again later.')
+      end
+    end
+
+    context 'when unauthorized' do
+      before do
+        github_client_mock = instance_double(Octokit::Client)
+        allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
+        allow(github_client_mock)
+          .to receive(:contents)
+          .with(repository.url, path: nil_content_file_item.path, ref: repository.commit_hash)
+          .and_raise(Octokit::Unauthorized)
+      end
+
+      it 'returns unauthorized status' do
+        get api_repository_file_item_path(repository_id: repository.id, id: nil_content_file_item.id), headers: headers
+
+        expect(response).to have_http_status(:unauthorized)
+        json = response.parsed_body
+        expect(json['error']).to eq('Invalid access token')
+      end
+    end
+
+    context 'when unexpected error occurs' do
+      before do
+        github_client_mock = instance_double(Octokit::Client)
+        allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
+        allow(github_client_mock)
+          .to receive(:contents)
+          .with(repository.url, path: nil_content_file_item.path, ref: repository.commit_hash)
+          .and_raise(StandardError)
+      end
+
+      it 'returns internal server error status' do
+        get api_repository_file_item_path(repository_id: repository.id, id: nil_content_file_item.id), headers: headers
+
+        expect(response).to have_http_status(:internal_server_error)
+        json = response.parsed_body
+        expect(json['error']).to eq('An error occurred. Please try again.')
       end
     end
   end
