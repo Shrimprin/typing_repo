@@ -42,13 +42,13 @@ class Repository < ApplicationRecord
   end
 
   def create_file_items_by_depth?(file_tree)
-    file_items_grouped_by_depth = file_tree.group_by { |file_item| depth_of(file_item.path) }
+    file_tree_grouped_by_depth = file_tree.group_by { |file_item| depth_of(file_item.path) }
     directory_items_map = {} # typeがtreeで作成済みfile_itemのマップ（path => FileItem）
 
-    file_items_grouped_by_depth.keys.sort.each do |depth|
-      file_items_at_depth = file_items_grouped_by_depth[depth]
-      file_items_to_import = build_file_items_batch(file_items_at_depth, directory_items_map)
-      import_result = FileItem.import(file_items_to_import, batch_size: BATCH_SIZE, timestamps: true)
+    file_tree_grouped_by_depth.keys.sort.each do |depth|
+      file_tree_at_depth = file_tree_grouped_by_depth[depth]
+      file_items_batch = build_file_items_batch(file_tree_at_depth, directory_items_map)
+      import_result = FileItem.import(file_items_batch, batch_size: BATCH_SIZE, timestamps: true)
 
       if import_result.failed_instances.any?
         import_result.failed_instances.each do |failed_item|
@@ -60,7 +60,7 @@ class Repository < ApplicationRecord
         return false
       end
 
-      new_directory_items = extract_directory_items(file_items_at_depth, file_items_to_import)
+      new_directory_items = extract_directory_items(file_tree_at_depth, file_items_batch)
       directory_items_map.merge!(new_directory_items)
     end
 
@@ -99,12 +99,8 @@ class Repository < ApplicationRecord
 
   def find_parent_item(path, directory_items_map)
     parent_path = File.dirname(path)
-    return nil if root_directory?(parent_path)
+    return nil if parent_path == '.'
 
     directory_items_map[parent_path]
-  end
-
-  def root_directory?(path)
-    path == '.'
   end
 end

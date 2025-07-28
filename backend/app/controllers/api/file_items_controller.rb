@@ -68,6 +68,7 @@ module Api
       file_content = client.contents(@repository.url, path: @file_item.path, ref: @repository.commit_hash)[
         :content
       ]
+
       decoded_file_content = FileItem.decode_file_content(file_content)
       @file_item.update(content: decoded_file_content)
     end

@@ -26,12 +26,14 @@ RSpec.describe FileItem, type: :model do
       ]
     }
   end
+
   let(:valid_params) do
     {
       status: :typed,
       typing_progress: valid_typing_progress_params
     }
   end
+
   let(:invalid_params) do
     {
       status: :typed,
