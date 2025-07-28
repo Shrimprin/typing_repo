@@ -2,7 +2,6 @@ import { LoaderCircle } from 'lucide-react';
 
 type LoadingProps = {
   text?: string;
-  className?: string;
 };
 
 export default function Loading({ text = 'Loading...' }: LoadingProps) {
