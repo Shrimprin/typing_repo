@@ -1,6 +1,6 @@
 import { signIn, signOut } from '@/auth';
 import { Button } from '@/components/ui/button';
-import { LogOut } from 'lucide-react';
+import { Github, LogOut } from 'lucide-react';
 
 export function SignIn({ provider }: { provider?: string }) {
   return (
@@ -10,7 +10,8 @@ export function SignIn({ provider }: { provider?: string }) {
         await signIn(provider);
       }}
     >
-      <Button type="submit" variant="outline">
+      <Button type="submit" variant="outline" className="flex items-center gap-2">
+        <Github />
         Sign in with GitHub
       </Button>
     </form>
