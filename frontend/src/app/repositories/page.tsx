@@ -46,7 +46,7 @@ export default async function RepositoriesPage({ searchParams }: Props) {
   return (
     <div className="flex h-screen flex-col">
       <Header title="Repositories" />
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1">
         <div className="flex min-h-full flex-col px-2">
           <RepositoryList repositories={sortedRepositories} pagination={repositoriesResponse.pagination} />
           <RepositoryFooter />
