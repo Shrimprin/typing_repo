@@ -2,8 +2,11 @@
 
 module Api
   class RepositoriesController < ApplicationController
+    after_action { pagy_headers_merge(@pagy) if @pagy }
+
+    PER_PAGE = 10
     def index
-      repositories = @current_user.repositories
+      @pagy, repositories = pagy(@current_user.repositories, limit: PER_PAGE)
       render json: RepositorySerializer.new(repositories, params: { progress: true }), status: :ok
     end
 
