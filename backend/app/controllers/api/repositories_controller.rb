@@ -5,7 +5,9 @@ module Api
     after_action { pagy_headers_merge(@pagy) if @pagy }
 
     def index
-      @pagy, repositories = pagy(@current_user.repositories)
+      @pagy, repositories = pagy(
+        @current_user.repositories.order(last_typed_at: :asc)
+      )
       render json: RepositorySerializer.new(repositories, params: { progress: true }), status: :ok
     end
 

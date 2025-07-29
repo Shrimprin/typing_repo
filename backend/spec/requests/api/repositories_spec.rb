@@ -7,15 +7,16 @@ RSpec.describe 'Api::Repositories', type: :request do
 
   describe 'GET /api/repositories' do
     context 'when user has repositories' do
-      let!(:repositories) { create_list(:repository, 3, :with_file_items, user: user) }
-
       it 'returns repositories and success status' do
+        repositories = create_list(:repository, 3, :with_file_items, user: user)
+
         get api_repositories_path, headers: headers
 
         json = response.parsed_body
         expect(response).to have_http_status(:ok)
         expect(json.length).to eq(3)
         expect(json.map { |r| r['id'] }).to match_array(repositories.map(&:id))
+
         repositories.each do |repository|
           repository_json = json.find { |r| r['id'] == repository.id }
           expect(repository_json['name']).to eq(repository.name)
@@ -23,6 +24,20 @@ RSpec.describe 'Api::Repositories', type: :request do
           expect(repository_json['last_typed_at']).to eq(repository.last_typed_at&.as_json)
           expect(repository_json['progress']).to eq(0.4)
         end
+      end
+
+      it 'returns repositories in ascending order of last_typed_at' do
+        old_repo = create(:repository, user: user, last_typed_at: 2.days.ago)
+        recent_repo = create(:repository, user: user, last_typed_at: 1.day.ago)
+        untyped_repo = create(:repository, user: user, last_typed_at: nil)
+
+        get api_repositories_path, headers: headers
+
+        json = response.parsed_body
+        expect(json.length).to eq(3)
+        expect(json[0]['id']).to eq(old_repo.id)
+        expect(json[1]['id']).to eq(recent_repo.id)
+        expect(json[2]['id']).to eq(untyped_repo.id)
       end
     end
 
