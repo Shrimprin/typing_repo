@@ -2,33 +2,41 @@ import { FolderOpen, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import { Repository } from '@/types/repository';
+import { PaginationInfo, Repository } from '@/types/repository';
 import RepositoryListItem from './RepositoryListItem';
+import RepositoryPagination from './RepositoryPagination';
 
 type Props = {
   repositories: Repository[];
+  pagination: PaginationInfo;
 };
 
-export default function RepositoryList({ repositories }: Props) {
+export default function RepositoryList({ repositories, pagination }: Props) {
+  const isPagination = repositories.length > 0 && pagination.totalPages > 1;
+
   return (
-    <div className="container mx-auto max-w-4xl flex-grow py-4">
-      {repositories.length > 0 ? (
-        repositories.map((repository) => <RepositoryListItem key={repository.id} repository={repository} />)
-      ) : (
-        <div className="py-12 text-center">
-          <div className="mb-4">
-            <FolderOpen className="mx-auto h-12 w-12" />
+    <div className="container mx-auto flex max-w-4xl flex-grow flex-col py-4">
+      <div className="flex-grow">
+        {repositories.length > 0 ? (
+          repositories.map((repository) => <RepositoryListItem key={repository.id} repository={repository} />)
+        ) : (
+          <div className="py-12 text-center">
+            <div className="mb-4">
+              <FolderOpen className="mx-auto h-12 w-12" />
+            </div>
+            <h3 className="mb-2 text-lg font-medium">No repositories</h3>
+            <p className="text-muted-foreground mb-6 text-sm">Add a repository to start typing.</p>
+            <Button variant="outline" asChild>
+              <Link href="/repositories/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Repository
+              </Link>
+            </Button>
           </div>
-          <h3 className="mb-2 text-lg font-medium">No repositories</h3>
-          <p className="text-muted-foreground mb-6 text-sm">Add a repository to start typing.</p>
-          <Button variant="outline" asChild>
-            <Link href="/repositories/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Repository
-            </Link>
-          </Button>
-        </div>
-      )}
+        )}
+      </div>
+
+      {isPagination && <RepositoryPagination pagination={pagination} />}
     </div>
   );
 }
