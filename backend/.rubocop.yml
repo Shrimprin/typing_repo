@@ -60,3 +60,7 @@ RSpec/MultipleMemoizedHelpers:
 # instance_doubleを必須としない(doubleを許可する)
 RSpec/VerifiedDoubles:
   Enabled: false
+
+# create_listで10以上のデータ作成を許可
+FactoryBot/ExcessiveCreateList:
+  Enabled: false

@@ -41,6 +41,42 @@ RSpec.describe 'Api::Repositories', type: :request do
       end
     end
 
+    context 'with pagination' do
+      before do
+        create_list(:repository, 11, :with_file_items, user: user)
+      end
+
+      it 'returns first page when page parameter is 1' do
+        get api_repositories_path(page: 1), headers: headers
+
+        json = response.parsed_body
+        expect(json.length).to eq(10)
+        expect(response.headers['Current-Page']).to eq('1')
+        expect(response.headers['Total-Count']).to eq('11')
+        expect(response.headers['Page-Items']).to eq('10')
+        expect(response.headers['Total-Pages']).to eq('2')
+      end
+
+      it 'returns second page with remaining items' do
+        get api_repositories_path(page: 2), headers: headers
+
+        json = response.parsed_body
+        expect(json.length).to eq(1)
+        expect(response.headers['Current-Page']).to eq('2')
+        expect(response.headers['Total-Count']).to eq('11')
+        expect(response.headers['Page-Items']).to eq('10')
+        expect(response.headers['Total-Pages']).to eq('2')
+      end
+
+      it 'defaults to page 1 when page parameter is not provided' do
+        get api_repositories_path, headers: headers
+
+        json = response.parsed_body
+        expect(json.length).to eq(10)
+        expect(response.headers['Current-Page']).to eq('1')
+      end
+    end
+
     context 'when user has no repositories' do
       it 'returns an empty array' do
         get api_repositories_path, headers: headers
