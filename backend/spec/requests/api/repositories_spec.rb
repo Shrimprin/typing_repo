@@ -75,6 +75,14 @@ RSpec.describe 'Api::Repositories', type: :request do
         expect(json.length).to eq(10)
         expect(response.headers['Current-Page']).to eq('1')
       end
+
+      it 'returns empty array when page parameter is greater than total pages' do
+        get api_repositories_path(page: 3), headers: headers
+
+        json = response.parsed_body
+        puts json
+        expect(json).to be_empty
+      end
     end
 
     context 'when user has no repositories' do
