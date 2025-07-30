@@ -22,6 +22,11 @@ const buttonVariants = cva(
           bg-primary text-primary-foreground shadow-xs
           hover:bg-primary/90
         `,
+        primary: `
+          bg-primary text-primary-foreground shadow-xs transition-all
+          hover:bg-primary/80 hover:shadow-[0_0_15px_rgba(59,130,246,0.6),0_0_30px_rgba(59,130,246,0.3)]
+          dark:hover:bg-primary/70 dark:hover:shadow-[0_0_15px_rgba(96,165,250,0.6),0_0_30px_rgba(96,165,250,0.3)]
+        `,
         destructive: `
           bg-destructive text-white shadow-xs
           hover:bg-destructive/90
