@@ -7,15 +7,16 @@ RSpec.describe 'Api::Repositories', type: :request do
 
   describe 'GET /api/repositories' do
     context 'when user has repositories' do
-      let!(:repositories) { create_list(:repository, 3, :with_file_items, user: user) }
-
       it 'returns repositories and success status' do
+        repositories = create_list(:repository, 3, :with_file_items, user: user)
+
         get api_repositories_path, headers: headers
 
         json = response.parsed_body
         expect(response).to have_http_status(:ok)
         expect(json.length).to eq(3)
         expect(json.map { |r| r['id'] }).to match_array(repositories.map(&:id))
+
         repositories.each do |repository|
           repository_json = json.find { |r| r['id'] == repository.id }
           expect(repository_json['name']).to eq(repository.name)
@@ -23,6 +24,64 @@ RSpec.describe 'Api::Repositories', type: :request do
           expect(repository_json['last_typed_at']).to eq(repository.last_typed_at&.as_json)
           expect(repository_json['progress']).to eq(0.4)
         end
+      end
+
+      it 'returns repositories in ascending order of last_typed_at' do
+        old_repo = create(:repository, user: user, last_typed_at: 2.days.ago)
+        recent_repo = create(:repository, user: user, last_typed_at: 1.day.ago)
+        untyped_repo = create(:repository, user: user, last_typed_at: nil)
+
+        get api_repositories_path, headers: headers
+
+        json = response.parsed_body
+        expect(json.length).to eq(3)
+        expect(json[0]['id']).to eq(old_repo.id)
+        expect(json[1]['id']).to eq(recent_repo.id)
+        expect(json[2]['id']).to eq(untyped_repo.id)
+      end
+    end
+
+    context 'with pagination' do
+      before do
+        create_list(:repository, 11, :with_file_items, user: user)
+      end
+
+      it 'returns first page when page parameter is 1' do
+        get api_repositories_path(page: 1), headers: headers
+
+        json = response.parsed_body
+        expect(json.length).to eq(10)
+        expect(response.headers['Current-Page']).to eq('1')
+        expect(response.headers['Total-Count']).to eq('11')
+        expect(response.headers['Page-Items']).to eq('10')
+        expect(response.headers['Total-Pages']).to eq('2')
+      end
+
+      it 'returns second page with remaining items' do
+        get api_repositories_path(page: 2), headers: headers
+
+        json = response.parsed_body
+        expect(json.length).to eq(1)
+        expect(response.headers['Current-Page']).to eq('2')
+        expect(response.headers['Total-Count']).to eq('11')
+        expect(response.headers['Page-Items']).to eq('10')
+        expect(response.headers['Total-Pages']).to eq('2')
+      end
+
+      it 'defaults to page 1 when page parameter is not provided' do
+        get api_repositories_path, headers: headers
+
+        json = response.parsed_body
+        expect(json.length).to eq(10)
+        expect(response.headers['Current-Page']).to eq('1')
+      end
+
+      it 'returns empty array when page parameter is greater than total pages' do
+        get api_repositories_path(page: 3), headers: headers
+
+        json = response.parsed_body
+        puts json
+        expect(json).to be_empty
       end
     end
 
