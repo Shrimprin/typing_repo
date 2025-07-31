@@ -3,6 +3,9 @@
 class Repository < ApplicationRecord
   belongs_to :user
   has_many :file_items, dependent: :destroy
+  has_many :extensions, dependent: :destroy
+
+  accepts_nested_attributes_for :extensions, allow_destroy: true
 
   validates :commit_hash, presence: true
   validates :name, presence: true
