@@ -39,6 +39,16 @@ class FileItem < ApplicationRecord
     "#{repository.name}/#{path}"
   end
 
+  def is_active
+    return true if repository.extensions.empty? || dir?
+
+    file_extension = File.extname(path)
+    file_extension = 'without extension' if file_extension.empty?
+
+    extension = repository.extensions.find { |ext| ext.name == file_extension }
+    extension ? extension.is_active : true
+  end
+
   def update_parent_status
     return true unless parent
 

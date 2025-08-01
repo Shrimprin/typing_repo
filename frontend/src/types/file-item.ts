@@ -18,6 +18,7 @@ export type TypingProgress = {
 export type FileItem = {
   id: number;
   fileItems: FileItem[] | [];
+  isActive: boolean;
   name: string;
   path: string;
   status: FileItemStatus;

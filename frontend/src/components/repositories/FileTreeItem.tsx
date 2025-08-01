@@ -14,11 +14,11 @@ type FileTreeItemProps = {
 };
 
 export default function FileTreeItem({ fileItem, level, selectedFileItem, onSelectFileItem }: FileTreeItemProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => {
     if (fileItem.type === 'dir') {
-      setExpanded(!expanded);
+      setIsExpanded(!isExpanded);
     }
   };
 
@@ -34,6 +34,16 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
   const fileItems: FileItem[] = fileItem.fileItems;
   const sortedFileItems = sortFileItems(fileItems);
   const isDir = fileItem.type === 'dir';
+  const isActive = fileItem.isActive;
+
+  const opacityClass = !isActive ? 'opacity-70' : '';
+  const fileIconColorClass = !isActive ? 'text-muted-foreground' : '';
+  const fileNameColorClass = () => {
+    if (isSelected) return 'text-primary font-bold';
+    if (isTyped) return 'text-secondary';
+    if (!isActive) return 'text-muted-foreground';
+    return '';
+  };
 
   return (
     <div style={{ marginLeft: `${level * 4}px` }}>
@@ -41,13 +51,14 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
         className={`
           hover:bg-accent
           flex w-full cursor-pointer items-center py-1
+          ${opacityClass}
         `}
         onClick={isDir ? toggleExpand : handleFileSelect}
       >
         {isDir ? (
           <>
             <span className="mr-1 flex-shrink-0">
-              {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </span>
             <Folder size={16} className="mr-1 flex-shrink-0" />
             <span
@@ -63,12 +74,17 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
         ) : (
           <>
             <div className="mr-1 w-4 flex-shrink-0"></div>
-            <File size={16} className="mr-1 flex-shrink-0" />
+            <File
+              size={16}
+              className={`
+                mr-1 flex-shrink-0
+                ${fileIconColorClass}
+              `}
+            />
             <span
               className={`
                 truncate
-                ${isSelected ? 'text-primary font-bold' : ''}
-                ${isTyped ? 'text-secondary' : ''}
+                ${fileNameColorClass()}
               `}
             >
               {fileItem.name}
@@ -84,7 +100,7 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
         )}
       </button>
 
-      {expanded && sortedFileItems.length > 0 && (
+      {isExpanded && sortedFileItems.length > 0 && (
         <div>
           {sortedFileItems.map((child) => (
             <FileTreeItem
