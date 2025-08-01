@@ -25,35 +25,22 @@ module Api
         return
       end
 
-      begin
-        client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
-        repository_info = client.repository(repository_url)
-        repository_name = repository_info.name
-        latest_commit = client.commits(repository_url).first
-        commit_hash = latest_commit.sha
+      client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
+      repository = build_repository(client, repository_url)
 
-        repository = Repository.new(
-          user: @current_user,
-          name: repository_name,
-          url: repository_url,
-          commit_hash:,
-          extensions_attributes: repository_params[:extensions_attributes] || []
-        )
-
-        if repository.save_with_file_items(client)
-          render json: RepositorySerializer.new(repository), status: :created
-        else
-          render json: repository.errors, status: :unprocessable_entity
-        end
-      rescue Octokit::NotFound
-        render json: { error: 'Repository not found' }, status: :not_found
-      rescue Octokit::TooManyRequests
-        render json: { error: 'Too many requests. Please try again later.' }, status: :too_many_requests
-      rescue Octokit::Unauthorized
-        render json: { error: 'Invalid access token' }, status: :unauthorized
-      rescue StandardError
-        render json: { error: 'An error occurred. Please try again.' }, status: :internal_server_error
+      if repository.save_with_file_items(client)
+        render json: RepositorySerializer.new(repository), status: :created
+      else
+        render json: repository.errors, status: :unprocessable_entity
       end
+    rescue Octokit::NotFound
+      render json: { error: 'Repository not found' }, status: :not_found
+    rescue Octokit::TooManyRequests
+      render json: { error: 'Too many requests. Please try again later.' }, status: :too_many_requests
+    rescue Octokit::Unauthorized
+      render json: { error: 'Invalid access token' }, status: :unauthorized
+    rescue StandardError
+      render json: { error: 'An error occurred. Please try again.' }, status: :internal_server_error
     end
 
     def preview
@@ -65,28 +52,18 @@ module Api
         return
       end
 
-      begin
-        client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
-        repository_info = client.repository(repository_url)
-        latest_commit = client.commits(repository_url).first
-        extensions = extract_extensions_from_repository(client, repository_url, latest_commit.sha)
+      client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
+      repository_preview_data = build_repository_preview_data(client, repository_url)
 
-        preview_data = {
-          name: repository_info.name,
-          url: url,
-          extensions: extensions
-        }
-
-        render json: preview_data, status: :ok
-      rescue Octokit::NotFound
-        render json: { error: 'Repository not found' }, status: :not_found
-      rescue Octokit::TooManyRequests
-        render json: { error: 'Too many requests. Please try again later.' }, status: :too_many_requests
-      rescue Octokit::Unauthorized
-        render json: { error: 'Invalid access token' }, status: :unauthorized
-      rescue StandardError
-        render json: { error: 'An error occurred. Please try again.' }, status: :internal_server_error
-      end
+      render json: repository_preview_data, status: :ok
+    rescue Octokit::NotFound
+      render json: { error: 'Repository not found' }, status: :not_found
+    rescue Octokit::TooManyRequests
+      render json: { error: 'Too many requests. Please try again later.' }, status: :too_many_requests
+    rescue Octokit::Unauthorized
+      render json: { error: 'Invalid access token' }, status: :unauthorized
+    rescue StandardError
+      render json: { error: 'An error occurred. Please try again.' }, status: :internal_server_error
     end
 
     private
@@ -97,6 +74,33 @@ module Api
 
     def preview_params
       params.expect(repository_preview: [:url])
+    end
+
+    def build_repository(client, repository_url)
+      repository_info = client.repository(repository_url)
+      repository_name = repository_info.name
+      latest_commit = client.commits(repository_url).first
+      commit_hash = latest_commit.sha
+
+      Repository.new(
+        user: @current_user,
+        name: repository_name,
+        url: repository_url,
+        commit_hash:,
+        extensions_attributes: repository_params[:extensions_attributes] || []
+      )
+    end
+
+    def build_repository_preview_data(client, repository_url)
+      repository_info = client.repository(repository_url)
+      latest_commit = client.commits(repository_url).first
+      extensions = extract_extensions_from_repository(client, repository_url, latest_commit.sha)
+
+      {
+        name: repository_info.name,
+        url: repository_url,
+        extensions:
+      }
     end
 
     def extract_extensions_from_repository(client, repository_url, commit_hash)
@@ -112,13 +116,15 @@ module Api
         extension_counts[extension] += 1
       end
 
-      extension_counts.map do |extension, count|
+      extensions = extension_counts.map do |extension, count|
         {
           name: extension,
           file_count: count,
           is_active: true
         }
-      end.sort_by { |ext| [-ext[:file_count], -ext[:name]] }
+      end
+
+      extensions.sort_by { |ext| [-ext[:file_count], -ext[:name]] }
     end
   end
 end

@@ -3,11 +3,13 @@
 class FileItemSerializer
   include Alba::Serializer
 
-  attributes :id, :name, :path, :status, :type, :is_active
+  attributes :id, :name, :path, :status, :type
 
   attribute :content, if: proc { params[:content] } do |file_item|
     file_item.content || ''
   end
+
+  attribute :is_active, &:active?
 
   attribute :file_items, if: proc { params[:children] } do |file_item|
     file_items_grouped_by_parent = params[:file_items_grouped_by_parent]

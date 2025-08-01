@@ -39,7 +39,7 @@ class FileItem < ApplicationRecord
     "#{repository.name}/#{path}"
   end
 
-  def is_active
+  def active?
     return true if repository.extensions.empty? || dir?
 
     file_extension = File.extname(path)
