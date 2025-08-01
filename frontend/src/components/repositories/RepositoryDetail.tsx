@@ -37,6 +37,11 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
     }
 
     setSelectedFileItem(fileItem);
+    if (!fileItem.isActive) {
+      setTypingStatus('ready');
+      return;
+    }
+
     setIsLoading(true);
 
     await typingHandler.setupTypingState(fileItem.id);
