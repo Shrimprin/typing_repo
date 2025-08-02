@@ -53,7 +53,7 @@ module Api
       end
 
       client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
-      repository_preview_data = build_repository_preview_data(client, repository_url)
+      repository_preview_data = build_repository_preview_data(client, repository_url, url)
 
       render json: repository_preview_data, status: :ok
     rescue Octokit::NotFound
@@ -91,14 +91,14 @@ module Api
       )
     end
 
-    def build_repository_preview_data(client, repository_url)
+    def build_repository_preview_data(client, repository_url, url)
       repository_info = client.repository(repository_url)
       latest_commit = client.commits(repository_url).first
       extensions = extract_extensions_from_repository(client, repository_url, latest_commit.sha)
 
       {
         name: repository_info.name,
-        url: repository_url,
+        url:,
         extensions:
       }
     end
