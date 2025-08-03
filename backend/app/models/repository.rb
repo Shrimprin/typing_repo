@@ -20,7 +20,7 @@ class Repository < ApplicationRecord
 
   def save_with_file_items(client)
     transaction do
-      is_saved = save && save_file_items?(client)
+      is_saved = save && save_file_items_with_status?(client)
       raise ActiveRecord::Rollback unless is_saved
 
       true
@@ -39,9 +39,9 @@ class Repository < ApplicationRecord
 
   private
 
-  def save_file_items?(client)
+  def save_file_items_with_status?(client)
     file_tree_data = client.tree(url, commit_hash, recursive: true)
-    create_file_items_by_depth?(file_tree_data.tree)
+    create_file_items_by_depth?(file_tree_data.tree) && update_directories_status
   end
 
   def create_file_items_by_depth?(file_tree)
@@ -70,9 +70,23 @@ class Repository < ApplicationRecord
     true
   end
 
+  def update_directories_status
+    directory_items = file_items.where(type: :dir).includes(:children, repository: :extensions)
+    sorted_directory_items = directory_items.sort_by { |dir| -depth_of(dir.path) }
+
+    sorted_directory_items.each do |directory_item|
+      children = directory_item.children.reload
+      is_active = children.any?(&:is_active)
+      is_typed = children.all? { |child| !child.is_active || child.typed? }
+
+      directory_item.update(is_active: is_active, status: is_typed ? :typed : :untyped)
+    end
+  end
+
   def build_file_items_batch(file_items, directory_items_map)
     file_items.map do |file_item|
       parent_item = find_parent_item(file_item.path, directory_items_map)
+      is_active = calculate_is_active(file_item)
 
       FileItem.new(
         repository: self,
@@ -81,9 +95,20 @@ class Repository < ApplicationRecord
         path: file_item.path,
         type: directory?(file_item) ? :dir : :file,
         content: nil,
-        status: :untyped
+        status: :untyped,
+        is_active: is_active
       )
     end
+  end
+
+  def calculate_is_active(file_item)
+    return false if directory?(file_item) # ディレクトリは後で子の状態に基づいて更新されるため、仮でfalseとする
+
+    file_extension = File.extname(file_item.path)
+    file_extension = 'without extension' if file_extension.empty?
+
+    extension = extensions.find { |ext| ext.name == file_extension }
+    extension.is_active
   end
 
   def extract_directory_items(file_items, created_file_items)
