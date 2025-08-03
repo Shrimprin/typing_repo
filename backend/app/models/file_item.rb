@@ -7,6 +7,7 @@ class FileItem < ApplicationRecord
   has_one :typing_progress, dependent: :destroy
   has_closure_tree
 
+  validates :is_active, inclusion: { in: [true, false] }
   validates :name, presence: true
   validates :status, presence: true
   validates :type, presence: true
@@ -53,7 +54,7 @@ class FileItem < ApplicationRecord
     return true unless parent
 
     children = parent.children
-    is_all_typed = children.all?(&:typed?)
+    is_all_typed = children.all? { |child| child.typed? || !child.is_active }
     return true unless is_all_typed
 
     parent.update(status: :typed) && parent.update_parent_status
