@@ -111,8 +111,7 @@ module Api
         next unless file_item.type == 'blob'
 
         extension = File.extname(file_item.path)
-        extension = 'without extension' if extension.empty?
-
+        extension = Repository::NO_EXTENSION if extension.empty?
         extension_counts[extension] += 1
       end
 

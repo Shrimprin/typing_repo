@@ -3,7 +3,7 @@
 class FileItemSerializer
   include Alba::Serializer
 
-  attributes :id, :is_active, :name, :path, :status, :type
+  attributes :id, :name, :path, :status, :type
 
   attribute :content, if: proc { params[:content] } do |file_item|
     file_item.content || ''

@@ -7,7 +7,6 @@ class FileItem < ApplicationRecord
   has_one :typing_progress, dependent: :destroy
   has_closure_tree
 
-  validates :is_active, inclusion: { in: [true, false] }
   validates :name, presence: true
   validates :status, presence: true
   validates :type, presence: true
@@ -40,21 +39,11 @@ class FileItem < ApplicationRecord
     "#{repository.name}/#{path}"
   end
 
-  def active?
-    return true if repository.extensions.empty? || dir?
-
-    file_extension = File.extname(path)
-    file_extension = 'without extension' if file_extension.empty?
-
-    extension = repository.extensions.find { |ext| ext.name == file_extension }
-    extension ? extension.is_active : true
-  end
-
   def update_parent_status
     return true unless parent
 
     children = parent.children
-    is_all_typed = children.all? { |child| child.typed? || !child.is_active }
+    is_all_typed = children.all?(&:typed?)
     return true unless is_all_typed
 
     parent.update(status: :typed) && parent.update_parent_status

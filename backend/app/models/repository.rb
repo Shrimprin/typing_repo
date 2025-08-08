@@ -12,6 +12,7 @@ class Repository < ApplicationRecord
   validates :url, presence: true
 
   BATCH_SIZE = 1000
+  NO_EXTENSION = 'no extension'
 
   def file_items_grouped_by_parent
     file_items = self.file_items.to_a
@@ -20,7 +21,7 @@ class Repository < ApplicationRecord
 
   def save_with_file_items(client)
     transaction do
-      is_saved = save && save_file_items_with_status?(client)
+      is_saved = save && save_file_items?(client)
       raise ActiveRecord::Rollback unless is_saved
 
       true
@@ -39,96 +40,81 @@ class Repository < ApplicationRecord
 
   private
 
-  def save_file_items_with_status?(client)
+  def save_file_items?(client)
     file_tree_data = client.tree(url, commit_hash, recursive: true)
-    create_file_items_by_depth?(file_tree_data.tree) && update_directories_status
+    file_tree_grouped_by_depth = file_tree_data.tree.group_by { |node| depth_of(node.path) }
+    filtered_file_tree = filter_file_tree_by_valid_extensions(file_tree_grouped_by_depth)
+    create_file_items_recursively(filtered_file_tree, nil)
   end
 
-  def create_file_items_by_depth?(file_tree)
-    file_tree_grouped_by_depth = file_tree.group_by { |file_item| depth_of(file_item.path) }
-    directory_items_map = {} # typeがtreeで作成済みfile_itemのマップ（path => FileItem）
+  def filter_file_tree_by_valid_extensions(file_tree_grouped_by_depth, parent_node_path = '')
+    nodes = children_of(file_tree_grouped_by_depth, parent_node_path)
 
-    file_tree_grouped_by_depth.keys.sort.each do |depth|
-      file_tree_at_depth = file_tree_grouped_by_depth[depth]
-      file_items_batch = build_file_items_batch(file_tree_at_depth, directory_items_map)
-      import_result = FileItem.import(file_items_batch, batch_size: BATCH_SIZE, timestamps: true)
+    nodes.filter_map do |node|
+      if node.type == 'tree'
+        filtered_children = filter_file_tree_by_valid_extensions(file_tree_grouped_by_depth, "#{node.path}/")
+        next if filtered_children.empty?
 
-      if import_result.failed_instances.any?
-        import_result.failed_instances.each do |failed_item|
-          failed_item.errors.each do |error|
-            errors.add("file_item.#{error.attribute}", error.message)
-          end
+        node.children = filtered_children
+        node
+      else
+        is_active = calculate_is_active(node)
+        node if is_active
+      end
+    end
+  end
+
+  def create_file_items_recursively(nodes, parent_file_item)
+    new_file_items = build_file_items(nodes, parent_file_item)
+    import_result = FileItem.import(new_file_items, batch_size: BATCH_SIZE, timestamps: true)
+
+    if import_result.failed_instances.any?
+      import_result.failed_instances.each do |failed_item|
+        failed_item.errors.each do |error|
+          errors.add("file_item.#{error.attribute}", error.message)
         end
-
-        return false
       end
 
-      new_directory_items = extract_directory_items(file_tree_at_depth, file_items_batch)
-      directory_items_map.merge!(new_directory_items)
+      return false
     end
 
-    true
-  end
+    nodes.each do |node|
+      next if node.type == 'blob'
 
-  def update_directories_status
-    directory_items = file_items.where(type: :dir).includes(:children, repository: :extensions)
-    sorted_directory_items = directory_items.sort_by { |dir| -depth_of(dir.path) }
-
-    sorted_directory_items.each do |directory_item|
-      children = directory_item.children.reload
-      is_active = children.any?(&:is_active)
-      is_typed = children.all? { |child| !child.is_active || child.typed? }
-
-      directory_item.update(is_active: is_active, status: is_typed ? :typed : :untyped)
+      parent_item = new_file_items.find { |item| item.path == node.path }
+      create_file_items_recursively(node.children, parent_item)
     end
   end
 
-  def build_file_items_batch(file_items, directory_items_map)
-    file_items.map do |file_item|
-      parent_item = find_parent_item(file_item.path, directory_items_map)
-      is_active = calculate_is_active(file_item)
-
+  def build_file_items(nodes, parent_file_item)
+    nodes.map do |node|
       FileItem.new(
         repository: self,
-        parent: parent_item,
-        name: File.basename(file_item.path),
-        path: file_item.path,
-        type: directory?(file_item) ? :dir : :file,
+        parent: parent_file_item,
+        name: File.basename(node.path),
+        path: node.path,
+        type: node.type == 'tree' ? :dir : :file,
         content: nil,
-        status: :untyped,
-        is_active: is_active
+        status: :untyped
       )
     end
   end
 
-  def calculate_is_active(file_item)
-    return false if directory?(file_item) # ディレクトリは後で子の状態に基づいて更新されるため、仮でfalseとする
-
-    file_extension = File.extname(file_item.path)
-    file_extension = 'without extension' if file_extension.empty?
-
+  def calculate_is_active(node)
+    file_extension = File.extname(node.path)
+    file_extension = NO_EXTENSION if file_extension.empty?
     extension = extensions.find { |ext| ext.name == file_extension }
     extension.is_active
   end
 
-  def extract_directory_items(file_items, created_file_items)
-    file_items.filter_map.with_index do |file_item, index|
-      [file_item.path, created_file_items[index]] if directory?(file_item)
-    end.to_h
+  def children_of(file_tree_grouped_by_depth, parent_node_path)
+    depth = depth_of(parent_node_path)
+    file_tree_grouped_by_depth[depth].select do |item|
+      item.path.start_with?(parent_node_path.to_s)
+    end
   end
 
   def depth_of(path)
     path.count('/')
-  end
-
-  def directory?(file_item)
-    file_item.type == 'tree'
-  end
-
-  def find_parent_item(path, directory_items_map)
-    parent_path = File.dirname(path)
-    return nil if parent_path == '.'
-
-    directory_items_map[parent_path]
   end
 end

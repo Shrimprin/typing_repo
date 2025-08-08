@@ -34,14 +34,10 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
   const fileItems: FileItem[] = fileItem.fileItems;
   const sortedFileItems = sortFileItems(fileItems);
   const isDir = fileItem.type === 'dir';
-  const isActive = fileItem.isActive;
 
-  const opacityClass = !isActive ? 'opacity-70' : '';
-  const fileIconColorClass = !isActive ? 'text-muted-foreground' : '';
   const fileNameColorClass = () => {
     if (isSelected) return 'text-primary font-bold';
     if (isTyped) return 'text-secondary';
-    if (!isActive) return 'text-muted-foreground';
     return '';
   };
 
@@ -51,7 +47,6 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
         className={`
           hover:bg-accent
           flex w-full cursor-pointer items-center py-1
-          ${opacityClass}
         `}
         onClick={isDir ? toggleExpand : handleFileSelect}
       >
@@ -74,13 +69,7 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
         ) : (
           <>
             <div className="mr-1 w-4 flex-shrink-0"></div>
-            <File
-              size={16}
-              className={`
-                mr-1 flex-shrink-0
-                ${fileIconColorClass}
-              `}
-            />
+            <File size={16} className={`mr-1 flex-shrink-0`} />
             <span
               className={`
                 truncate
