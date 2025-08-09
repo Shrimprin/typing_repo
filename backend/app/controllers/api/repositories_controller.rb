@@ -110,8 +110,7 @@ module Api
       file_tree_data.tree.each do |file_item|
         next unless file_item.type == 'blob'
 
-        extension = File.extname(file_item.path)
-        extension = Repository::NO_EXTENSION if extension.empty?
+        extension = Extension.extract_extension_name(file_item.path)
         extension_counts[extension] += 1
       end
 

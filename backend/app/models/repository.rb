@@ -12,7 +12,6 @@ class Repository < ApplicationRecord
   validates :url, presence: true
 
   BATCH_SIZE = 1000
-  NO_EXTENSION = 'no extension'
 
   def file_items_grouped_by_parent
     file_items = self.file_items.to_a
@@ -101,10 +100,9 @@ class Repository < ApplicationRecord
   end
 
   def calculate_is_active(node)
-    file_extension = File.extname(node.path)
-    file_extension = NO_EXTENSION if file_extension.empty?
-    extension = extensions.find { |ext| ext.name == file_extension }
-    extension.is_active
+    node_extension = Extension.extract_extension_name(node.path)
+    extension = extensions.find { |ext| ext.name == node_extension }
+    extension&.is_active
   end
 
   def children_of(file_tree_grouped_by_depth, parent_node_path)
