@@ -94,7 +94,7 @@ export default function CreationConfirmStep({
       </div>
 
       <div className="mb-4 flex items-center gap-3">
-        <CheckCircle className="text-primary h-5 w-5" />
+        <CheckCircle className="text-primary h-5 w-5 flex-shrink-0" />
         <div>
           <p className="font-medium">Create repository?</p>
           <p className="text-muted-foreground text-sm">
