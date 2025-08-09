@@ -59,20 +59,48 @@ export default function ExtensionSelectionStep({
     <div className="space-y-6">
       <RepositoryCard repositoryPreview={repositoryPreview} />
 
-      <div className="flex items-center justify-between">
+      <div
+        className={`
+          flex flex-col space-y-3
+          md:flex-row md:items-center md:justify-between md:space-y-0
+        `}
+      >
         <div className="text-muted-foreground text-sm">
           {selectedExtensions.length} / {repositoryPreview.extensions.length} extensions selected ({selectedFiles} /{' '}
           {totalFiles} files)
         </div>
-        <div className="space-x-2">
-          <Button variant="outline" size="sm" onClick={handleSelectAll}>
-            <CheckSquare className="mr-2 h-4 w-4" />
-            Select All
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleDeselectAll}>
-            <Square className="mr-2 h-4 w-4" />
-            Deselect All
-          </Button>
+        <div>
+          <div
+            className={`
+              flex flex-col space-y-2
+              md:flex-row md:space-y-0 md:space-x-2
+            `}
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSelectAll}
+              className={`
+                w-full
+                md:w-auto
+              `}
+            >
+              <CheckSquare className="mr-2 h-4 w-4" />
+              Select All
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDeselectAll}
+              className={`
+                w-full
+                md:w-auto
+              `}
+            >
+              <Square className="mr-2 h-4 w-4" />
+              Deselect All
+            </Button>
+          </div>
         </div>
       </div>
 

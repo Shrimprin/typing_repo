@@ -99,22 +99,41 @@ export default function RepositoryCreationWizard() {
   const progress = ((currentStepIndex + 1) / stepsInfo.length) * 100;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>{currentStepInfo.title}</CardTitle>
-              <CardDescription>{currentStepInfo.description}</CardDescription>
+    <div
+      className={`
+        mx-auto max-w-2xl space-y-6 px-4
+        sm:px-6
+      `}
+    >
+      <div className="overflow-x-auto">
+        <Card className="min-w-[360px]">
+          <CardHeader className="space-y-4">
+            <div
+              className={`
+                flex flex-col space-y-3
+                sm:flex-row sm:items-center sm:justify-between sm:space-y-0
+              `}
+            >
+              <div className="min-w-0 flex-1">
+                <CardTitle className="break-words">{currentStepInfo.title}</CardTitle>
+                <CardDescription className="break-words">{currentStepInfo.description}</CardDescription>
+              </div>
+              <div className="text-muted-foreground flex-shrink-0 text-sm">
+                {currentStepIndex + 1} / {stepsInfo.length}
+              </div>
             </div>
-            <div className="text-muted-foreground text-sm">
-              {currentStepIndex + 1} / {stepsInfo.length}
-            </div>
-          </div>
-          <Progress value={progress} className="w-full" />
-        </CardHeader>
-        <CardContent>{renderCurrentStep()}</CardContent>
-      </Card>
+            <Progress value={progress} className="w-full" />
+          </CardHeader>
+          <CardContent
+            className={`
+              px-4
+              sm:px-6
+            `}
+          >
+            {renderCurrentStep()}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
