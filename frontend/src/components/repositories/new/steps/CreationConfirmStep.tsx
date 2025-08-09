@@ -5,7 +5,6 @@ import { CheckCircle, ChevronLeftIcon, File, Files, Github, LoaderCircle } from 
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { WizardData } from '@/types';
@@ -56,7 +55,6 @@ export default function CreationConfirmStep({
       } else {
         setErrorMessage('An error occurred. Please try again.');
       }
-    } finally {
       setIsLoading(false);
     }
   };
@@ -97,12 +95,6 @@ export default function CreationConfirmStep({
         </div>
       </div>
 
-      {errorMessage && (
-        <Alert variant="destructive">
-          <AlertDescription>{errorMessage}</AlertDescription>
-        </Alert>
-      )}
-
       <div className="mb-4 flex items-center gap-3">
         <CheckCircle className="text-primary h-5 w-5" />
         <div>
@@ -112,6 +104,8 @@ export default function CreationConfirmStep({
           </p>
         </div>
       </div>
+
+      {errorMessage && <div className="text-destructive text-sm">{errorMessage}</div>}
 
       <div className="flex justify-between">
         <Button variant="outline" onClick={onBack} disabled={isLoading}>

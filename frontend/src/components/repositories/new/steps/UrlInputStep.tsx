@@ -8,7 +8,6 @@ import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -90,11 +89,7 @@ export default function UrlInputStep({ initialUrl, isLoading, setIsLoading, onNe
           )}
         />
 
-        {errorMessage && (
-          <Alert variant="destructive">
-            <AlertDescription>{errorMessage}</AlertDescription>
-          </Alert>
-        )}
+        {errorMessage && <div className="text-destructive text-sm">{errorMessage}</div>}
 
         <div className="flex justify-end">
           <Button type="submit" variant="outline" disabled={isLoading}>
