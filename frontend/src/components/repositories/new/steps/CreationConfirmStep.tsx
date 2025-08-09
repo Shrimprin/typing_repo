@@ -1,7 +1,7 @@
 'use client';
 
 import axios from 'axios';
-import { CheckCircle, ChevronLeftIcon, File, Files, Github, LoaderCircle } from 'lucide-react';
+import { CheckCircle, ChevronLeftIcon, File, LoaderCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 
@@ -63,16 +63,14 @@ export default function CreationConfirmStep({
     <div className="space-y-8">
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Github className="text-muted-foreground h-5 w-5" />
-          <h3 className="text-lg font-semibold">Repository</h3>
+          <h2 className="text-lg font-semibold">Repository</h2>
         </div>
         <RepositoryCard repositoryPreview={wizardData.repositoryPreview!} />
       </div>
 
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Files className="text-muted-foreground h-5 w-5" />
-          <h3 className="text-lg font-semibold">Selected Extensions</h3>
+          <h2 className="text-lg font-semibold">Selected Extensions</h2>
         </div>
         <div
           className={`
