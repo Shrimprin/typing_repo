@@ -59,7 +59,7 @@ RSpec.describe Repository, type: :model do
   end
 
   describe '#progress' do
-    let!(:repository) { create(:repository) }
+    let(:repository) { create(:repository) }
 
     context 'when no file_items exist' do
       it 'returns 1.0' do
@@ -93,7 +93,7 @@ RSpec.describe Repository, type: :model do
     context 'when saved successfully' do
       before do
         allow(repository).to receive(:save).and_return(true)
-        allow(repository).to receive(:save_file_items?).with(github_client_mock).and_return(true)
+        allow(repository).to receive(:save_file_items).with(github_client_mock).and_return(true)
       end
 
       it 'returns true' do
@@ -104,7 +104,7 @@ RSpec.describe Repository, type: :model do
     context 'when save failed' do
       before do
         allow(repository).to receive(:save).and_return(false)
-        allow(repository).to receive(:save_file_items?).with(github_client_mock).and_return(true)
+        allow(repository).to receive(:save_file_items).with(github_client_mock).and_return(true)
       end
 
       it 'returns nil' do
@@ -118,10 +118,10 @@ RSpec.describe Repository, type: :model do
       end
     end
 
-    context 'when save_file_items? failed' do
+    context 'when save_file_items failed' do
       before do
         allow(repository).to receive(:save).and_return(true)
-        allow(repository).to receive(:save_file_items?).with(github_client_mock).and_return(false)
+        allow(repository).to receive(:save_file_items).with(github_client_mock).and_return(false)
       end
 
       it 'returns nil' do
@@ -136,32 +136,33 @@ RSpec.describe Repository, type: :model do
     end
   end
 
-  describe '#save_file_items?' do
-    let(:repository) { build(:repository) }
-    let(:github_client_mock) { instance_double(Octokit::Client) }
-    let(:tree_response) { double('tree_response', tree: tree_items) }
-    let(:tree_items) do
+  describe '#save_file_items' do
+    let(:repository) { create(:repository, :with_extensions) }
+    let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
+    let(:file_tree) do
       [
-        double('tree_item', path: 'file1.rb', type: 'blob'),
-        double('tree_item', path: 'file2.rb', type: 'blob'),
-        double('tree_item', path: 'directory1', type: 'tree'),
-        double('tree_item', path: 'directory1/file3.rb', type: 'blob'),
-        double('tree_item', path: 'directory1/directory2', type: 'tree'),
-        double('tree_item', path: 'directory1/directory2/file4.rb', type: 'blob')
+        node_class.new(path: 'file1.rb', type: 'blob'),
+        node_class.new(path: 'file2.rb', type: 'blob'),
+        node_class.new(path: 'directory1', type: 'tree'),
+        node_class.new(path: 'directory1/file3.rb', type: 'blob'),
+        node_class.new(path: 'directory1/directory2', type: 'tree'),
+        node_class.new(path: 'directory1/directory2/file4.rb', type: 'blob'),
+        node_class.new(path: 'invalid_directory', type: 'tree'),
+        node_class.new(path: 'invalid_directory/invalid_file.md', type: 'blob')
       ]
     end
+    let(:github_client_mock) { instance_double(Octokit::Client) }
+    let(:tree_response) { double('tree_response', tree: file_tree) }
 
     before do
       allow(github_client_mock).to receive(:tree)
         .with(repository.url, repository.commit_hash, recursive: true)
         .and_return(tree_response)
-
-      repository.save!
     end
 
     it 'saves file_items with tree structure' do
       expect(repository.file_items.count).to eq(0)
-      repository.send(:save_file_items?, github_client_mock)
+      repository.send(:save_file_items, github_client_mock)
 
       expect(repository.file_items.count).to eq(6)
       expect(repository.file_items.where(type: 'file').count).to eq(4)
@@ -181,179 +182,228 @@ RSpec.describe Repository, type: :model do
       grandchild_file = child_directory.children.find_by(path: 'directory1/directory2/file4.rb')
       expect(grandchild_file.parent_id).to eq(child_directory.id)
     end
+
+    it 'does not save file_items with invalid extensions' do
+      expect(repository.extensions.find_by(name: 'md').is_active).to be false
+      repository.send(:save_file_items, github_client_mock)
+
+      invalid_directory = repository.file_items.find_by(path: 'invalid_directory')
+      expect(invalid_directory).to be_nil
+
+      invalid_file = repository.file_items.find_by(path: 'invalid_directory/invalid_file.md')
+      expect(invalid_file).to be_nil
+    end
   end
 
-  describe '#create_file_items_by_depth?' do
-    let!(:repository) { create(:repository) }
+  describe '#filter_file_tree_by_valid_extensions' do
+    let(:repository) { create(:repository, :with_extensions) }
+    let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
+    let(:file_tree_grouped_by_depth) do
+      {
+        0 => [node_class.new(path: 'root_file.rb', type: 'blob'),
+              node_class.new(path: 'root_directory', type: 'tree'),
+              node_class.new(path: 'invalid_directory', type: 'tree')],
+        1 => [node_class.new(path: 'root_directory/child_file.rb', type: 'blob'),
+              node_class.new(path: 'root_directory/child_directory', type: 'tree'),
+              node_class.new(path: 'invalid_directory/invalid_file.md', type: 'blob')],
+        2 => [node_class.new(path: 'root_directory/child_directory/grandchild_file.rb', type: 'blob')]
+      }
+    end
 
-    context 'when file tree is given' do
+    it 'filters file_items with valid extensions' do
+      result = repository.send(:filter_file_tree_by_valid_extensions, file_tree_grouped_by_depth)
+
+      root_file = result.find { |node| node.path == 'root_file.rb' }
+      expect(root_file).to be_present
+
+      root_directory = result.find { |node| node.path == 'root_directory' }
+      expect(root_directory).to be_present
+
+      children = root_directory.children
+      expect(children.count).to eq(2)
+
+      child_file = children.find { |node| node.path == 'root_directory/child_file.rb' }
+      expect(child_file).to be_present
+
+      child_directory = children.find { |node| node.path == 'root_directory/child_directory' }
+      expect(child_directory).to be_present
+
+      grandchildren = child_directory.children
+      expect(grandchildren.count).to eq(1)
+
+      grandchild_file = grandchildren.find { |node| node.path == 'root_directory/child_directory/grandchild_file.rb' }
+      expect(grandchild_file).to be_present
+
+      invalid_file = result.find { |node| node.path == 'invalid_directory/invalid_file.md' }
+      expect(invalid_file).to be_nil
+
+      invalid_directory = result.find { |node| node.path == 'invalid_directory' }
+      expect(invalid_directory).to be_nil
+    end
+  end
+
+  describe '#create_file_items_recursively' do
+    let(:repository) { create(:repository) }
+    let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
+
+    context 'when valid file_tree is given' do
       let(:file_tree) do
         [
-          double('tree_item', path: 'README.md', type: 'blob'),
-          double('tree_item', path: 'src', type: 'tree'),
-          double('tree_item', path: 'src/main.rb', type: 'blob'),
-          double('tree_item', path: 'src/utils', type: 'tree'),
-          double('tree_item', path: 'src/utils/helper.rb', type: 'blob')
+          node_class.new(path: 'root_file.rb', type: 'blob'),
+          node_class.new(path: 'root_directory', type: 'tree', children: [
+                           node_class.new(path: 'root_directory/child_file.rb', type: 'blob'),
+                           node_class.new(path: 'root_directory/child_directory', type: 'tree', children: [
+                                            node_class.new(path: 'root_directory/child_directory/grandchild_file.rb',
+                                                           type: 'blob')
+                                          ])
+                         ])
         ]
-      end
-
-      it 'returns true' do
-        expect(repository.send(:create_file_items_by_depth?, file_tree)).to be true
       end
 
       it 'creates file_items with tree structure' do
         expect(repository.file_items.count).to eq(0)
-
-        repository.send(:create_file_items_by_depth?, file_tree)
+        repository.send(:create_file_items_recursively, file_tree)
 
         expect(repository.file_items.count).to eq(5)
+        expect(repository.file_items.where(type: 'file').count).to eq(3)
+        expect(repository.file_items.where(type: 'dir').count).to eq(2)
 
-        readme = repository.file_items.find_by(path: 'README.md')
-        expect(readme.parent_id).to be_nil
+        root_file = repository.file_items.find_by(path: 'root_file.rb')
+        expect(root_file.parent_id).to be_nil
 
-        src_dir = repository.file_items.find_by(path: 'src')
-        expect(src_dir.parent_id).to be_nil
+        root_directory = repository.file_items.find_by(path: 'root_directory')
+        expect(root_directory.parent_id).to be_nil
 
-        main_file = repository.file_items.find_by(path: 'src/main.rb')
-        expect(main_file.parent_id).to eq(src_dir.id)
+        child_file = root_directory.children.find_by(path: 'root_directory/child_file.rb')
+        expect(child_file.parent_id).to eq(root_directory.id)
 
-        utils_dir = repository.file_items.find_by(path: 'src/utils')
-        expect(utils_dir.parent_id).to eq(src_dir.id)
+        child_directory = root_directory.children.find_by(path: 'root_directory/child_directory')
+        expect(child_directory.parent_id).to eq(root_directory.id)
 
-        helper_file = repository.file_items.find_by(path: 'src/utils/helper.rb')
-        expect(helper_file.parent_id).to eq(utils_dir.id)
+        grandchild_file = child_directory.children.find_by(path: 'root_directory/child_directory/grandchild_file.rb')
+        expect(grandchild_file.parent_id).to eq(child_directory.id)
       end
     end
 
-    context 'when empty file tree is given' do
-      let(:file_tree) { [] }
-
-      it 'returns true without creating any file_items' do
-        expect(repository.file_items.count).to eq(0)
-
-        result = repository.send(:create_file_items_by_depth?, file_tree)
-
-        expect(result).to be true
-        expect(repository.file_items.count).to eq(0)
-      end
-    end
-
-    context 'when invalid file_items are given' do
+    context 'when invalid file_tree is given' do
       let(:file_tree) do
         [
-          double('tree_item', path: 'invalid_file.rb', type: 'blob'),
-          double('tree_item', path: 'valid_file.rb', type: 'blob')
+          node_class.new(path: '', type: 'blob')
         ]
       end
 
-      before do
-        invalid_file_item = FileItem.new(
-          repository: repository,
-          name: '',
-          path: '',
-          type: :file,
-          status: :untyped
-        )
-        valid_file_item = FileItem.new(
-          repository: repository,
-          name: 'valid_file.rb',
-          path: 'valid_file.rb',
-          type: :file,
-          status: :untyped
-        )
-
-        allow(repository).to receive(:build_file_items_batch)
-          .and_return([invalid_file_item, valid_file_item])
-      end
-
       it 'returns false' do
-        expect(repository.send(:create_file_items_by_depth?, file_tree)).to be false
+        expect(repository.send(:create_file_items_recursively, file_tree)).to be false
       end
 
-      it 'returns false and adds validation errors' do
+      it 'does not create file_items' do
         expect(repository.file_items.count).to eq(0)
+        repository.send(:create_file_items_recursively, file_tree)
 
-        repository.send(:create_file_items_by_depth?, file_tree)
+        expect(repository.file_items.count).to eq(0)
+      end
+
+      it 'adds errors to the repository' do
+        repository.send(:create_file_items_recursively, file_tree)
 
         expect(repository.errors['file_item.name']).to include("can't be blank")
         expect(repository.errors['file_item.path']).to include("can't be blank")
-        expect(repository.file_items.count).to eq(1) # この時点でロールバックはされないため、正常なfile_item1つは作成される
       end
     end
   end
 
-  describe '#build_file_items_batch' do
+  describe '#build_file_items' do
     let(:repository) { create(:repository) }
-    let(:parent_dir) { create(:file_item, :directory, repository: repository, path: 'src') }
-    let(:file_items) do
+    let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
+    let(:parent_file_item) { create(:file_item, repository:) }
+    let(:file_tree) do
       [
-        double('tree_item', path: 'README.md', type: 'blob'),
-        double('tree_item', path: 'src', type: 'tree'),
-        double('tree_item', path: 'src/main.rb', type: 'blob')
+        node_class.new(path: 'root_file.rb', type: 'blob'),
+        node_class.new(path: 'root_directory', type: 'tree')
       ]
     end
 
-    let(:directory_items_map) { { 'src' => parent_dir } }
+    it 'builds file_items with correct attributes' do
+      result = repository.send(:build_file_items, file_tree, parent_file_item)
 
-    it 'creates file_items with tree structure' do
-      result = repository.send(:build_file_items_batch, file_items, directory_items_map)
+      expect(result.size).to eq(2)
 
-      expect(result.size).to eq(3)
+      root_file = result.find { |file_item| file_item.path == 'root_file.rb' }
+      root_directory = result.find { |file_item| file_item.path == 'root_directory' }
 
-      readme = result[0]
-      expect(readme.name).to eq('README.md')
-      expect(readme.path).to eq('README.md')
-      expect(readme.type).to eq('file')
-      expect(readme.parent).to be_nil
+      expect(root_file).to be_a(FileItem)
+      expect(root_file.repository).to eq(repository)
+      expect(root_file.parent).to eq(parent_file_item)
+      expect(root_file.name).to eq('root_file.rb')
+      expect(root_file.path).to eq('root_file.rb')
+      expect(root_file).to be_file
+      expect(root_file).to be_untyped
+      expect(root_file.content).to be_nil
 
-      src_dir = result[1]
-      expect(src_dir.name).to eq('src')
-      expect(src_dir.path).to eq('src')
-      expect(src_dir.type).to eq('dir')
-      expect(src_dir.parent).to be_nil
-
-      main_file = result[2]
-      expect(main_file.name).to eq('main.rb')
-      expect(main_file.path).to eq('src/main.rb')
-      expect(main_file.type).to eq('file')
-      expect(main_file.parent).to eq(parent_dir)
+      expect(root_directory).to be_a(FileItem)
+      expect(root_directory.repository).to eq(repository)
+      expect(root_directory.parent).to eq(parent_file_item)
+      expect(root_directory.name).to eq('root_directory')
+      expect(root_directory.path).to eq('root_directory')
+      expect(root_directory).to be_dir
+      expect(root_directory).to be_untyped
+      expect(root_directory.content).to be_nil
     end
   end
 
-  describe '#extract_directory_items' do
-    let(:repository) { build(:repository) }
-    let(:file_items) do
-      [
-        double('tree_item', path: 'README.md', type: 'blob'),
-        double('tree_item', path: 'src', type: 'tree'),
-        double('tree_item', path: 'Gemfile', type: 'blob'),
-        double('tree_item', path: 'lib', type: 'tree')
-      ]
+  describe '#is_active?' do
+    let(:repository) { create(:repository, :with_extensions) }
+    let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
+
+    context 'when file_item has valid extension' do
+      let(:valid_node) { node_class.new(path: 'valid_file.rb', type: 'blob') }
+
+      it 'returns true' do
+        expect(repository.send(:active?, valid_node)).to be true
+      end
     end
 
-    let(:file_items_batch) do
-      [
-        FileItem.new(path: 'README.md', type: :file),
-        FileItem.new(path: 'src', type: :dir),
-        FileItem.new(path: 'Gemfile', type: :file),
-        FileItem.new(path: 'lib', type: :dir)
-      ]
+    context 'when file_item has invalid extension' do
+      let(:invalid_node) { node_class.new(path: 'invalid_file.md', type: 'blob') }
+
+      it 'returns false' do
+        expect(repository.send(:active?, invalid_node)).to be false
+      end
+    end
+  end
+
+  describe '#children_of' do
+    let(:repository) { create(:repository, :with_extensions) }
+    let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
+    let(:file_tree_grouped_by_depth) do
+      {
+        0 => [node_class.new(path: 'root_file.rb', type: 'blob'),
+              node_class.new(path: 'root_directory', type: 'tree'),
+              node_class.new(path: 'invalid_directory', type: 'tree')],
+        1 => [node_class.new(path: 'root_directory/child_file.rb', type: 'blob'),
+              node_class.new(path: 'root_directory/child_directory', type: 'tree'),
+              node_class.new(path: 'invalid_directory/invalid_file.md', type: 'blob')],
+        2 => [node_class.new(path: 'root_directory/child_directory/grandchild_file.rb', type: 'blob')]
+      }
     end
 
-    it 'extracts directory items and maps them' do
-      result = repository.send(:extract_directory_items, file_items, file_items_batch)
+    context 'when parent_node has children' do
+      it 'returns children of the given node' do
+        result = repository.send(:children_of, file_tree_grouped_by_depth, 'root_directory/')
 
-      expect(result.keys).to contain_exactly('src', 'lib')
-      expect(result.size).to eq(2)
+        expect(result.count).to eq(2)
 
-      expect(result['src']).to eq(file_items_batch[1])
-      expect(result['lib']).to eq(file_items_batch[3])
+        child_file = result.find { |node| node.path == 'root_directory/child_file.rb' }
+        child_directory = result.find { |node| node.path == 'root_directory/child_directory' }
+        expect(child_file).to be_present
+        expect(child_directory).to be_present
+      end
     end
 
-    it 'does not include file items' do
-      result = repository.send(:extract_directory_items, file_items, file_items_batch)
-
-      expect(result.keys).not_to include('README.md', 'Gemfile')
+    context 'when parent_node has no children' do
+      it 'returns empty array' do
+        expect(repository.send(:children_of, file_tree_grouped_by_depth, 'root_file.rb')).to be_empty
+      end
     end
   end
 
@@ -364,44 +414,6 @@ RSpec.describe Repository, type: :model do
       expect(repository.send(:depth_of, 'file.rb')).to eq(0)
       expect(repository.send(:depth_of, 'src/main.rb')).to eq(1)
       expect(repository.send(:depth_of, 'src/lib/helper.rb')).to eq(2)
-    end
-  end
-
-  describe '#directory?' do
-    let(:repository) { build(:repository) }
-
-    it 'identifies directories correctly' do
-      tree_item = double('tree_item', type: 'tree')
-      blob_item = double('blob_item', type: 'blob')
-
-      expect(repository.send(:directory?, tree_item)).to be true
-      expect(repository.send(:directory?, blob_item)).to be false
-    end
-  end
-
-  describe '#find_parent_item' do
-    let(:repository) { build(:repository) }
-
-    it 'finds parent item from directory_items_map' do
-      parent_item = double('parent_item')
-      directory_items_map = { 'src' => parent_item }
-
-      result = repository.send(:find_parent_item, 'src/main.rb', directory_items_map)
-      expect(result).to eq(parent_item)
-    end
-
-    it 'returns nil for root level files' do
-      directory_items_map = { 'src' => double('parent_item') }
-
-      result = repository.send(:find_parent_item, 'README.md', directory_items_map)
-      expect(result).to be_nil
-    end
-
-    it 'returns nil when parent not found in map' do
-      directory_items_map = {}
-
-      result = repository.send(:find_parent_item, 'src/main.rb', directory_items_map)
-      expect(result).to be_nil
     end
   end
 end
