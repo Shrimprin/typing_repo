@@ -4,9 +4,6 @@ Rails.application.routes.draw do
   namespace :api do
     resources :repositories, only: [:index, :show, :create] do
       resources :file_items, only: [:show, :update]
-      member do
-        get :extensions
-      end
       collection do
         get :preview
       end
