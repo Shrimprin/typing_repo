@@ -8,7 +8,7 @@ Rails.application.routes.draw do
         get :extensions
       end
       collection do
-        post :preview
+        get :preview
       end
     end
   end

@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { RepositoryPreview, WizardData } from '@/types';
-import { axiosPost } from '@/utils/axios';
+import { axiosGet } from '@/utils/axios';
 
 type FormValues = {
   url: string;
@@ -52,7 +52,7 @@ export default function UrlInputStep({ initialUrl, isLoading, setIsLoading, onNe
       const accessToken = session?.user?.accessToken;
       const url = '/api/repositories/preview';
       const postData = { repository_preview: { url: data.url } };
-      const res = await axiosPost(url, accessToken, postData);
+      const res = await axiosGet(url, accessToken, postData);
       const repositoryPreview: RepositoryPreview = res.data;
 
       onNext({
