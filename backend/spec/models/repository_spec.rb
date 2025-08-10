@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Repository, type: :model do
+  let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
+
   describe '#file_items_grouped_by_parent' do
     let(:repository) { build(:repository) }
 
@@ -138,7 +140,6 @@ RSpec.describe Repository, type: :model do
 
   describe '#save_file_items' do
     let(:repository) { create(:repository, :with_extensions) }
-    let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
     let(:file_tree) do
       [
         node_class.new(path: 'file1.rb', type: 'blob'),
@@ -197,7 +198,6 @@ RSpec.describe Repository, type: :model do
 
   describe '#filter_file_tree_by_valid_extensions' do
     let(:repository) { create(:repository, :with_extensions) }
-    let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
     let(:file_tree_grouped_by_depth) do
       {
         0 => [node_class.new(path: 'root_file.rb', type: 'blob'),
@@ -244,7 +244,6 @@ RSpec.describe Repository, type: :model do
 
   describe '#create_file_items_recursively' do
     let(:repository) { create(:repository) }
-    let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
 
     context 'when valid file_tree is given' do
       let(:file_tree) do
@@ -314,7 +313,6 @@ RSpec.describe Repository, type: :model do
 
   describe '#build_file_items' do
     let(:repository) { create(:repository) }
-    let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
     let(:parent_file_item) { create(:file_item, repository:) }
     let(:file_tree) do
       [
@@ -351,9 +349,8 @@ RSpec.describe Repository, type: :model do
     end
   end
 
-  describe '#is_active?' do
+  describe '#active?' do
     let(:repository) { create(:repository, :with_extensions) }
-    let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
 
     context 'when file_item has valid extension' do
       let(:valid_node) { node_class.new(path: 'valid_file.rb', type: 'blob') }
@@ -374,7 +371,6 @@ RSpec.describe Repository, type: :model do
 
   describe '#children_of' do
     let(:repository) { create(:repository, :with_extensions) }
-    let(:node_class) { Struct.new(:path, :type, :children, keyword_init: true) }
     let(:file_tree_grouped_by_depth) do
       {
         0 => [node_class.new(path: 'root_file.rb', type: 'blob'),
