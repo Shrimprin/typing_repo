@@ -11,10 +11,6 @@ module UrlUtils
     GITHUB_REPOSITORY_URL_PATTERN.match?(url)
   end
 
-  def invalid_github_repository_url?(url)
-    !valid_github_repository_url?(url)
-  end
-
   def extract_github_repository_path(url)
     return nil unless valid_github_repository_url?(url)
 
