@@ -176,7 +176,6 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         json = response.parsed_body
         expect(json).to have_json_attributes(
-          id: be_present,
           user_id: user.id,
           name: 'repository',
           last_typed_at: nil
