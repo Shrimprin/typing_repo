@@ -19,10 +19,12 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         repositories.each do |repository|
           repository_json = json.find { |r| r['id'] == repository.id }
-          expect(repository_json['name']).to eq(repository.name)
-          expect(repository_json['user_id']).to eq(repository.user_id)
-          expect(repository_json['last_typed_at']).to eq(repository.last_typed_at&.as_json)
-          expect(repository_json['progress']).to eq(0.4)
+          expect(repository_json).to have_json_attributes(
+            name: repository.name,
+            user_id: repository.user_id,
+            last_typed_at: repository.last_typed_at&.as_json,
+            progress: 0.4
+          )
         end
       end
 
@@ -80,7 +82,6 @@ RSpec.describe 'Api::Repositories', type: :request do
         get api_repositories_path(page: 3), headers: headers
 
         json = response.parsed_body
-        puts json
         expect(json).to be_empty
       end
     end
@@ -115,10 +116,12 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:ok)
         json = response.parsed_body
-        expect(json['id']).to eq(repository.id)
-        expect(json['name']).to eq(repository.name)
-        expect(json['user_id']).to eq(repository.user_id)
-        expect(json['last_typed_at']).to eq(repository.last_typed_at&.as_json)
+        expect(json).to have_json_attributes(
+          id: repository.id,
+          name: repository.name,
+          user_id: repository.user_id,
+          last_typed_at: repository.last_typed_at&.as_json
+        )
         expect(json['file_items'].length).to eq(4)
         expect(json['file_items'][0]['file_items'].length).to eq(2)
       end
@@ -172,10 +175,12 @@ RSpec.describe 'Api::Repositories', type: :request do
         expect(response).to have_http_status(:created)
 
         json = response.parsed_body
-        expect(json['id']).to be_present
-        expect(json['user_id']).to eq(user.id)
-        expect(json['name']).to eq('repository')
-        expect(json['last_typed_at']).to be_nil
+        expect(json).to have_json_attributes(
+          id: be_present,
+          user_id: user.id,
+          name: 'repository',
+          last_typed_at: nil
+        )
       end
 
       it 'creates extensions' do
@@ -347,18 +352,11 @@ RSpec.describe 'Api::Repositories', type: :request do
         json_extensions = response.parsed_body['extensions']
 
         expect(json_extensions.length).to eq(4)
-        expect(json_extensions[0]['name']).to eq('.rb')
-        expect(json_extensions[0]['file_count']).to eq(3)
-        expect(json_extensions[0]['is_active']).to be true
-        expect(json_extensions[1]['name']).to eq('.html')
-        expect(json_extensions[1]['file_count']).to eq(2)
-        expect(json_extensions[1]['is_active']).to be true
-        expect(json_extensions[2]['name']).to eq('.gitignore')
-        expect(json_extensions[2]['file_count']).to eq(1)
-        expect(json_extensions[2]['is_active']).to be true
-        expect(json_extensions[3]['name']).to eq(Extension::NO_EXTENSION_NAME)
-        expect(json_extensions[3]['file_count']).to eq(1)
-        expect(json_extensions[3]['is_active']).to be true
+        expect(json_extensions[0]).to have_json_attributes(name: '.rb', file_count: 3, is_active: true)
+        expect(json_extensions[1]).to have_json_attributes(name: '.html', file_count: 2, is_active: true)
+        expect(json_extensions[2]).to have_json_attributes(name: '.gitignore', file_count: 1, is_active: true)
+        expect(json_extensions[3]).to have_json_attributes(name: Extension::NO_EXTENSION_NAME, file_count: 1,
+                                                           is_active: true)
       end
 
       it 'does not return directory' do
