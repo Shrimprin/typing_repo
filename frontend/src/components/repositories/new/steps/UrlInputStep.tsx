@@ -58,12 +58,11 @@ export default function UrlInputStep({ initialUrl, isLoading, setIsLoading, onNe
       onNext({
         url: data.url,
         repositoryPreview,
-        selectedExtensions: repositoryPreview.extensions.filter((ext) => ext.isActive),
+        selectedExtensions: repositoryPreview.extensions,
       });
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.error || 'An error occurred. Please try again.';
-        setErrorMessage(message);
+        setErrorMessage(error.message);
       } else {
         setErrorMessage('An error occurred. Please try again.');
       }
