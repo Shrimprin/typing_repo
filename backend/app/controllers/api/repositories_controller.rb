@@ -107,10 +107,10 @@ module Api
       file_tree_data = client.tree(repository_url, commit_hash, recursive: true)
       extension_counts = Hash.new(0)
 
-      file_tree_data.tree.each do |file_item|
-        next unless file_item.type == 'blob'
+      file_tree_data.tree.each do |node|
+        next unless node.type == 'blob'
 
-        extension = Extension.extract_extension_name(file_item.path)
+        extension = Extension.extract_extension_name(node.path)
         extension_counts[extension] += 1
       end
 

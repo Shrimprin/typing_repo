@@ -106,7 +106,8 @@ class Repository < ApplicationRecord
 
   def children_of(file_tree_grouped_by_depth, parent_node_path)
     depth = depth_of(parent_node_path)
-    file_tree_grouped_by_depth[depth].select do |node|
+    nodes_by_depth = file_tree_grouped_by_depth[depth] || []
+    nodes_by_depth.select do |node|
       node.path.start_with?(parent_node_path) && node.path != parent_node_path
     end
   end

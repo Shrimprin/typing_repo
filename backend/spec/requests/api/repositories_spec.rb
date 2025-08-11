@@ -138,6 +138,7 @@ RSpec.describe 'Api::Repositories', type: :request do
   describe 'POST /api/repositories' do
     let(:valid_url) { 'https://github.com/username/repository' }
     let(:valid_repository_url) { 'username/repository' }
+    let(:extensions_attributes) { [{ name: '.rb', is_active: true }, { name: '.md', is_active: false }] }
 
     before do
       allow(ENV).to receive(:fetch).with('GITHUB_ACCESS_TOKEN').and_return('github_access_token')
@@ -162,16 +163,30 @@ RSpec.describe 'Api::Repositories', type: :request do
         allow(github_client_mock).to receive(:tree)
           .with(valid_repository_url, 'commit_hash', recursive: true)
           .and_return(tree_response)
+
+        post api_repositories_path,
+             params: { repository: { url: valid_url, extensions_attributes: extensions_attributes } }, headers: headers
       end
 
-      it 'creates repository' do
-        post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
+      it 'returns created repository' do
         expect(response).to have_http_status(:created)
+
         json = response.parsed_body
         expect(json['id']).to be_present
         expect(json['user_id']).to eq(user.id)
         expect(json['name']).to eq('repository')
         expect(json['last_typed_at']).to be_nil
+      end
+
+      it 'creates extensions' do
+        created_repository = Repository.find(response.parsed_body['id'])
+        expect(created_repository.extensions.length).to eq(2)
+
+        ruby_extension = created_repository.extensions.find { |extension| extension.name == '.rb' }
+        expect(ruby_extension.is_active).to be true
+
+        md_extension = created_repository.extensions.find { |extension| extension.name == '.md' }
+        expect(md_extension.is_active).to be false
       end
     end
 
@@ -218,12 +233,12 @@ RSpec.describe 'Api::Repositories', type: :request do
         github_client_mock = instance_double(Octokit::Client)
         allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
         allow(github_client_mock).to receive(:repository).with(non_existent_repository_url).and_raise(Octokit::NotFound)
+
+        non_existent_url = 'https://github.com/username/invalid_url'
+        post api_repositories_path, params: { repository: { url: non_existent_url } }, headers: headers
       end
 
       it 'returns not found status' do
-        non_existent_url = 'https://github.com/username/invalid_url'
-        post api_repositories_path, params: { repository: { url: non_existent_url } }, headers: headers
-
         expect(response).to have_http_status(:not_found)
         json = response.parsed_body
         expect(json['error']).to eq('Repository not found')
@@ -235,11 +250,11 @@ RSpec.describe 'Api::Repositories', type: :request do
         github_client_mock = instance_double(Octokit::Client)
         allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
         allow(github_client_mock).to receive(:repository).with(valid_repository_url).and_raise(Octokit::TooManyRequests)
+
+        post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
       end
 
       it 'returns too_many_requests status' do
-        post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
-
         expect(response).to have_http_status(:too_many_requests)
         json = response.parsed_body
         expect(json['error']).to eq('Too many requests. Please try again later.')
@@ -251,11 +266,11 @@ RSpec.describe 'Api::Repositories', type: :request do
         github_client_mock = instance_double(Octokit::Client)
         allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
         allow(github_client_mock).to receive(:repository).with(valid_repository_url).and_raise(Octokit::Unauthorized)
+
+        post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
       end
 
       it 'returns unauthorized status' do
-        post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
-
         expect(response).to have_http_status(:unauthorized)
         json = response.parsed_body
         expect(json['error']).to eq('Invalid access token')
@@ -267,11 +282,164 @@ RSpec.describe 'Api::Repositories', type: :request do
         github_client_mock = instance_double(Octokit::Client)
         allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
         allow(github_client_mock).to receive(:repository).with(valid_repository_url).and_raise(StandardError)
+
+        post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
       end
 
       it 'returns internal_server_error status' do
-        post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
+        expect(response).to have_http_status(:internal_server_error)
+        json = response.parsed_body
+        expect(json['error']).to eq('An error occurred. Please try again.')
+      end
+    end
+  end
 
+  describe 'GET /api/repositories/preview' do
+    let(:valid_url) { 'https://github.com/username/repository' }
+    let(:valid_repository_url) { 'username/repository' }
+
+    context 'when url is valid' do
+      let(:repository_info) do
+        instance_double(Octokit::Repository, name: 'repository')
+      end
+
+      let(:commit) do
+        double('commit', sha: 'commit_hash')
+      end
+
+      let(:file_tree_data) do
+        double('file_tree_data', tree: [
+                 double('node', path: 'directory', type: 'tree'),
+                 double('node', path: 'ruby_file1.rb', type: 'blob'),
+                 double('node', path: 'ruby_file2.rb', type: 'blob'),
+                 double('node', path: 'ruby_file3.rb', type: 'blob'),
+                 double('node', path: 'html_file1.html', type: 'blob'),
+                 double('node', path: 'html_file2.html', type: 'blob'),
+                 double('node', path: 'Gemfile', type: 'blob'),
+                 double('node', path: '.gitignore', type: 'blob')
+               ])
+      end
+
+      before do
+        github_client_mock = instance_double(Octokit::Client)
+        allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
+        allow(github_client_mock).to receive(:repository).with(valid_repository_url).and_return(repository_info)
+        allow(github_client_mock).to receive(:commits).with(valid_repository_url).and_return([commit])
+
+        allow(github_client_mock).to receive(:tree)
+          .with(valid_repository_url, 'commit_hash', recursive: true)
+          .and_return(file_tree_data)
+
+        get preview_api_repositories_path, params: { repository_preview: { url: valid_url } }, headers: headers
+      end
+
+      it 'returns ok status' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns repository name and url' do
+        json = response.parsed_body
+        expect(json['name']).to eq('repository')
+        expect(json['url']).to eq(valid_url)
+      end
+
+      it 'returns extensions order by file count and name' do
+        json_extensions = response.parsed_body['extensions']
+
+        expect(json_extensions.length).to eq(4)
+        expect(json_extensions[0]['name']).to eq('.rb')
+        expect(json_extensions[0]['file_count']).to eq(3)
+        expect(json_extensions[0]['is_active']).to be true
+        expect(json_extensions[1]['name']).to eq('.html')
+        expect(json_extensions[1]['file_count']).to eq(2)
+        expect(json_extensions[1]['is_active']).to be true
+        expect(json_extensions[2]['name']).to eq('.gitignore')
+        expect(json_extensions[2]['file_count']).to eq(1)
+        expect(json_extensions[2]['is_active']).to be true
+        expect(json_extensions[3]['name']).to eq(Extension::NO_EXTENSION_NAME)
+        expect(json_extensions[3]['file_count']).to eq(1)
+        expect(json_extensions[3]['is_active']).to be true
+      end
+
+      it 'does not return directory' do
+        json_extensions = response.parsed_body['extensions']
+
+        directory = json_extensions.find { |extension| extension['name'] == 'directory' }
+        expect(directory).to be_nil
+      end
+    end
+
+    context 'when url is invalid' do
+      it 'returns unprocessable_entity status' do
+        invalid_url = 'https://invalid_url.com'
+        get preview_api_repositories_path, params: { repository_preview: { url: invalid_url } }, headers: headers
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = response.parsed_body
+        expect(json['error']).to eq('Invalid URL')
+      end
+    end
+
+    context 'when repository is non-existent' do
+      before do
+        non_existent_repository_url = 'username/invalid_url'
+        github_client_mock = instance_double(Octokit::Client)
+        allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
+        allow(github_client_mock).to receive(:repository).with(non_existent_repository_url).and_raise(Octokit::NotFound)
+
+        non_existent_url = 'https://github.com/username/invalid_url'
+        get preview_api_repositories_path, params: { repository_preview: { url: non_existent_url } }, headers: headers
+      end
+
+      it 'returns not found status' do
+        expect(response).to have_http_status(:not_found)
+        json = response.parsed_body
+        expect(json['error']).to eq('Repository not found')
+      end
+    end
+
+    context 'when too many requests' do
+      before do
+        github_client_mock = instance_double(Octokit::Client)
+        allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
+        allow(github_client_mock).to receive(:repository).with(valid_repository_url).and_raise(Octokit::TooManyRequests)
+
+        get preview_api_repositories_path, params: { repository_preview: { url: valid_url } }, headers: headers
+      end
+
+      it 'returns too_many_requests status' do
+        expect(response).to have_http_status(:too_many_requests)
+        json = response.parsed_body
+        expect(json['error']).to eq('Too many requests. Please try again later.')
+      end
+    end
+
+    context 'when unauthorized' do
+      before do
+        github_client_mock = instance_double(Octokit::Client)
+        allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
+        allow(github_client_mock).to receive(:repository).with(valid_repository_url).and_raise(Octokit::Unauthorized)
+
+        get preview_api_repositories_path, params: { repository_preview: { url: valid_url } }, headers: headers
+      end
+
+      it 'returns unauthorized status' do
+        expect(response).to have_http_status(:unauthorized)
+        json = response.parsed_body
+        expect(json['error']).to eq('Invalid access token')
+      end
+    end
+
+    context 'when unexpected error occurs' do
+      before do
+        github_client_mock = instance_double(Octokit::Client)
+        allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
+        allow(github_client_mock).to receive(:repository).with(valid_repository_url).and_raise(StandardError)
+
+        get preview_api_repositories_path, params: { repository_preview: { url: valid_url } }, headers: headers
+      end
+
+      it 'returns internal_server_error status' do
         expect(response).to have_http_status(:internal_server_error)
         json = response.parsed_body
         expect(json['error']).to eq('An error occurred. Please try again.')
