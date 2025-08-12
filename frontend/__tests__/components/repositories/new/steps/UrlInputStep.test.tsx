@@ -7,7 +7,7 @@ import UrlInputStep from '@/components/repositories/new/steps/UrlInputStep';
 import { mockUseSession } from '../../../../mocks/auth';
 import { clickButton } from '../../../../utils/testUtils';
 
-describe('UrlInputStep (unit)', () => {
+describe('UrlInputStep', () => {
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
   const setup = () => {
     const onNext = jest.fn();
