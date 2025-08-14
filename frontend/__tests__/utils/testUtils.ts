@@ -7,6 +7,17 @@ export const clickButton = async (buttonName: string) => {
 };
 
 export const clickCheckboxByText = async (text: string) => {
-  const checkbox = screen.getByText(text);
+  const checkbox = getCheckboxByText(text);
   await userEvent.click(checkbox);
+};
+
+export const getCheckboxByText = (text: string) => {
+  // shadcn/uiのチェックボックスはチェックボックスとテキストが兄弟の構造のため、
+  // テキストから要素を経由してチェックボックスを取得する
+  const textElement = screen.getByText(text);
+  const cardElement = textElement.closest('[data-slot="card"]');
+  if (!cardElement) {
+    throw new Error(`Card element containing text "${text}" not found`);
+  }
+  return cardElement.querySelector('[role="checkbox"]') as HTMLElement;
 };

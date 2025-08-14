@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 
 import ExtensionSelectionStep from '@/components/repositories/new/steps/ExtensionSelectionStep';
 import { Extension, RepositoryPreview } from '@/types';
-import { clickButton, clickCheckboxByText } from '../../../../utils/testUtils';
+import { clickButton, clickCheckboxByText, getCheckboxByText } from '../../../../utils/testUtils';
 
 describe('ExtensionSelectionStep', () => {
   const mockRepositoryPreview: RepositoryPreview = {
@@ -58,6 +58,22 @@ describe('ExtensionSelectionStep', () => {
     setup();
 
     expect(screen.getByText('3 / 3 extensions selected (16 / 16 files)')).toBeInTheDocument();
+  });
+
+  it('renders extension checkboxes', () => {
+    setup();
+
+    expect(getCheckboxByText('.tsx')).toBeChecked();
+    expect(getCheckboxByText('.css')).toBeChecked();
+    expect(getCheckboxByText('no extension')).toBeChecked();
+  });
+
+  it('renders extension selection buttons', () => {
+    setup();
+
+    expect(screen.getByRole('button', { name: '.tsx' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '.css' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'no extension' })).toBeInTheDocument();
   });
 
   it('selects all and updates counts, enabling Next', async () => {
