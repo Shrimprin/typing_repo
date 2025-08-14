@@ -122,9 +122,9 @@ describe('CreationConfirmStep', () => {
           repository: {
             url: 'https://github.com/test-username/test-repository',
             extensionsAttributes: [
-              { name: '.tsx', is_active: true },
-              { name: '.css', is_active: true },
-              { name: 'no extension', is_active: false },
+              { name: '.tsx', isActive: true },
+              { name: '.css', isActive: true },
+              { name: 'no extension', isActive: false },
             ],
           },
         },
