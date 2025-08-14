@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios, { AxiosError } from 'axios';
 
@@ -9,13 +9,14 @@ import { clickButton } from '../../../../utils/testUtils';
 
 describe('UrlInputStep', () => {
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-  const setup = () => {
+
+  const setup = (isLoading: boolean = false) => {
     const onNext = jest.fn();
     const setIsLoading = jest.fn();
     render(
       <UrlInputStep
         initialUrl="https://github.com/username/repository"
-        isLoading={false}
+        isLoading={isLoading}
         setIsLoading={setIsLoading}
         onNext={onNext}
       />,
@@ -54,6 +55,19 @@ describe('UrlInputStep', () => {
     expect(screen.getByRole('button', { name: 'Next' })).toBeInTheDocument();
   });
 
+  describe('when loading', () => {
+    beforeEach(() => {
+      setup(true);
+    });
+
+    it('disables buttons', () => {
+      expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
+    });
+
+    it('shows loading spinner', () => {
+      expect(screen.getByRole('button', { name: 'Next' })).toContainElement(document.querySelector('.animate-spin')!);
+    });
+  });
   describe('when submit with valid url', () => {
     it('calls api and onNext with repository preview', async () => {
       jest.spyOn(axios, 'get').mockResolvedValueOnce({ data: mockRepositoryPreview });
@@ -69,13 +83,16 @@ describe('UrlInputStep', () => {
         params: { repository_preview: { url: 'https://github.com/test-username/test-repository' } },
       });
 
-      expect(onNext).toHaveBeenCalledWith({
-        url: 'https://github.com/test-username/test-repository',
-        repositoryPreview: mockRepositoryPreview,
-        selectedExtensions: mockRepositoryPreview.extensions,
+      expect(setIsLoading).toHaveBeenCalledWith(true);
+
+      await waitFor(() => {
+        expect(onNext).toHaveBeenCalledWith({
+          url: 'https://github.com/test-username/test-repository',
+          repositoryPreview: mockRepositoryPreview,
+          selectedExtensions: mockRepositoryPreview.extensions,
+        });
       });
 
-      expect(setIsLoading).toHaveBeenCalledWith(true);
       expect(setIsLoading).toHaveBeenCalledWith(false);
     });
   });
@@ -107,20 +124,33 @@ describe('UrlInputStep', () => {
         code: 'ERR_NETWORK',
         isAxiosError: true,
       } as AxiosError);
-      setup();
+
+      const { setIsLoading } = setup();
 
       await typeUrlAndSubmit('https://github.com/test-username/test-repository');
 
-      expect(screen.getByText('Network Error')).toBeInTheDocument();
+      expect(setIsLoading).toHaveBeenCalledWith(true);
+
+      await waitFor(() => {
+        expect(screen.getByText('Network Error')).toBeInTheDocument();
+      });
+
+      expect(setIsLoading).toHaveBeenCalledWith(false);
     });
 
     it('shows error message when occur server error', async () => {
       jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Server error'));
-      setup();
+      const { setIsLoading } = setup();
 
       await typeUrlAndSubmit('https://github.com/test-username/test-repository');
 
-      expect(screen.getByText('An error occurred. Please try again.')).toBeInTheDocument();
+      expect(setIsLoading).toHaveBeenCalledWith(true);
+
+      await waitFor(() => {
+        expect(screen.getByText('An error occurred. Please try again.')).toBeInTheDocument();
+      });
+
+      expect(setIsLoading).toHaveBeenCalledWith(false);
     });
   });
 });
