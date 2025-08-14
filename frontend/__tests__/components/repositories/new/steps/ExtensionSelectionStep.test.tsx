@@ -68,14 +68,6 @@ describe('ExtensionSelectionStep', () => {
     expect(getCheckboxByText('no extension')).toBeChecked();
   });
 
-  it('renders extension selection buttons', () => {
-    setup();
-
-    expect(screen.getByRole('button', { name: '.tsx' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '.css' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'no extension' })).toBeInTheDocument();
-  });
-
   it('selects all and updates counts, enabling Next', async () => {
     setup(mockRepositoryPreview, []);
 

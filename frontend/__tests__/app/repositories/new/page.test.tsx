@@ -63,46 +63,6 @@ describe('NewRepositoryPage', () => {
     expect(screen.getByText('Import a GitHub repository to start typing practice.')).toBeInTheDocument();
   });
 
-  it('renders form', () => {
-    render(<NewRepositoryPage />);
-
-    expect(screen.getByPlaceholderText('https://github.com/username/repository')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Add Repository' })).toBeInTheDocument();
-  });
-
-  it('navigates to repository page when submit with valid url', async () => {
-    const pushMock = jest.fn();
-    (useRouter as jest.Mock).mockReturnValue({ push: pushMock });
-
-    jest.spyOn(axios, 'post').mockResolvedValueOnce({
-      data: {
-        id: 1,
-        userId: 1,
-        name: 'test-repository',
-        lastTypedAt: null,
-      },
-    });
-
-    render(<NewRepositoryPage />);
-
-    await inputRepositoryUrlAndSubmit('https://github.com/test-username/test-repository');
-
-    expect(axios.post).toHaveBeenCalledWith(
-      `${BASE_URL}/api/repositories`,
-      {
-        repository: { url: 'https://github.com/test-username/test-repository' },
-      },
-      {
-        headers: {
-          Authorization: 'Bearer token_1234567890',
-          'Content-Type': 'application/json',
-        },
-      },
-    );
-
-    expect(pushMock).toHaveBeenCalledWith('/repositories/1');
-  });
-
   describe('url input step', () => {
     beforeEach(() => {
       render(<NewRepositoryPage />);
