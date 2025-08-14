@@ -50,8 +50,7 @@ export default function CreationConfirmStep({
       onComplete(response.data.id);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.error || 'An error occurred. Please try again.';
-        setErrorMessage(message);
+        setErrorMessage(error.message);
       } else {
         setErrorMessage('An error occurred. Please try again.');
       }
