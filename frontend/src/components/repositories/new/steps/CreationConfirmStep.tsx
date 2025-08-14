@@ -37,7 +37,7 @@ export default function CreationConfirmStep({
       const accessToken = session?.user?.accessToken;
       const extensions = wizardData.repositoryPreview!.extensions.map((ext) => ({
         name: ext.name,
-        is_active: wizardData.selectedExtensions.some((selectedExt) => selectedExt.name === ext.name),
+        isActive: wizardData.selectedExtensions.some((selectedExt) => selectedExt.name === ext.name),
       }));
 
       const response = await axiosPost('/api/repositories', accessToken, {
