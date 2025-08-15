@@ -1,7 +1,7 @@
 'use client';
 
 import { CheckSquare, ChevronLeftIcon, ChevronRightIcon, File, Square } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -24,9 +24,8 @@ export default function ExtensionSelectionStep({
 }: ExtensionSelectionStepProps) {
   const [selectedExtensions, setSelectedExtensions] = useState<Extension[]>(initialSelectedExtensions);
 
-  const isExtensionSelected = (extension: Extension) => {
-    return selectedExtensions.some((selectedExtension) => selectedExtension.name === extension.name);
-  };
+  const selectedNameSet = useMemo(() => new Set(selectedExtensions.map((e) => e.name)), [selectedExtensions]);
+  const isExtensionSelected = (extension: Extension) => selectedNameSet.has(extension.name);
 
   const handleExtensionToggle = (extension: Extension) => {
     setSelectedExtensions((prev) => {
