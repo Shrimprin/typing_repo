@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 export const clickButton = async (buttonName: string) => {
@@ -19,5 +19,5 @@ export const getCheckboxByText = (text: string) => {
   if (!cardElement) {
     throw new Error(`Card element containing text "${text}" not found`);
   }
-  return cardElement.querySelector('[role="checkbox"]') as HTMLElement;
+  return within(cardElement as HTMLElement).getByRole('checkbox');
 };
