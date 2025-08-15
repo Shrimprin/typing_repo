@@ -56,20 +56,13 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
               {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </span>
             <Folder size={16} className="mr-1 flex-shrink-0" />
-            <span
-              className={`
-                truncate
-                ${isTyped ? 'text-secondary' : ''}
-              `}
-            >
-              {fileItem.name}
-            </span>
+            <span className={fileNameColorClass()}>{fileItem.name}</span>
             {isTyped && <Check size={16} className="text-secondary mr-2 ml-auto flex-shrink-0" />}
           </>
         ) : (
           <>
             <div className="mr-1 w-4 flex-shrink-0"></div>
-            <File size={16} className={`mr-1 flex-shrink-0`} />
+            <File size={16} className="mr-1 flex-shrink-0" />
             <span
               className={`
                 truncate
