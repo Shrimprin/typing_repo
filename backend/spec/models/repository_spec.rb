@@ -148,8 +148,8 @@ RSpec.describe Repository, type: :model do
         node_class.new(path: 'directory1/file3.rb', type: 'blob'),
         node_class.new(path: 'directory1/directory2', type: 'tree'),
         node_class.new(path: 'directory1/directory2/file4.rb', type: 'blob'),
-        node_class.new(path: 'invalid_directory', type: 'tree'),
-        node_class.new(path: 'invalid_directory/invalid_file.md', type: 'blob')
+        node_class.new(path: 'inactive_directory', type: 'tree'),
+        node_class.new(path: 'inactive_directory/inactive_file.md', type: 'blob')
       ]
     end
     let(:github_client_mock) { instance_double(Octokit::Client) }
@@ -184,15 +184,15 @@ RSpec.describe Repository, type: :model do
       expect(grandchild_file.parent_id).to eq(child_directory.id)
     end
 
-    it 'does not save file_items with invalid extensions' do
-      expect(repository.extensions.find_by(name: 'md').is_active).to be false
+    it 'does not save file_items with inactive extensions' do
+      expect(repository.extensions.find_by(name: '.md').is_active).to be false
       repository.send(:save_file_items, github_client_mock)
 
-      invalid_directory = repository.file_items.find_by(path: 'invalid_directory')
-      expect(invalid_directory).to be_nil
+      inactive_directory = repository.file_items.find_by(path: 'inactive_directory')
+      expect(inactive_directory).to be_nil
 
-      invalid_file = repository.file_items.find_by(path: 'invalid_directory/invalid_file.md')
-      expect(invalid_file).to be_nil
+      inactive_file = repository.file_items.find_by(path: 'inactive_directory/inactive_file.md')
+      expect(inactive_file).to be_nil
     end
   end
 
@@ -202,10 +202,10 @@ RSpec.describe Repository, type: :model do
       {
         0 => [node_class.new(path: 'root_file.rb', type: 'blob'),
               node_class.new(path: 'root_directory', type: 'tree'),
-              node_class.new(path: 'invalid_directory', type: 'tree')],
+              node_class.new(path: 'inactive_directory', type: 'tree')],
         1 => [node_class.new(path: 'root_directory/child_file.rb', type: 'blob'),
               node_class.new(path: 'root_directory/child_directory', type: 'tree'),
-              node_class.new(path: 'invalid_directory/invalid_file.md', type: 'blob')],
+              node_class.new(path: 'inactive_directory/inactive_file.md', type: 'blob')],
         2 => [node_class.new(path: 'root_directory/child_directory/grandchild_file.rb', type: 'blob')]
       }
     end
@@ -234,11 +234,11 @@ RSpec.describe Repository, type: :model do
       grandchild_file = grandchildren.find { |node| node.path == 'root_directory/child_directory/grandchild_file.rb' }
       expect(grandchild_file).to be_present
 
-      invalid_file = result.find { |node| node.path == 'invalid_directory/invalid_file.md' }
-      expect(invalid_file).to be_nil
+      inactive_file = result.find { |node| node.path == 'inactive_directory/inactive_file.md' }
+      expect(inactive_file).to be_nil
 
-      invalid_directory = result.find { |node| node.path == 'invalid_directory' }
-      expect(invalid_directory).to be_nil
+      inactive_directory = result.find { |node| node.path == 'inactive_directory' }
+      expect(inactive_directory).to be_nil
     end
   end
 
@@ -360,11 +360,11 @@ RSpec.describe Repository, type: :model do
       end
     end
 
-    context 'when file_item has invalid extension' do
-      let(:invalid_node) { node_class.new(path: 'invalid_file.md', type: 'blob') }
+    context 'when file_item has inactive extension' do
+      let(:inactive_node) { node_class.new(path: 'inactive_file.md', type: 'blob') }
 
       it 'returns false' do
-        expect(repository.send(:active?, invalid_node)).to be false
+        expect(repository.send(:active?, inactive_node)).to be false
       end
     end
   end
@@ -375,10 +375,10 @@ RSpec.describe Repository, type: :model do
       {
         0 => [node_class.new(path: 'root_file.rb', type: 'blob'),
               node_class.new(path: 'root_directory', type: 'tree'),
-              node_class.new(path: 'invalid_directory', type: 'tree')],
+              node_class.new(path: 'inactive_directory', type: 'tree')],
         1 => [node_class.new(path: 'root_directory/child_file.rb', type: 'blob'),
               node_class.new(path: 'root_directory/child_directory', type: 'tree'),
-              node_class.new(path: 'invalid_directory/invalid_file.md', type: 'blob')],
+              node_class.new(path: 'inactive_directory/inactive_file.md', type: 'blob')],
         2 => [node_class.new(path: 'root_directory/child_directory/grandchild_file.rb', type: 'blob')]
       }
     end

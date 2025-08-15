@@ -11,7 +11,7 @@ FactoryBot.define do
     trait :with_extensions do
       after(:create) do |repository|
         create(:extension, repository:, name: '.rb', is_active: true)
-        create(:extension, repository:, name: 'md', is_active: false)
+        create(:extension, repository:, name: '.md', is_active: false)
       end
     end
 
