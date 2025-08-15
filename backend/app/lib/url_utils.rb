@@ -14,6 +14,6 @@ module UrlUtils
   def extract_github_repository_path(url)
     return nil unless valid_github_repository_url?(url)
 
-    URI(url).path[1..]
+    URI(url).path.delete_prefix('/')
   end
 end
