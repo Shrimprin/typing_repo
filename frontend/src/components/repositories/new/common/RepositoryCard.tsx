@@ -3,7 +3,7 @@ import { RepositoryPreview } from '@/types';
 import { Github } from 'lucide-react';
 
 type RepositoryCardProps = {
-  repositoryPreview: RepositoryPreview;
+  repositoryPreview: Pick<RepositoryPreview, 'name' | 'url'>;
 };
 
 export default function RepositoryCard({ repositoryPreview }: RepositoryCardProps) {
