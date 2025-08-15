@@ -117,12 +117,20 @@ describe('NewRepositoryPage', () => {
   describe('creation confirm step', () => {
     beforeEach(async () => {
       jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepositoryPreview);
+      jest.spyOn(axios, 'post').mockResolvedValueOnce({
+        data: {
+          id: 10,
+          name: 'test-repository',
+          lastTypedAt: null,
+        },
+      });
+
+      (useRouter as jest.Mock).mockReturnValue({ push: jest.fn() });
 
       render(<NewRepositoryPage />);
 
       await inputRepositoryUrlAndSubmit('https://github.com/test-username/test-repository');
       await clickButton('Next');
-      await clickButton('Create');
     });
 
     it('renders title, description and progress', () => {
@@ -132,17 +140,6 @@ describe('NewRepositoryPage', () => {
     });
 
     it('calls api and navigates to repository page when click Create', async () => {
-      const pushMock = jest.fn();
-      (useRouter as jest.Mock).mockReturnValue({ push: pushMock });
-
-      jest.spyOn(axios, 'post').mockResolvedValueOnce({
-        data: {
-          id: 10,
-          name: 'test-repository',
-          lastTypedAt: null,
-        },
-      });
-
       await clickButton('Create');
 
       expect(axios.post).toHaveBeenCalledWith(
@@ -178,7 +175,8 @@ describe('NewRepositoryPage', () => {
         },
       );
 
-      expect(pushMock).toHaveBeenCalledWith('/repositories/10');
+      const router = useRouter();
+      expect(router.push).toHaveBeenCalledWith('/repositories/10');
     });
   });
 });
