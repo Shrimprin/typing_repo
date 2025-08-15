@@ -122,7 +122,7 @@ export default function ExtensionSelectionStep({
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <span className="font-medium">{extension.name}</span>
-                  <span className="text-muted-foreground text-sm">{extension.fileCount} files</span>
+                  <span className="text-muted-foreground text-sm">{extension.fileCount ?? 0} files</span>
                 </div>
               </div>
             </div>
