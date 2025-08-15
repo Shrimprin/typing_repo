@@ -41,7 +41,7 @@ export default function ExtensionSelectionStep({
   };
 
   const handleSelectAll = () => {
-    setSelectedExtensions(repositoryPreview.extensions);
+    setSelectedExtensions([...repositoryPreview.extensions]);
   };
 
   const handleDeselectAll = () => {
