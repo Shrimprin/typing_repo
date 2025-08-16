@@ -16,12 +16,14 @@ RSpec.describe 'Api::FileItems', type: :request do
 
         expect(response).to have_http_status(:ok)
         json = response.parsed_body
-        expect(json['id']).to eq(file_item.id)
-        expect(json['name']).to eq(file_item.name)
-        expect(json['path']).to eq(file_item.path)
-        expect(json['status']).to eq(file_item.status)
-        expect(json['type']).to eq(file_item.type)
-        expect(json['content']).to eq(file_item.content)
+        expect(json).to have_json_attributes(
+          id: file_item.id,
+          name: file_item.name,
+          path: file_item.path,
+          status: file_item.status,
+          type: file_item.type,
+          content: file_item.content
+        )
       end
     end
 

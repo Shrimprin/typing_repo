@@ -1,15 +1,39 @@
+import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 
 import { cn } from '@/libs/shadcn/utils';
 
-function Card({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
-    <div
-      data-slot="card"
-      className={cn('bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm', className)}
-      {...props}
-    />
-  );
+const cardVariants = cva('bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm', {
+  variants: {
+    variant: {
+      default: '',
+      outline: `
+        bg-background border-border border shadow-xs transition-all
+        hover:bg-accent/20 hover:text-accent-foreground hover:border-accent
+        hover:shadow-[0_0_15px_rgba(255,255,255,0.8),0_0_30px_rgba(255,255,255,0.4)]
+        dark:bg-input/30 dark:border-border dark:hover:bg-input/50
+      `,
+      interactive: `
+        hover:bg-accent/20 hover:text-accent-foreground hover:border-accent
+        hover:shadow-[0_0_15px_rgba(255,255,255,0.8),0_0_30px_rgba(255,255,255,0.4)]
+        dark:hover:bg-accent/50
+        cursor-pointer transition-all
+      `,
+      selectedInteractive: `
+        border-primary bg-primary/5 cursor-pointer transition-all
+        hover:bg-primary/8 hover:border-primary/80
+        hover:shadow-[0_0_15px_rgba(59,130,246,0.6),0_0_30px_rgba(59,130,246,0.3)]
+        dark:hover:shadow-[0_0_15px_rgba(96,165,250,0.6),0_0_30px_rgba(96,165,250,0.3)]
+      `,
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+});
+
+function Card({ className, variant, ...props }: React.ComponentProps<'div'> & VariantProps<typeof cardVariants>) {
+  return <div data-slot="card" className={cn(cardVariants({ variant, className }))} {...props} />;
 }
 
 function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {

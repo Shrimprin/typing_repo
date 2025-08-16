@@ -1,25 +1,56 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
 import NewRepositoryPage from '@/app/repositories/new/page';
 import { mockUseSession } from '../../../mocks/auth';
-import { clickButton } from '../../../utils/testUtils';
-
-const inputRepositoryUrlAndSubmit = async (url: string) => {
-  const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
-
-  if (url === '') {
-    await userEvent.clear(repositoryUrlInput);
-  } else {
-    await userEvent.type(repositoryUrlInput, url);
-  }
-  await clickButton('Add Repository');
-};
+import { clickButton, getCheckboxByText } from '../../../utils/testUtils';
 
 describe('NewRepositoryPage', () => {
+  const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+  const mockRepositoryPreview = {
+    data: {
+      name: 'test-repository',
+      url: 'https://github.com/test-username/test-repository',
+      extensions: [
+        {
+          name: '.tsx',
+          fileCount: 10,
+          isActive: true,
+        },
+        {
+          name: '.css',
+          fileCount: 5,
+          isActive: true,
+        },
+        {
+          name: 'no extension',
+          fileCount: 1,
+          isActive: true,
+        },
+        {
+          name: '.gitignore',
+          fileCount: 1,
+          isActive: true,
+        },
+      ],
+    },
+  };
+
+  const inputRepositoryUrlAndClickNext = async (url: string) => {
+    const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
+
+    if (url === '') {
+      await userEvent.clear(repositoryUrlInput);
+    } else {
+      await userEvent.type(repositoryUrlInput, url);
+    }
+    await clickButton('Next');
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseSession();
@@ -29,91 +60,122 @@ describe('NewRepositoryPage', () => {
     render(<NewRepositoryPage />);
 
     expect(screen.getByText('New Repository')).toBeInTheDocument();
-    expect(screen.getByText('Enter the URL of the GitHub repository you want to type.')).toBeInTheDocument();
+    expect(screen.getByText('Import a GitHub repository to start typing practice.')).toBeInTheDocument();
   });
 
-  it('renders form', () => {
-    render(<NewRepositoryPage />);
-
-    expect(screen.getByPlaceholderText('https://github.com/username/repository')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Add Repository' })).toBeInTheDocument();
-  });
-
-  it('navigates to repository page when submit with valid url', async () => {
-    const pushMock = jest.fn();
-    (useRouter as jest.Mock).mockReturnValue({ push: pushMock });
-
-    jest.spyOn(axios, 'post').mockResolvedValueOnce({
-      data: {
-        id: 1,
-        userId: 1,
-        name: 'repository-name',
-        lastTypedAt: null,
-      },
+  describe('url input step', () => {
+    beforeEach(() => {
+      render(<NewRepositoryPage />);
     });
 
-    render(<NewRepositoryPage />);
+    it('renders title, description and progress', () => {
+      expect(screen.getByText('Step 1: Repository URL')).toBeInTheDocument();
+      expect(screen.getByText('Enter the GitHub repository URL.')).toBeInTheDocument();
+      expect(screen.getByText('1 / 3')).toBeInTheDocument();
+    });
 
-    await inputRepositoryUrlAndSubmit('https://github.com/username/repository');
+    it('renders extension selection step when click Next with valid url', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepositoryPreview);
 
-    const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-    expect(axios.post).toHaveBeenCalledWith(
-      `${BASE_URL}/api/repositories`,
-      {
-        repository: { url: 'https://github.com/username/repository' },
-      },
-      {
-        headers: {
-          Authorization: 'Bearer token_1234567890',
-          'Content-Type': 'application/json',
+      await inputRepositoryUrlAndClickNext('https://github.com/test-username/test-repository');
+
+      expect(screen.getByText('Step 2: Extensions')).toBeInTheDocument();
+      expect(screen.getByText('test-repository')).toBeInTheDocument();
+      expect(getCheckboxByText('.tsx')).toBeChecked();
+      expect(getCheckboxByText('.css')).toBeChecked();
+      expect(getCheckboxByText('no extension')).toBeChecked();
+      expect(getCheckboxByText('.gitignore')).toBeChecked();
+    });
+  });
+
+  describe('extension selection step', () => {
+    beforeEach(async () => {
+      jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepositoryPreview);
+      render(<NewRepositoryPage />);
+
+      await inputRepositoryUrlAndClickNext('https://github.com/test-username/test-repository');
+    });
+
+    it('renders title, description and progress', () => {
+      expect(screen.getByText('Step 2: Extensions')).toBeInTheDocument();
+      expect(screen.getByText('Select the extensions you want to type.')).toBeInTheDocument();
+      expect(screen.getByText('2 / 3')).toBeInTheDocument();
+    });
+
+    it('renders creation confirm step when click Next', async () => {
+      await clickButton('Next');
+
+      expect(screen.getByText('Step 3: Confirm & Create')).toBeInTheDocument();
+      expect(screen.getByText('test-repository')).toBeInTheDocument();
+      expect(screen.getByText('.tsx')).toBeInTheDocument();
+      expect(screen.getByText('.css')).toBeInTheDocument();
+      expect(screen.getByText('no extension')).toBeInTheDocument();
+      expect(screen.getByText('.gitignore')).toBeInTheDocument();
+    });
+  });
+
+  describe('creation confirm step', () => {
+    beforeEach(async () => {
+      (useRouter as jest.Mock).mockReturnValue({ push: jest.fn() });
+      jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepositoryPreview);
+      jest.spyOn(axios, 'post').mockResolvedValueOnce({
+        data: {
+          id: 10,
+          name: 'test-repository',
+          lastTypedAt: null,
         },
-      },
-    );
+      });
 
-    expect(pushMock).toHaveBeenCalledWith('/repositories/1');
-  });
-
-  describe('form validation', () => {
-    it('shows error message when submit invalid url', async () => {
       render(<NewRepositoryPage />);
 
-      await inputRepositoryUrlAndSubmit('invalid-url');
-
-      expect(screen.getByText('Enter a valid URL')).toBeInTheDocument();
+      await inputRepositoryUrlAndClickNext('https://github.com/test-username/test-repository');
+      await clickButton('Next');
     });
 
-    it('shows error message when submit with empty url', async () => {
-      render(<NewRepositoryPage />);
-
-      await inputRepositoryUrlAndSubmit('');
-
-      expect(screen.getByText('URL is required')).toBeInTheDocument();
-    });
-  });
-
-  describe('error handling', () => {
-    it('shows error message when occur axios error', async () => {
-      jest.spyOn(axios, 'post').mockRejectedValueOnce({
-        message: 'Network Error',
-        name: 'AxiosError',
-        code: 'ERR_NETWORK',
-        isAxiosError: true,
-      } as AxiosError);
-
-      render(<NewRepositoryPage />);
-
-      await inputRepositoryUrlAndSubmit('https://github.com/username/repository');
-
-      expect(screen.getByText('Network Error')).toBeInTheDocument();
+    it('renders title, description and progress', () => {
+      expect(screen.getByText('Step 3: Confirm & Create')).toBeInTheDocument();
+      expect(screen.getByText('Review the settings and create the repository.')).toBeInTheDocument();
+      expect(screen.getByText('3 / 3')).toBeInTheDocument();
     });
 
-    it('shows error message when occur server error', async () => {
-      jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error('Server error'));
-      render(<NewRepositoryPage />);
+    it('calls api and navigates to repository page when click Create', async () => {
+      await clickButton('Create');
 
-      await inputRepositoryUrlAndSubmit('https://github.com/username/repository');
+      expect(axios.post).toHaveBeenCalledWith(
+        `${BASE_URL}/api/repositories`,
+        {
+          repository: {
+            url: 'https://github.com/test-username/test-repository',
+            extensionsAttributes: [
+              {
+                name: '.tsx',
+                isActive: true,
+              },
+              {
+                name: '.css',
+                isActive: true,
+              },
+              {
+                name: 'no extension',
+                isActive: true,
+              },
+              {
+                name: '.gitignore',
+                isActive: true,
+              },
+            ],
+          },
+        },
+        {
+          headers: {
+            Authorization: 'Bearer token_1234567890',
+            'Content-Type': 'application/json',
+          },
+        },
+      );
 
-      expect(screen.getByText('An error occurred. Please try again.')).toBeInTheDocument();
+      const router = useRouter();
+      expect(router.push).toHaveBeenCalledWith('/repositories/10');
     });
   });
 });

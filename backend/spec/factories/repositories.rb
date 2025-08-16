@@ -8,6 +8,13 @@ FactoryBot.define do
     commit_hash { SecureRandom.hex(20) }
     last_typed_at { nil }
 
+    trait :with_extensions do
+      after(:create) do |repository|
+        create(:extension, repository:, name: '.rb', is_active: true)
+        create(:extension, repository:, name: '.md', is_active: false)
+      end
+    end
+
     trait :with_file_items do
       after(:create) do |repository|
         directory = create(:file_item, :directory, repository:)

@@ -4,6 +4,8 @@ import * as React from 'react';
 
 import { cn } from '@/libs/shadcn/utils';
 
+const primaryBase = `bg-primary text-primary-foreground shadow-xs`;
+
 const buttonVariants = cva(
   `
     focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]
@@ -19,8 +21,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: `
-          bg-primary text-primary-foreground shadow-xs
+          ${primaryBase}
           hover:bg-primary/90
+        `,
+        primary: `
+          ${primaryBase}
+          hover:bg-primary/80 hover:shadow-[0_0_15px_hsl(var(--primary)_/_0.6),0_0_30px_hsl(var(--primary)_/_0.3)]
+          dark:hover:bg-primary/70
         `,
         destructive: `
           bg-destructive text-white shadow-xs
@@ -84,7 +91,7 @@ function Button({
   }) {
   const Comp = asChild ? Slot : 'button';
 
-  return <Comp data-slot="button" className={cn(buttonVariants({ variant, size, className }))} {...props} />;
+  return <Comp data-slot="button" className={cn(buttonVariants({ variant, size }), className)} {...props} />;
 }
 
 export { Button, buttonVariants };
