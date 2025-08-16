@@ -116,6 +116,7 @@ describe('NewRepositoryPage', () => {
 
   describe('creation confirm step', () => {
     beforeEach(async () => {
+      (useRouter as jest.Mock).mockReturnValue({ push: jest.fn() });
       jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepositoryPreview);
       jest.spyOn(axios, 'post').mockResolvedValueOnce({
         data: {
@@ -124,8 +125,6 @@ describe('NewRepositoryPage', () => {
           lastTypedAt: null,
         },
       });
-
-      (useRouter as jest.Mock).mockReturnValue({ push: jest.fn() });
 
       render(<NewRepositoryPage />);
 
