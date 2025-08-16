@@ -14,11 +14,11 @@ type FileTreeItemProps = {
 };
 
 export default function FileTreeItem({ fileItem, level, selectedFileItem, onSelectFileItem }: FileTreeItemProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => {
     if (fileItem.type === 'dir') {
-      setExpanded(!expanded);
+      setIsExpanded(!isExpanded);
     }
   };
 
@@ -35,6 +35,12 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
   const sortedFileItems = sortFileItems(fileItems);
   const isDir = fileItem.type === 'dir';
 
+  const fileNameColorClass = () => {
+    if (isSelected) return 'text-primary font-bold';
+    if (isTyped) return 'text-secondary';
+    return '';
+  };
+
   return (
     <div style={{ marginLeft: `${level * 4}px` }}>
       <button
@@ -47,17 +53,10 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
         {isDir ? (
           <>
             <span className="mr-1 flex-shrink-0">
-              {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </span>
             <Folder size={16} className="mr-1 flex-shrink-0" />
-            <span
-              className={`
-                truncate
-                ${isTyped ? 'text-secondary' : ''}
-              `}
-            >
-              {fileItem.name}
-            </span>
+            <span className={fileNameColorClass()}>{fileItem.name}</span>
             {isTyped && <Check size={16} className="text-secondary mr-2 ml-auto flex-shrink-0" />}
           </>
         ) : (
@@ -67,8 +66,7 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
             <span
               className={`
                 truncate
-                ${isSelected ? 'text-primary font-bold' : ''}
-                ${isTyped ? 'text-secondary' : ''}
+                ${fileNameColorClass()}
               `}
             >
               {fileItem.name}
@@ -84,7 +82,7 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
         )}
       </button>
 
-      {expanded && sortedFileItems.length > 0 && (
+      {isExpanded && sortedFileItems.length > 0 && (
         <div>
           {sortedFileItems.map((child) => (
             <FileTreeItem

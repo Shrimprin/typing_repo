@@ -3,6 +3,9 @@
 class Repository < ApplicationRecord
   belongs_to :user
   has_many :file_items, dependent: :destroy
+  has_many :extensions, dependent: :destroy
+
+  accepts_nested_attributes_for :extensions, allow_destroy: true
 
   validates :commit_hash, presence: true
   validates :name, presence: true
@@ -15,15 +18,6 @@ class Repository < ApplicationRecord
     file_items.group_by(&:parent_id)
   end
 
-  def save_with_file_items(client)
-    transaction do
-      is_saved = save && save_file_items?(client)
-      raise ActiveRecord::Rollback unless is_saved
-
-      true
-    end
-  end
-
   def progress
     files = file_items.where(type: :file)
     if files.empty?
@@ -34,73 +28,93 @@ class Repository < ApplicationRecord
     end
   end
 
-  private
+  def save_with_file_items(client)
+    transaction do
+      is_saved = save && save_file_items(client)
+      raise ActiveRecord::Rollback unless is_saved
 
-  def save_file_items?(client)
-    file_tree_data = client.tree(url, commit_hash, recursive: true)
-    create_file_items_by_depth?(file_tree_data.tree)
+      true
+    end
   end
 
-  def create_file_items_by_depth?(file_tree)
-    file_tree_grouped_by_depth = file_tree.group_by { |file_item| depth_of(file_item.path) }
-    directory_items_map = {} # typeがtreeで作成済みfile_itemのマップ（path => FileItem）
+  private
 
-    file_tree_grouped_by_depth.keys.sort.each do |depth|
-      file_tree_at_depth = file_tree_grouped_by_depth[depth]
-      file_items_batch = build_file_items_batch(file_tree_at_depth, directory_items_map)
-      import_result = FileItem.import(file_items_batch, batch_size: BATCH_SIZE, timestamps: true)
+  def save_file_items(client)
+    file_tree_data = client.tree(url, commit_hash, recursive: true)
+    file_tree_grouped_by_depth = file_tree_data.tree.group_by { |node| depth_of(node.path) }
+    filtered_file_tree = filter_file_tree_by_valid_extensions(file_tree_grouped_by_depth)
+    create_file_items_recursively(filtered_file_tree)
+  end
 
-      if import_result.failed_instances.any?
-        import_result.failed_instances.each do |failed_item|
-          failed_item.errors.each do |error|
-            errors.add("file_item.#{error.attribute}", error.message)
-          end
-        end
+  def filter_file_tree_by_valid_extensions(file_tree_grouped_by_depth, parent_node_path = '')
+    nodes = children_of(file_tree_grouped_by_depth, parent_node_path)
 
-        return false
+    nodes.filter_map do |node|
+      if node.type == 'tree'
+        filtered_children = filter_file_tree_by_valid_extensions(file_tree_grouped_by_depth, "#{node.path}/")
+        next if filtered_children.empty?
+
+        node.children = filtered_children
+        node
+      elsif active?(node)
+        node
       end
+    end
+  end
 
-      new_directory_items = extract_directory_items(file_tree_at_depth, file_items_batch)
-      directory_items_map.merge!(new_directory_items)
+  def create_file_items_recursively(nodes, parent_file_item = nil)
+    new_file_items = build_file_items(nodes, parent_file_item)
+    import_result = FileItem.import(new_file_items, batch_size: BATCH_SIZE, timestamps: true)
+
+    return false if handle_import_failures?(import_result)
+
+    nodes.select { |node| node.type == 'tree' }.each do |node|
+      parent_item = new_file_items.find { |item| item.path == node.path }
+      create_file_items_recursively(node.children, parent_item)
+    end
+  end
+
+  def handle_import_failures?(import_result)
+    return false unless import_result.failed_instances.any?
+
+    import_result.failed_instances.each do |failed_item|
+      failed_item.errors.each do |error|
+        errors.add("file_item.#{error.attribute}", error.message)
+      end
     end
 
     true
   end
 
-  def build_file_items_batch(file_items, directory_items_map)
-    file_items.map do |file_item|
-      parent_item = find_parent_item(file_item.path, directory_items_map)
-
+  def build_file_items(nodes, parent_file_item)
+    nodes.map do |node|
       FileItem.new(
         repository: self,
-        parent: parent_item,
-        name: File.basename(file_item.path),
-        path: file_item.path,
-        type: directory?(file_item) ? :dir : :file,
+        parent: parent_file_item,
+        name: File.basename(node.path),
+        path: node.path,
+        type: node.type == 'tree' ? :dir : :file,
         content: nil,
         status: :untyped
       )
     end
   end
 
-  def extract_directory_items(file_items, created_file_items)
-    file_items.filter_map.with_index do |file_item, index|
-      [file_item.path, created_file_items[index]] if directory?(file_item)
-    end.to_h
+  def active?(node)
+    node_extension = Extension.extract_extension_name(node.path)
+    extension = extensions.find { |ext| ext.name == node_extension }
+    extension&.is_active || false
+  end
+
+  def children_of(file_tree_grouped_by_depth, parent_node_path)
+    depth = depth_of(parent_node_path)
+    nodes_by_depth = file_tree_grouped_by_depth[depth] || []
+    nodes_by_depth.select do |node|
+      node.path.start_with?(parent_node_path) && node.path != parent_node_path
+    end
   end
 
   def depth_of(path)
     path.count('/')
-  end
-
-  def directory?(file_item)
-    file_item.type == 'tree'
-  end
-
-  def find_parent_item(path, directory_items_map)
-    parent_path = File.dirname(path)
-    return nil if parent_path == '.'
-
-    directory_items_map[parent_path]
   end
 end
