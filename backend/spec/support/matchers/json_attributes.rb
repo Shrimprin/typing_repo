@@ -5,11 +5,12 @@ RSpec::Matchers.define :have_json_attributes do |expected|
     return false unless actual.respond_to?(:[]) && actual.respond_to?(:keys)
 
     expected.all? do |key, expected_value|
-      actual_value = fetch_value(actual, key)
-      actual_value == expected_value
+      if expected_value.nil? && actual.respond_to?(:key?)
+        present = actual.key?(key) || actual.key?(key.to_s)
+        next false unless present
+      end
+      fetch_value(actual, key) == expected_value
     end
-  rescue ArgumentError
-    false
   end
 
   failure_message do |actual|
