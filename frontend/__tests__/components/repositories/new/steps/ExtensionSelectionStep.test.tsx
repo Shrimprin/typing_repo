@@ -92,7 +92,7 @@ describe('ExtensionSelectionStep', () => {
     expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
   });
 
-  it('toggles a extension by click the checkbox', async () => {
+  it('toggles an extension by clicking the checkbox', async () => {
     setup(mockRepositoryPreview, []);
 
     await clickCheckboxByText('.tsx');
