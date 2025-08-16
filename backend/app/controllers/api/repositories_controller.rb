@@ -122,7 +122,7 @@ module Api
         }
       end
 
-      extensions.sort_by { |ext| [-ext[:file_count], -ext[:name]] }
+      extensions.sort_by { |ext| [-ext[:file_count], ext[:name]] }
     end
   end
 end
