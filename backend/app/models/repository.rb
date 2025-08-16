@@ -66,22 +66,24 @@ class Repository < ApplicationRecord
     new_file_items = build_file_items(nodes, parent_file_item)
     import_result = FileItem.import(new_file_items, batch_size: BATCH_SIZE, timestamps: true)
 
-    if import_result.failed_instances.any?
-      import_result.failed_instances.each do |failed_item|
-        failed_item.errors.each do |error|
-          errors.add("file_item.#{error.attribute}", error.message)
-        end
-      end
+    return false if handle_import_failures?(import_result)
 
-      return false
-    end
-
-    nodes.each do |node|
-      next if node.type == 'blob'
-
+    nodes.select { |node| node.type == 'tree' }.each do |node|
       parent_item = new_file_items.find { |item| item.path == node.path }
       create_file_items_recursively(node.children, parent_item)
     end
+  end
+
+  def handle_import_failures?(import_result)
+    return false unless import_result.failed_instances.any?
+
+    import_result.failed_instances.each do |failed_item|
+      failed_item.errors.each do |error|
+        errors.add("file_item.#{error.attribute}", error.message)
+      end
+    end
+
+    true
   end
 
   def build_file_items(nodes, parent_file_item)
