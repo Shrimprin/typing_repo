@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import axios, { AxiosError } from 'axios';
 
 import UrlInputStep from '@/components/repositories/new/steps/UrlInputStep';
+import { RepositoryPreview } from '@/types/repository-creation';
 import { mockUseSession } from '../../../../mocks/auth';
 import { clickButton } from '../../../../utils/testUtils';
 
@@ -33,7 +34,7 @@ describe('UrlInputStep', () => {
     await clickButton('Next');
   };
 
-  const mockRepositoryPreview = {
+  const mockRepositoryPreview: RepositoryPreview = {
     name: 'repository-name',
     url: 'https://github.com/test-username/test-repository',
     extensions: [
