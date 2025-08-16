@@ -11,10 +11,16 @@ class Extension < ApplicationRecord
 
   def self.extract_extension_name(path)
     basename = File.basename(path)
+    basename.start_with?('.') ? extract_extension_from_dotfile(basename) : extract_full_extension(basename)
+  end
 
-    return basename if basename.start_with?('.')
+  def self.extract_full_extension(basename)
+    parts = basename.split('.')
+    parts.length <= 1 ? NO_EXTENSION_NAME : ".#{parts[1..].join('.')}"
+  end
 
-    extension_name = File.extname(path)
-    extension_name.empty? ? NO_EXTENSION_NAME : extension_name
+  def self.extract_extension_from_dotfile(basename)
+    extension_name = File.extname(basename)
+    extension_name.empty? ? basename : extension_name
   end
 end

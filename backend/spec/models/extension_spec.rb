@@ -21,5 +21,11 @@ RSpec.describe Extension, type: :model do
         expect(described_class.extract_extension_name('.gitignore')).to eq('.gitignore')
       end
     end
+
+    context 'when path has multiple extensions' do
+      it 'returns the extension name' do
+        expect(described_class.extract_extension_name('testfile.test.tsx')).to eq('.test.tsx')
+      end
+    end
   end
 end
