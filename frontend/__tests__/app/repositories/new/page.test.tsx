@@ -40,7 +40,7 @@ describe('NewRepositoryPage', () => {
     },
   };
 
-  const inputRepositoryUrlAndSubmit = async (url: string) => {
+  const inputRepositoryUrlAndClickNext = async (url: string) => {
     const repositoryUrlInput = screen.getByPlaceholderText('https://github.com/username/repository');
 
     if (url === '') {
@@ -74,10 +74,10 @@ describe('NewRepositoryPage', () => {
       expect(screen.getByText('1 / 3')).toBeInTheDocument();
     });
 
-    it('renders extension selection step when submit with valid url', async () => {
+    it('renders extension selection step when click Next with valid url', async () => {
       jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepositoryPreview);
 
-      await inputRepositoryUrlAndSubmit('https://github.com/test-username/test-repository');
+      await inputRepositoryUrlAndClickNext('https://github.com/test-username/test-repository');
 
       expect(screen.getByText('Step 2: Extensions')).toBeInTheDocument();
       expect(screen.getByText('test-repository')).toBeInTheDocument();
@@ -93,7 +93,7 @@ describe('NewRepositoryPage', () => {
       jest.spyOn(axios, 'get').mockResolvedValueOnce(mockRepositoryPreview);
       render(<NewRepositoryPage />);
 
-      await inputRepositoryUrlAndSubmit('https://github.com/test-username/test-repository');
+      await inputRepositoryUrlAndClickNext('https://github.com/test-username/test-repository');
     });
 
     it('renders title, description and progress', () => {
@@ -129,7 +129,7 @@ describe('NewRepositoryPage', () => {
 
       render(<NewRepositoryPage />);
 
-      await inputRepositoryUrlAndSubmit('https://github.com/test-username/test-repository');
+      await inputRepositoryUrlAndClickNext('https://github.com/test-username/test-repository');
       await clickButton('Next');
     });
 
