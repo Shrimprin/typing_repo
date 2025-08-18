@@ -11,7 +11,7 @@ export type TypingProgress = {
   row: number;
   column: number;
   time: number;
-  total_typo_count: number;
+  totalTypoCount: number;
   typos?: Typo[];
 };
 
