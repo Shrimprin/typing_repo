@@ -124,7 +124,7 @@ RSpec.describe 'Api::FileItems', type: :request do
                   typing_progress: {
                     row: untyped_file_item.content.split("\n").size - 1,
                     column: untyped_file_item.content.split("\n").last.size,
-                    time: 330.5,
+                    elapsed_seconds: 330,
                     typos_attributes: [
                       { row: 1, column: 1, character: 'a' },
                       { row: 2, column: 2, character: 'b' }
@@ -154,7 +154,7 @@ RSpec.describe 'Api::FileItems', type: :request do
         updated_file_item = FileItem.find(untyped_file_item.id)
         expect(updated_file_item.typing_progress.row).to eq(untyped_file_item.content.split("\n").size - 1)
         expect(updated_file_item.typing_progress.column).to eq(untyped_file_item.content.split("\n").last.size)
-        expect(updated_file_item.typing_progress.time).to eq(330.5)
+        expect(updated_file_item.typing_progress.elapsed_seconds).to eq(330)
 
         expect(updated_file_item.typing_progress.typos.length).to eq(2)
         expect(updated_file_item.typing_progress.typos[0].row).to eq(1)
@@ -175,7 +175,7 @@ RSpec.describe 'Api::FileItems', type: :request do
                   typing_progress: {
                     row: 3,
                     column: 1,
-                    time: 330.5,
+                    elapsed_seconds: 330,
                     typos_attributes: [
                       { row: 1, column: 1, character: 'a' },
                       { row: 2, column: 2, character: 'b' }
@@ -203,7 +203,7 @@ RSpec.describe 'Api::FileItems', type: :request do
         updated_file_item = FileItem.find(untyped_file_item.id)
         expect(updated_file_item.typing_progress.row).to eq(3)
         expect(updated_file_item.typing_progress.column).to eq(1)
-        expect(updated_file_item.typing_progress.time).to eq(330.5)
+        expect(updated_file_item.typing_progress.elapsed_seconds).to eq(330)
         expect(updated_file_item.typing_progress.typos.length).to eq(2)
 
         expect(updated_file_item.typing_progress.typos.length).to eq(2)
@@ -238,7 +238,6 @@ RSpec.describe 'Api::FileItems', type: :request do
         json = response.parsed_body
         expect(json['typing_progress.row']).to include("can't be blank")
         expect(json['typing_progress.column']).to include("can't be blank")
-        expect(json['typing_progress.time']).to include("can't be blank")
 
         # status: typing
         patch api_repository_file_item_path(repository_id: repository.id, id: untyped_file_item.id),
@@ -248,7 +247,6 @@ RSpec.describe 'Api::FileItems', type: :request do
         json = response.parsed_body
         expect(json['typing_progress.row']).to include("can't be blank")
         expect(json['typing_progress.column']).to include("can't be blank")
-        expect(json['typing_progress.time']).to include("can't be blank")
       end
     end
 
