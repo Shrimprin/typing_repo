@@ -31,7 +31,7 @@ FactoryBot.define do
         create(:typing_progress,
                row: 0,
                column: 0,
-               time: 0,
+               elapsed_seconds: 0,
                total_typo_count: 0,
                file_item:)
       end
