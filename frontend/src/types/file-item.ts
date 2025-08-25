@@ -10,8 +10,11 @@ export type Typo = {
 export type TypingProgress = {
   row: number;
   column: number;
-  time: number;
+  accuracy: number;
+  elapsedSeconds: number;
+  totalCorrectTypeCount: number;
   totalTypoCount: number;
+  wpm: number;
   typos?: Typo[];
 };
 
