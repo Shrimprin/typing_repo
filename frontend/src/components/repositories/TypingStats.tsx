@@ -1,11 +1,12 @@
+import { Stats } from '@/types';
+
 type TypingStatsProps = {
-  accuracy: number;
-  elapsedSeconds: number;
-  typoCount: number;
-  wpm: number;
+  stats: Stats;
 };
 
-export default function TypingStats({ accuracy, elapsedSeconds, typoCount, wpm }: TypingStatsProps) {
+export default function TypingStats({ stats }: TypingStatsProps) {
+  const { accuracy, elapsedSeconds, typoCount, wpm } = stats;
+
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;

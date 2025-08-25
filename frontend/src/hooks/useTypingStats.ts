@@ -1,29 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export type TypingStatsData = {
-  accuracy: number;
-  correctTypeCount: number;
-  elapsedSeconds: number;
-  typoCount: number;
-  wpm: number;
-};
+import { Stats } from '@/types';
 
-type TypingStatsActions = {
-  startStats: () => void;
-  pauseStats: () => void;
-  resumeStats: () => void;
-  resetStats: () => void;
-  updateStats: (isCorrect: boolean) => void;
-  restoreStats: (
-    savedAccuracy: number,
-    savedCorrectTypeCount: number,
-    savedElapsedSeconds: number,
-    savedTypoCount: number,
-    savedWpm: number,
-  ) => void;
-};
-
-export function useTypingStats(): TypingStatsData & TypingStatsActions {
+export function useTypingStats() {
   const [accuracy, setAccuracy] = useState(100);
   const [correctTypeCount, setCorrectTypeCount] = useState(0);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -123,12 +102,16 @@ export function useTypingStats(): TypingStatsData & TypingStatsActions {
     [setAccuracy, setCorrectTypeCount, setElapsedSeconds, setTypoCount, setWpm, setLastMeasureTime, setIsTyping],
   );
 
-  return {
+  const stats: Stats = {
     accuracy,
     correctTypeCount,
     elapsedSeconds,
     typoCount,
     wpm,
+  };
+
+  return {
+    ...stats,
     startStats,
     pauseStats,
     resumeStats,

@@ -1,4 +1,4 @@
-import { FileItem, TypingStatus } from '@/types';
+import { FileItem, Stats, TypingStatus } from '@/types';
 import TypingContent from './TypingContent';
 import TypingHeader from './TypingHeader';
 import TypingStats from './TypingStats';
@@ -15,11 +15,7 @@ type TypingPanelProps = {
     resumeTyping: () => void;
     pauseTyping: () => void;
     resetTyping: () => void;
-    accuracy: number;
-    correctTypeCount: number;
-    elapsedSeconds: number;
-    typoCount: number;
-    wpm: number;
+    stats: Stats;
   };
 };
 
@@ -30,14 +26,11 @@ export default function TypingPanel({ fileItem, typingHandler }: TypingPanelProp
     targetTextLines,
     typedTextLines,
     typingStatus,
+    stats,
     startTyping,
     resetTyping,
     pauseTyping,
     resumeTyping,
-    accuracy,
-    elapsedSeconds,
-    typoCount,
-    wpm,
   } = typingHandler;
 
   return (
@@ -58,9 +51,7 @@ export default function TypingPanel({ fileItem, typingHandler }: TypingPanelProp
           typedTextLines={typedTextLines}
           typingStatus={typingStatus}
         />
-        {(typingStatus === 'typing' || typingStatus === 'paused') && (
-          <TypingStats accuracy={accuracy} elapsedSeconds={elapsedSeconds} typoCount={typoCount} wpm={wpm} />
-        )}
+        {(typingStatus === 'typing' || typingStatus === 'paused') && <TypingStats stats={stats} />}
       </div>
     </div>
   );
