@@ -70,12 +70,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
       setTypedTextLines(restoredTypedTextLines);
       setCursorRow(currentRow);
 
-      const savedAccuracy = fetchedFileItem.typingProgress.accuracy;
-      const savedElapsedSeconds = fetchedFileItem.typingProgress.elapsedSeconds;
-      const savedCorrectTypeCount = fetchedFileItem.typingProgress.totalCorrectTypeCount;
-      const savedTypoCount = fetchedFileItem.typingProgress.totalTypoCount;
-      const savedWpm = fetchedFileItem.typingProgress.wpm;
-      stats.restoreStats(savedAccuracy, savedCorrectTypeCount, savedElapsedSeconds, savedTypoCount, savedWpm);
+      const { accuracy, totalCorrectTypeCount, elapsedSeconds, totalTypoCount, wpm } = fetchedFileItem.typingProgress;
+      stats.restoreStats(accuracy, totalCorrectTypeCount, elapsedSeconds, totalTypoCount, wpm);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.message);
@@ -174,9 +170,9 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
     cursorColumns,
     typedTextLines,
     targetTextLines,
+    stats,
     setFileItems,
     setTypingStatus,
-    stats,
   ]);
 
   const isComplete = useCallback(

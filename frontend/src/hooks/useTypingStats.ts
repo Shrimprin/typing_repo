@@ -24,35 +24,34 @@ type TypingStatsActions = {
 };
 
 export function useTypingStats(): TypingStatsData & TypingStatsActions {
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [accumulatedSeconds, setAccumulatedSeconds] = useState(0);
-  const [wpm, setWpm] = useState(0);
-  const [typoCount, setTypoCount] = useState(0);
-  const [correctTypeCount, setCorrectTypeCount] = useState(0);
-  const [isTyping, setIsTyping] = useState(false);
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [accuracy, setAccuracy] = useState(100);
+  const [correctTypeCount, setCorrectTypeCount] = useState(0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [typoCount, setTypoCount] = useState(0);
+  const [wpm, setWpm] = useState(0);
+  const [lastMeasureTime, setLastMeasureTime] = useState<number | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    console.log('ACCUMULATED TIME', accumulatedSeconds);
-
     const interval = setInterval(() => {
-      if (!isTyping || !startTime) return;
+      if (!isTyping || !lastMeasureTime) return;
 
-      const newElapsedSeconds = accumulatedSeconds + Math.floor((Date.now() - startTime) / 1000);
+      const currentTime = Date.now();
+      const newElapsedSeconds = elapsedSeconds + Math.floor((currentTime - lastMeasureTime) / 1000);
       setElapsedSeconds(newElapsedSeconds);
+      setLastMeasureTime(currentTime);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isTyping, startTime, accumulatedSeconds]);
+  }, [isTyping, lastMeasureTime, elapsedSeconds]);
 
   useEffect(() => {
-    if (!isTyping || !startTime || correctTypeCount === 0 || elapsedSeconds === 0) return;
+    if (!isTyping || !lastMeasureTime || correctTypeCount === 0 || elapsedSeconds === 0) return;
 
     const elapsedMinutes = elapsedSeconds / 60;
     const newWpm = Math.round(correctTypeCount / 5 / elapsedMinutes);
     setWpm(newWpm);
-  }, [isTyping, startTime, elapsedSeconds, correctTypeCount]);
+  }, [isTyping, lastMeasureTime, elapsedSeconds, correctTypeCount]);
 
   useEffect(() => {
     const totalTypeCount = correctTypeCount + typoCount;
@@ -65,45 +64,45 @@ export function useTypingStats(): TypingStatsData & TypingStatsActions {
   }, [correctTypeCount, typoCount]);
 
   const startStats = useCallback(() => {
-    setStartTime(Date.now());
-    setAccumulatedSeconds(0);
-    setWpm(0);
-    setTypoCount(0);
+    setAccuracy(100);
     setCorrectTypeCount(0);
     setElapsedSeconds(0);
-    setAccuracy(100);
+    setTypoCount(0);
+    setWpm(0);
+    setLastMeasureTime(Date.now());
     setIsTyping(true);
-  }, []);
+  }, [setAccuracy, setCorrectTypeCount, setElapsedSeconds, setTypoCount, setWpm, setLastMeasureTime, setIsTyping]);
 
   const pauseStats = useCallback(() => {
-    setAccumulatedSeconds(elapsedSeconds);
-    setStartTime(null);
+    setLastMeasureTime(null);
     setIsTyping(false);
-  }, [elapsedSeconds]);
+  }, [setLastMeasureTime, setIsTyping]);
 
   const resumeStats = useCallback(() => {
-    setStartTime(Date.now());
+    setLastMeasureTime(Date.now());
     setIsTyping(true);
-  }, []);
+  }, [setLastMeasureTime, setIsTyping]);
 
   const resetStats = useCallback(() => {
-    setStartTime(null);
-    setAccumulatedSeconds(0);
-    setWpm(0);
     setAccuracy(100);
-    setTypoCount(0);
     setCorrectTypeCount(0);
     setElapsedSeconds(0);
+    setTypoCount(0);
+    setWpm(0);
+    setLastMeasureTime(null);
     setIsTyping(false);
-  }, []);
+  }, [setAccuracy, setCorrectTypeCount, setElapsedSeconds, setTypoCount, setWpm, setLastMeasureTime, setIsTyping]);
 
-  const updateStats = useCallback((isCorrect: boolean) => {
-    if (isCorrect) {
-      setCorrectTypeCount((prev) => prev + 1);
-    } else {
-      setTypoCount((prev) => prev + 1);
-    }
-  }, []);
+  const updateStats = useCallback(
+    (isCorrect: boolean) => {
+      if (isCorrect) {
+        setCorrectTypeCount((prev) => prev + 1);
+      } else {
+        setTypoCount((prev) => prev + 1);
+      }
+    },
+    [setCorrectTypeCount, setTypoCount],
+  );
 
   const restoreStats = useCallback(
     (
@@ -113,19 +112,15 @@ export function useTypingStats(): TypingStatsData & TypingStatsActions {
       savedTypoCount: number,
       savedWpm: number,
     ) => {
-      const timeInSeconds = Math.floor(savedElapsedSeconds);
-      setAccumulatedSeconds(timeInSeconds);
-      setElapsedSeconds(timeInSeconds);
-      setTypoCount(savedTypoCount);
-      setCorrectTypeCount(savedCorrectTypeCount);
-      setWpm(savedWpm);
-      setStartTime(null);
-
       setAccuracy(savedAccuracy);
-
+      setCorrectTypeCount(savedCorrectTypeCount);
+      setElapsedSeconds(savedElapsedSeconds);
+      setTypoCount(savedTypoCount);
+      setWpm(savedWpm);
+      setLastMeasureTime(null);
       setIsTyping(false);
     },
-    [],
+    [setAccuracy, setCorrectTypeCount, setElapsedSeconds, setTypoCount, setWpm, setLastMeasureTime, setIsTyping],
   );
 
   return {
