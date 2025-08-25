@@ -49,8 +49,8 @@ RSpec.describe FileItem, type: :model do
   def expect_typing_progress_attributes(typing_progress, file_item)
     expect(typing_progress.row).to eq(file_item.content.lines.count)
     expect(typing_progress.column).to eq(file_item.content.lines.first.length)
-    expect(typing_progress.elapsed_seconds).to eq(0)
-    expect(typing_progress.total_typo_count).to eq(0)
+    expect(typing_progress.elapsed_seconds).to be_zero
+    expect(typing_progress.total_typo_count).to be_zero
   end
 
   def expect_typo_attributes(typos)
@@ -72,11 +72,11 @@ RSpec.describe FileItem, type: :model do
   end
 
   def expect_initial_typing_progress_attributes(typing_progress)
-    expect(typing_progress.row).to eq(0)
-    expect(typing_progress.column).to eq(0)
-    expect(typing_progress.elapsed_seconds).to eq(0)
-    expect(typing_progress.total_typo_count).to eq(0)
-    expect(typing_progress.typos.count).to eq(0)
+    expect(typing_progress.row).to be_zero
+    expect(typing_progress.column).to be_zero
+    expect(typing_progress.elapsed_seconds).to be_zero
+    expect(typing_progress.total_typo_count).to be_zero
+    expect(typing_progress.typos.count).to be_zero
   end
 
   def expect_validation_errors(file_item)
