@@ -7,6 +7,7 @@ import { FileItem, TypingStatus, Typo } from '@/types';
 import { axiosPatch } from '@/utils/axios';
 import { fetcher } from '@/utils/fetcher';
 import { sortFileItems } from '@/utils/sort';
+import { useTypingStats } from './useTypingStats';
 
 type useTypingHandlerProps = {
   typingStatus: TypingStatus;
@@ -21,8 +22,10 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
   const [typedTextLines, setTypedTextLines] = useState<string[]>([]);
   const [cursorRow, setCursorRow] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const { data: session } = useSession();
   const params = useParams();
+  const stats = useTypingStats();
 
   const setupTypingState = async (fileItemId: number) => {
     setErrorMessage(null);
@@ -41,6 +44,7 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
         setCursorColumns(initialCursorColumns);
         setTypedTextLines(initialTypedTextLines);
         setCursorRow(0);
+        stats.resetStats();
         return;
       }
 
@@ -65,6 +69,13 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
       setCursorColumns(restoredCursorColumns);
       setTypedTextLines(restoredTypedTextLines);
       setCursorRow(currentRow);
+
+      const savedAccuracy = fetchedFileItem.typingProgress.accuracy;
+      const savedElapsedSeconds = fetchedFileItem.typingProgress.elapsedSeconds;
+      const savedCorrectTypeCount = fetchedFileItem.typingProgress.totalCorrectTypeCount;
+      const savedTypoCount = fetchedFileItem.typingProgress.totalTypoCount;
+      const savedWpm = fetchedFileItem.typingProgress.wpm;
+      stats.restoreStats(savedAccuracy, savedCorrectTypeCount, savedElapsedSeconds, savedTypoCount, savedWpm);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.message);
@@ -75,11 +86,14 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
   };
 
   const startTyping = () => {
+    stats.startStats();
     setTypingStatus('typing');
   };
 
   const pauseTyping = async () => {
     try {
+      stats.pauseStats();
+
       const url = `/api/repositories/${params.id}/file_items/${fileItem?.id}`;
       const accessToken = session?.user?.accessToken;
       const postData = {
@@ -88,8 +102,9 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
           typingProgress: {
             row: cursorRow,
             column: cursorColumns[cursorRow],
-            time: 100.5, // TODO: タイピング時間を計測する
-            totalTypoCount: 10, // TODO: タイポ数を計測する
+            elapsedSeconds: stats.elapsedSeconds,
+            totalCorrectTypeCount: stats.correctTypeCount,
+            totalTypoCount: stats.typoCount,
             typosAttributes: calculateTypos(typedTextLines, targetTextLines),
           },
         },
@@ -108,6 +123,7 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
   };
 
   const resumeTyping = () => {
+    stats.resumeStats();
     setTypingStatus('typing');
   };
 
@@ -117,6 +133,7 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
     setCursorColumns(initialCursorColumns);
     setTypedTextLines(initialTypedTextLines);
     setCursorRow(0);
+    stats.resetStats();
     setTypingStatus('ready');
   };
 
@@ -130,8 +147,9 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
           typingProgress: {
             row: cursorRow,
             column: cursorColumns[cursorRow],
-            time: 100.5, // TODO: タイピング時間を計測する
-            totalTypoCount: 10, // TODO: タイポ数を計測する
+            elapsedSeconds: stats.elapsedSeconds,
+            totalCorrectTypeCount: stats.correctTypeCount,
+            totalTypoCount: stats.typoCount,
             typosAttributes: calculateTypos(typedTextLines, targetTextLines),
           },
         },
@@ -158,6 +176,7 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
     targetTextLines,
     setFileItems,
     setTypingStatus,
+    stats,
   ]);
 
   const isComplete = useCallback(
@@ -181,9 +200,13 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
           ? Math.min(targetTextLines.length - 1, cursorRow + 1)
           : cursorRow;
 
+      const targetChar = targetTextLines[cursorRow]?.[cursorColumns[cursorRow]];
+      const isCorrect = targetChar === character;
+      stats.updateStats(isCorrect);
+
       return { newTypedTextLines, newCursorColumns, newCursorRow };
     },
-    [typedTextLines, cursorColumns, cursorRow, targetTextLines],
+    [typedTextLines, cursorColumns, cursorRow, targetTextLines, stats],
   );
 
   const handleBackspace = useCallback(() => {
@@ -259,6 +282,11 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
     pauseTyping,
     resetTyping,
     setupTypingState,
+    accuracy: stats.accuracy,
+    correctTypeCount: stats.correctTypeCount,
+    elapsedSeconds: stats.elapsedSeconds,
+    typoCount: stats.typoCount,
+    wpm: stats.wpm,
   };
 }
 

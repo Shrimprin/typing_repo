@@ -1,6 +1,7 @@
 import { FileItem, TypingStatus } from '@/types';
 import TypingContent from './TypingContent';
 import TypingHeader from './TypingHeader';
+import TypingStats from './TypingStats';
 
 type TypingPanelProps = {
   fileItem: FileItem;
@@ -14,6 +15,11 @@ type TypingPanelProps = {
     resumeTyping: () => void;
     pauseTyping: () => void;
     resetTyping: () => void;
+    accuracy: number;
+    correctTypeCount: number;
+    elapsedSeconds: number;
+    typoCount: number;
+    wpm: number;
   };
 };
 
@@ -28,6 +34,10 @@ export default function TypingPanel({ fileItem, typingHandler }: TypingPanelProp
     resetTyping,
     pauseTyping,
     resumeTyping,
+    accuracy,
+    elapsedSeconds,
+    typoCount,
+    wpm,
   } = typingHandler;
 
   return (
@@ -40,7 +50,7 @@ export default function TypingPanel({ fileItem, typingHandler }: TypingPanelProp
         resumeTyping={resumeTyping}
         resetTyping={resetTyping}
       />
-      <div className="flex-1 overflow-hidden">
+      <div className="relative flex-1 overflow-hidden">
         <TypingContent
           cursorRow={cursorRow}
           cursorColumns={cursorColumns}
@@ -48,6 +58,9 @@ export default function TypingPanel({ fileItem, typingHandler }: TypingPanelProp
           typedTextLines={typedTextLines}
           typingStatus={typingStatus}
         />
+        {(typingStatus === 'typing' || typingStatus === 'paused') && (
+          <TypingStats accuracy={accuracy} elapsedSeconds={elapsedSeconds} typoCount={typoCount} wpm={wpm} />
+        )}
       </div>
     </div>
   );

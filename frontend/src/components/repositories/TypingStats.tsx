@@ -1,0 +1,37 @@
+type TypingStatsProps = {
+  accuracy: number;
+  elapsedSeconds: number;
+  typoCount: number;
+  wpm: number;
+};
+
+export default function TypingStats({ accuracy, elapsedSeconds, typoCount, wpm }: TypingStatsProps) {
+  const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="bg-background/80 absolute right-4 bottom-4 rounded-lg border px-3 py-2 text-sm backdrop-blur-sm">
+      <div className="flex min-w-[120px] flex-col gap-1">
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Accuracy:</span>
+          <span>{accuracy}%</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Time:</span>
+          <span>{formatTime(elapsedSeconds)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Typos:</span>
+          <span>{typoCount}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">WPM:</span>
+          <span>{wpm}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
