@@ -18,19 +18,19 @@ export default function TypingStats({ stats }: TypingStatsProps) {
       <div className="flex min-w-[120px] flex-col gap-1">
         <div className="flex justify-between">
           <span className="text-muted-foreground">Accuracy:</span>
-          <span>{accuracy.toFixed(1)}%</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Time:</span>
-          <span>{formatTime(elapsedSeconds)}</span>
+          <span>{accuracy?.toFixed(1) || '0.0'}%</span>
         </div>
         <div className="flex justify-between">
           <span className="text-muted-foreground">Typos:</span>
-          <span>{totalTypoCount}</span>
+          <span>{totalTypoCount || 0}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-muted-foreground">WPM:</span>
-          <span>{wpm.toFixed(1)}</span>
+          <span>{wpm?.toFixed(1) || '0.0'}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Time:</span>
+          <span>{formatTime(elapsedSeconds || 0)}</span>
         </div>
       </div>
     </div>
