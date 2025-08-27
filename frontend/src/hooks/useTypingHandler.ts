@@ -70,8 +70,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
       setTypedTextLines(restoredTypedTextLines);
       setCursorRow(currentRow);
 
-      const { accuracy, totalCorrectTypeCount, elapsedSeconds, totalTypoCount, wpm } = fetchedFileItem.typingProgress;
-      typingStats.restoreStats(accuracy, totalCorrectTypeCount, elapsedSeconds, totalTypoCount, wpm);
+      const { accuracy, elapsedSeconds, totalCorrectTypeCount, totalTypoCount, wpm } = fetchedFileItem.typingProgress;
+      typingStats.restoreStats(accuracy, elapsedSeconds, totalCorrectTypeCount, totalTypoCount, wpm);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.message);
@@ -268,8 +268,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
 
   const stats: Stats = {
     accuracy: typingStats.accuracy,
-    totalCorrectTypeCount: typingStats.totalCorrectTypeCount,
     elapsedSeconds: typingStats.elapsedSeconds,
+    totalCorrectTypeCount: typingStats.totalCorrectTypeCount,
     totalTypoCount: typingStats.totalTypoCount,
     wpm: typingStats.wpm,
   };

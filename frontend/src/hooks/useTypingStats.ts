@@ -4,8 +4,8 @@ import { Stats } from '@/types';
 
 export function useTypingStats() {
   const [accuracy, setAccuracy] = useState(100);
-  const [totalCorrectTypeCount, setTotalCorrectTypeCount] = useState(0);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [totalCorrectTypeCount, setTotalCorrectTypeCount] = useState(0);
   const [totalTypoCount, setTotalTypoCount] = useState(0);
   const [wpm, setWpm] = useState(0);
   const lastMeasureTimeRef = useRef<number | null>(null);
@@ -86,14 +86,14 @@ export function useTypingStats() {
   const restoreStats = useCallback(
     (
       savedAccuracy: number,
-      savedCorrectTypeCount: number,
       savedElapsedSeconds: number,
+      savedCorrectTypeCount: number,
       savedTypoCount: number,
       savedWpm: number,
     ) => {
       setAccuracy(savedAccuracy);
-      setTotalCorrectTypeCount(savedCorrectTypeCount);
       setElapsedSeconds(savedElapsedSeconds);
+      setTotalCorrectTypeCount(savedCorrectTypeCount);
       setTotalTypoCount(savedTypoCount);
       setWpm(savedWpm);
       lastMeasureTimeRef.current = null;
@@ -104,8 +104,8 @@ export function useTypingStats() {
 
   const stats: Stats = {
     accuracy,
-    totalCorrectTypeCount,
     elapsedSeconds,
+    totalCorrectTypeCount,
     totalTypoCount,
     wpm,
   };
