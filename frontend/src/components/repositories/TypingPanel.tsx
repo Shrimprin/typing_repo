@@ -1,4 +1,4 @@
-import { FileItem, Stats, TypingStatus } from '@/types';
+import type { FileItem, Stats, TypingStatus } from '@/types';
 import TypingContent from './TypingContent';
 import TypingHeader from './TypingHeader';
 import TypingStats from './TypingStats';

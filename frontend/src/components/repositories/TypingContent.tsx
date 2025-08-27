@@ -1,5 +1,5 @@
 import TypingLine from '@/components/repositories/TypingLine';
-import { TypingStatus } from '@/types';
+import type { TypingStatus } from '@/types';
 
 type TypingContentProps = {
   cursorRow: number;

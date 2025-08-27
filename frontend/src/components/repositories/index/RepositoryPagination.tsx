@@ -10,7 +10,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { PAGINATION } from '@/constants/pagination';
-import { PaginationInfo } from '@/types/repository';
+import type { PaginationInfo } from '@/types/repository';
 import { useSearchParams } from 'next/navigation';
 
 type Props = {
