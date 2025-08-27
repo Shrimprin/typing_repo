@@ -33,6 +33,8 @@ export function useTypingStats() {
   }, [isTyping, elapsedSeconds, totalCorrectTypeCount]);
 
   useEffect(() => {
+    if (!isTyping) return;
+
     const totalTypeCount = totalCorrectTypeCount + totalTypoCount;
     if (totalTypeCount > 0) {
       const newAccuracy = Math.round((totalCorrectTypeCount / totalTypeCount) * 1000) / 10;
@@ -40,7 +42,7 @@ export function useTypingStats() {
     } else {
       setAccuracy(100);
     }
-  }, [totalCorrectTypeCount, totalTypoCount]);
+  }, [isTyping, totalCorrectTypeCount, totalTypoCount]);
 
   const startStats = useCallback(() => {
     setAccuracy(100);
