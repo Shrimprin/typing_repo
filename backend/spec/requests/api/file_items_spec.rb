@@ -204,7 +204,6 @@ RSpec.describe 'Api::FileItems', type: :request do
         expect(updated_file_item.typing_progress.row).to eq(3)
         expect(updated_file_item.typing_progress.column).to eq(1)
         expect(updated_file_item.typing_progress.elapsed_seconds).to eq(330)
-        expect(updated_file_item.typing_progress.typos.length).to eq(2)
 
         expect(updated_file_item.typing_progress.typos.length).to eq(2)
         expect(updated_file_item.typing_progress.typos[0].row).to eq(1)
