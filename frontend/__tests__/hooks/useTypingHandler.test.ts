@@ -445,8 +445,9 @@ describe('useTypingHandler', () => {
               typingProgress: {
                 row: 1,
                 column: 6,
-                time: 100.5,
-                totalTypoCount: 10,
+                elapsedSeconds: 0,
+                totalCorrectTypeCount: 18,
+                totalTypoCount: 2,
                 typosAttributes: [
                   {
                     row: 1,
@@ -706,8 +707,9 @@ describe('useTypingHandler', () => {
               typingProgress: {
                 row: 2,
                 column: 3,
-                time: 100.5,
-                totalTypoCount: 10,
+                elapsedSeconds: 0,
+                totalCorrectTypeCount: 38,
+                totalTypoCount: 2,
                 typosAttributes: [
                   {
                     row: 1,
