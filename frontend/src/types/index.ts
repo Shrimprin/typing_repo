@@ -1,6 +1,6 @@
-export * from './extension';
-export * from './file-item';
-export * from './repository';
-export * from './repository-creation';
-export * from './stats';
-export * from './typing';
+export type { Extension } from './extension';
+export type { FileItem, TypingProgress, Typo } from './file-item';
+export type { Repository } from './repository';
+export type { RepositoryPreview, WizardData, WizardStep } from './repository-creation';
+export type { Stats } from './stats';
+export type { TypingStatus } from './typing';
