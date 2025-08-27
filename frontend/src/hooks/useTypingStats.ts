@@ -28,14 +28,14 @@ export function useTypingStats() {
     if (!isTyping || !lastMeasureTimeRef.current || totalCorrectTypeCount === 0 || elapsedSeconds === 0) return;
 
     const elapsedMinutes = elapsedSeconds / 60;
-    const newWpm = Math.round(totalCorrectTypeCount / 5 / elapsedMinutes);
+    const newWpm = Math.round((totalCorrectTypeCount / 5 / elapsedMinutes) * 10) / 10;
     setWpm(newWpm);
   }, [isTyping, elapsedSeconds, totalCorrectTypeCount]);
 
   useEffect(() => {
     const totalTypeCount = totalCorrectTypeCount + totalTypoCount;
     if (totalTypeCount > 0) {
-      const newAccuracy = Math.round((totalCorrectTypeCount / totalTypeCount) * 100);
+      const newAccuracy = Math.round((totalCorrectTypeCount / totalTypeCount) * 1000) / 10;
       setAccuracy(newAccuracy);
     } else {
       setAccuracy(100);

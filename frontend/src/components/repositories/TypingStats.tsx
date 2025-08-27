@@ -18,7 +18,7 @@ export default function TypingStats({ stats }: TypingStatsProps) {
       <div className="flex min-w-[120px] flex-col gap-1">
         <div className="flex justify-between">
           <span className="text-muted-foreground">Accuracy:</span>
-          <span>{accuracy}%</span>
+          <span>{accuracy.toFixed(1)}%</span>
         </div>
         <div className="flex justify-between">
           <span className="text-muted-foreground">Time:</span>
@@ -30,7 +30,7 @@ export default function TypingStats({ stats }: TypingStatsProps) {
         </div>
         <div className="flex justify-between">
           <span className="text-muted-foreground">WPM:</span>
-          <span>{wpm}</span>
+          <span>{wpm.toFixed(1)}</span>
         </div>
       </div>
     </div>
