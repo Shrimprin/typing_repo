@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Extension, RepositoryPreview, WizardData } from '@/types';
+import type { Extension, RepositoryPreview, WizardData } from '@/types';
 import RepositoryCard from '../common/RepositoryCard';
 
 type ExtensionSelectionStepProps = {

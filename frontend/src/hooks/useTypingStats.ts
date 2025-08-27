@@ -91,7 +91,6 @@ export function useTypingStats() {
       savedTypoCount: number,
       savedWpm: number,
     ) => {
-      console.log('restoreStats', savedAccuracy, savedCorrectTypeCount, savedElapsedSeconds, savedTypoCount, savedWpm);
       setAccuracy(savedAccuracy);
       setTotalCorrectTypeCount(savedCorrectTypeCount);
       setElapsedSeconds(savedElapsedSeconds);

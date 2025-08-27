@@ -1,4 +1,4 @@
-import { Stats } from '@/types';
+import type { Stats } from '@/types';
 
 type TypingStatsProps = {
   stats: Stats;
