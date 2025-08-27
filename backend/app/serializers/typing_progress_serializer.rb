@@ -6,21 +6,21 @@ class TypingProgressSerializer
   attributes :row, :column, :elapsed_seconds, :total_correct_type_count, :total_typo_count
 
   attribute :accuracy do |typing_progress|
-    total_chars = typing_progress.total_correct_type_count + typing_progress.total_typo_count
-    if total_chars.zero?
+    total_type_count = typing_progress.total_correct_type_count + typing_progress.total_typo_count
+    if total_type_count.zero?
       100.0
     else
-      ((typing_progress.total_correct_type_count.to_f / total_chars) * 100).round(1)
+      (typing_progress.total_correct_type_count.fdiv(total_type_count) * 100).round(1)
     end
   end
 
   attribute :wpm do |typing_progress|
-    elapsed_minutes = typing_progress.elapsed_seconds / 60.0
+    elapsed_minutes = typing_progress.elapsed_seconds.fdiv(60)
     if elapsed_minutes.zero?
       0.0
     else
-      typed_words = typing_progress.total_correct_type_count / 5
-      (typed_words / elapsed_minutes).round(1)
+      typed_words = typing_progress.total_correct_type_count.fdiv(5)
+      typed_words.fdiv(elapsed_minutes).round(1)
     end
   end
 

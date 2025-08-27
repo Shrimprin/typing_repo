@@ -22,7 +22,7 @@ RSpec.describe 'Api::Repositories', type: :request do
           expect(repository_json).to have_json_attributes(
             name: repository.name,
             user_id: repository.user_id,
-            last_typed_at: repository.last_typed_at&.as_json,
+            last_typed_at: repository.last_typed_at,
             progress: 0.4
           )
         end
