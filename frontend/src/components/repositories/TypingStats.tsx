@@ -5,7 +5,7 @@ type TypingStatsProps = {
 };
 
 export default function TypingStats({ stats }: TypingStatsProps) {
-  const { accuracy, elapsedSeconds, typoCount, wpm } = stats;
+  const { accuracy, elapsedSeconds, totalTypoCount, wpm } = stats;
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -26,7 +26,7 @@ export default function TypingStats({ stats }: TypingStatsProps) {
         </div>
         <div className="flex justify-between">
           <span className="text-muted-foreground">Typos:</span>
-          <span>{typoCount}</span>
+          <span>{totalTypoCount}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-muted-foreground">WPM:</span>

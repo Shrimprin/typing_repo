@@ -1,7 +1,7 @@
 export type Stats = {
   accuracy: number;
-  correctTypeCount: number;
+  totalCorrectTypeCount: number;
   elapsedSeconds: number;
-  typoCount: number;
+  totalTypoCount: number;
   wpm: number;
 };

@@ -99,8 +99,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
             row: cursorRow,
             column: cursorColumns[cursorRow],
             elapsedSeconds: typingStats.elapsedSeconds,
-            totalCorrectTypeCount: typingStats.correctTypeCount,
-            totalTypoCount: typingStats.typoCount,
+            totalCorrectTypeCount: typingStats.totalCorrectTypeCount,
+            totalTypoCount: typingStats.totalTypoCount,
             typosAttributes: calculateTypos(typedTextLines, targetTextLines),
           },
         },
@@ -144,8 +144,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
             row: cursorRow,
             column: cursorColumns[cursorRow],
             elapsedSeconds: typingStats.elapsedSeconds,
-            totalCorrectTypeCount: typingStats.correctTypeCount,
-            totalTypoCount: typingStats.typoCount,
+            totalCorrectTypeCount: typingStats.totalCorrectTypeCount,
+            totalTypoCount: typingStats.totalTypoCount,
             typosAttributes: calculateTypos(typedTextLines, targetTextLines),
           },
         },
@@ -268,9 +268,9 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
 
   const stats: Stats = {
     accuracy: typingStats.accuracy,
-    correctTypeCount: typingStats.correctTypeCount,
+    totalCorrectTypeCount: typingStats.totalCorrectTypeCount,
     elapsedSeconds: typingStats.elapsedSeconds,
-    typoCount: typingStats.typoCount,
+    totalTypoCount: typingStats.totalTypoCount,
     wpm: typingStats.wpm,
   };
 
