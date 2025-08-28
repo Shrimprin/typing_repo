@@ -1,7 +1,7 @@
 import { Pause, Play, RotateCcw } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { TypingStatus } from '@/types';
+import type { TypingStatus } from '@/types';
 
 type TypingHeaderProps = {
   fileItemName: string;

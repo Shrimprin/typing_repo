@@ -1,6 +1,7 @@
-import { FileItem, TypingStatus } from '@/types';
+import type { FileItem, Stats, TypingStatus } from '@/types';
 import TypingContent from './TypingContent';
 import TypingHeader from './TypingHeader';
+import TypingStats from './TypingStats';
 
 type TypingPanelProps = {
   fileItem: FileItem;
@@ -14,6 +15,7 @@ type TypingPanelProps = {
     resumeTyping: () => void;
     pauseTyping: () => void;
     resetTyping: () => void;
+    stats: Stats;
   };
 };
 
@@ -24,6 +26,7 @@ export default function TypingPanel({ fileItem, typingHandler }: TypingPanelProp
     targetTextLines,
     typedTextLines,
     typingStatus,
+    stats,
     startTyping,
     resetTyping,
     pauseTyping,
@@ -40,7 +43,7 @@ export default function TypingPanel({ fileItem, typingHandler }: TypingPanelProp
         resumeTyping={resumeTyping}
         resetTyping={resetTyping}
       />
-      <div className="flex-1 overflow-hidden">
+      <div className="relative flex-1 overflow-hidden">
         <TypingContent
           cursorRow={cursorRow}
           cursorColumns={cursorColumns}
@@ -48,6 +51,7 @@ export default function TypingPanel({ fileItem, typingHandler }: TypingPanelProp
           typedTextLines={typedTextLines}
           typingStatus={typingStatus}
         />
+        {(typingStatus === 'typing' || typingStatus === 'paused') && <TypingStats stats={stats} />}
       </div>
     </div>
   );

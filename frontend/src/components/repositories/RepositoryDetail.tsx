@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { useTypingHandler } from '@/hooks/useTypingHandler';
-import { FileItem, TypingStatus } from '@/types';
+import type { FileItem, TypingStatus } from '@/types';
 import { Card } from '../ui/card';
 import Loading from '../ui/loading';
 import FileTree from './FileTree';

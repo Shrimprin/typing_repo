@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { RepositoryPreview, WizardData } from '@/types';
+import type { RepositoryPreview, WizardData } from '@/types';
 import { axiosGet } from '@/utils/axios';
 
 type FormValues = {
