@@ -162,7 +162,7 @@ RSpec.describe Repository, type: :model do
     end
 
     it 'saves file_items with tree structure' do
-      expect(repository.file_items.count).to eq(0)
+      expect(repository.file_items.count).to be_zero
       repository.send(:save_file_items, github_client_mock)
 
       expect(repository.file_items.count).to eq(6)
@@ -260,7 +260,7 @@ RSpec.describe Repository, type: :model do
       end
 
       it 'creates file_items with tree structure' do
-        expect(repository.file_items.count).to eq(0)
+        expect(repository.file_items.count).to be_zero
         repository.send(:create_file_items_recursively, file_tree)
 
         expect(repository.file_items.count).to eq(5)
@@ -296,10 +296,10 @@ RSpec.describe Repository, type: :model do
       end
 
       it 'does not create file_items' do
-        expect(repository.file_items.count).to eq(0)
+        expect(repository.file_items.count).to be_zero
         repository.send(:create_file_items_recursively, file_tree)
 
-        expect(repository.file_items.count).to eq(0)
+        expect(repository.file_items.count).to be_zero
       end
 
       it 'adds errors to the repository' do
@@ -407,7 +407,7 @@ RSpec.describe Repository, type: :model do
     let(:repository) { build(:repository) }
 
     it 'calculates path depth correctly' do
-      expect(repository.send(:depth_of, 'file.rb')).to eq(0)
+      expect(repository.send(:depth_of, 'file.rb')).to be_zero
       expect(repository.send(:depth_of, 'src/main.rb')).to eq(1)
       expect(repository.send(:depth_of, 'src/lib/helper.rb')).to eq(2)
     end

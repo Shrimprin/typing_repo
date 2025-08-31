@@ -3,7 +3,7 @@
 import { Check, ChevronDown, ChevronRight, File, Folder } from 'lucide-react';
 import { useState } from 'react';
 
-import { FileItem } from '@/types';
+import type { FileItem } from '@/types';
 import { sortFileItems } from '@/utils/sort';
 
 type FileTreeItemProps = {

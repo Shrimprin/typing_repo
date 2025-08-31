@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { WizardData } from '@/types';
+import type { WizardData } from '@/types';
 import { axiosPost } from '@/utils/axios';
 import RepositoryCard from '../common/RepositoryCard';
 

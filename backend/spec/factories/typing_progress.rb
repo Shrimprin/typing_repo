@@ -5,7 +5,8 @@ FactoryBot.define do
     file_item
     row { 0 }
     column { 0 }
-    time { 0 }
+    elapsed_seconds { 0 }
+    total_correct_type_count { 0 }
     total_typo_count { 0 }
   end
 end

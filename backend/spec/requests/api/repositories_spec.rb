@@ -15,14 +15,14 @@ RSpec.describe 'Api::Repositories', type: :request do
         json = response.parsed_body
         expect(response).to have_http_status(:ok)
         expect(json.length).to eq(3)
-        expect(json.map { |r| r['id'] }).to match_array(repositories.map(&:id))
+        expect(json.pluck('id')).to match_array(repositories.map(&:id))
 
         repositories.each do |repository|
           repository_json = json.find { |r| r['id'] == repository.id }
           expect(repository_json).to have_json_attributes(
             name: repository.name,
             user_id: repository.user_id,
-            last_typed_at: repository.last_typed_at&.as_json,
+            last_typed_at: repository.last_typed_at,
             progress: 0.4
           )
         end

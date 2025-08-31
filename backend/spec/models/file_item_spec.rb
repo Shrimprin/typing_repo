@@ -10,7 +10,7 @@ RSpec.describe FileItem, type: :model do
     {
       row: untyped_file_item.content.lines.count,
       column: untyped_file_item.content.lines.first.length,
-      time: 0,
+      elapsed_seconds: 0,
       total_typo_count: 0,
       typos_attributes: [
         {
@@ -40,7 +40,7 @@ RSpec.describe FileItem, type: :model do
       typing_progress: {
         row: nil,
         column: nil,
-        time: nil,
+        elapsed_seconds: nil,
         total_typo_count: nil
       }
     }
@@ -49,8 +49,8 @@ RSpec.describe FileItem, type: :model do
   def expect_typing_progress_attributes(typing_progress, file_item)
     expect(typing_progress.row).to eq(file_item.content.lines.count)
     expect(typing_progress.column).to eq(file_item.content.lines.first.length)
-    expect(typing_progress.time).to eq(0)
-    expect(typing_progress.total_typo_count).to eq(0)
+    expect(typing_progress.elapsed_seconds).to be_zero
+    expect(typing_progress.total_typo_count).to be_zero
   end
 
   def expect_typo_attributes(typos)
@@ -72,18 +72,18 @@ RSpec.describe FileItem, type: :model do
   end
 
   def expect_initial_typing_progress_attributes(typing_progress)
-    expect(typing_progress.row).to eq(0)
-    expect(typing_progress.column).to eq(0)
-    expect(typing_progress.time).to eq(0)
-    expect(typing_progress.total_typo_count).to eq(0)
-    expect(typing_progress.typos.count).to eq(0)
+    expect(typing_progress.row).to be_zero
+    expect(typing_progress.column).to be_zero
+    expect(typing_progress.elapsed_seconds).to be_zero
+    expect(typing_progress.total_typo_count).to be_zero
+    expect(typing_progress.typos.count).to be_zero
   end
 
   def expect_validation_errors(file_item)
     errors = file_item.errors
     expect(errors[:'typing_progress.row']).to include("can't be blank")
     expect(errors[:'typing_progress.column']).to include("can't be blank")
-    expect(errors[:'typing_progress.time']).to include("can't be blank")
+    expect(errors[:'typing_progress.elapsed_seconds']).to include("can't be blank")
     expect(errors[:'typing_progress.total_typo_count']).to include("can't be blank")
   end
 

@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Repository } from '@/types/repository';
+import type { Repository } from '@/types/repository';
 import RepositoryProgress from './RepositoryProgress';
 
 type Props = {

@@ -45,7 +45,9 @@ describe('useTypingHandler', () => {
     const { result } = renderHook(() => useTypingHandler(props));
     await act(async () => {
       await result.current.setupTypingState(1);
+      result.current.startTyping();
     });
+
     return result;
   };
 
@@ -426,6 +428,7 @@ describe('useTypingHandler', () => {
         jest.spyOn(axios, 'patch').mockResolvedValueOnce(mockResponse);
 
         const result = await setupHook(typingProps);
+
         await userEvent.keyboard('def hello_world{Enter}');
         await userEvent.keyboard('pust');
 
@@ -445,8 +448,9 @@ describe('useTypingHandler', () => {
               typingProgress: {
                 row: 1,
                 column: 6,
-                time: 100.5,
-                totalTypoCount: 10,
+                elapsedSeconds: 0,
+                totalCorrectTypeCount: 18,
+                totalTypoCount: 2,
                 typosAttributes: [
                   {
                     row: 1,
@@ -534,6 +538,7 @@ describe('useTypingHandler', () => {
         jest.spyOn(axios, 'patch').mockRejectedValueOnce(new Error('Server Error'));
 
         const result = await setupHook(typingProps);
+
         await typeEntireContent();
 
         expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
@@ -692,6 +697,7 @@ describe('useTypingHandler', () => {
         (sortFileItems as jest.Mock).mockReturnValue(sortedResponse);
 
         await setupHook(typingProps);
+
         await typeEntireContent();
       });
 
@@ -706,8 +712,9 @@ describe('useTypingHandler', () => {
               typingProgress: {
                 row: 2,
                 column: 3,
-                time: 100.5,
-                totalTypoCount: 10,
+                elapsedSeconds: 0,
+                totalCorrectTypeCount: 38,
+                totalTypoCount: 2,
                 typosAttributes: [
                   {
                     row: 1,
