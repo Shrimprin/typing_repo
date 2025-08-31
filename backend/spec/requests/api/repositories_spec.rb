@@ -15,7 +15,7 @@ RSpec.describe 'Api::Repositories', type: :request do
         json = response.parsed_body
         expect(response).to have_http_status(:ok)
         expect(json.length).to eq(3)
-        expect(json.map { |r| r['id'] }).to match_array(repositories.map(&:id))
+        expect(json.pluck('id')).to match_array(repositories.map(&:id))
 
         repositories.each do |repository|
           repository_json = json.find { |r| r['id'] == repository.id }
