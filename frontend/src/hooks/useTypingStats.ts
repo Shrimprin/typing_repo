@@ -45,6 +45,8 @@ export function useTypingStats() {
   }, [isTyping, totalCorrectTypeCount, totalTypoCount]);
 
   const startStats = useCallback(() => {
+    if (isTyping) return;
+
     setAccuracy(100);
     setTotalCorrectTypeCount(0);
     setElapsedSeconds(0);
@@ -52,17 +54,21 @@ export function useTypingStats() {
     setWpm(0);
     lastMeasureTimeRef.current = performance.now();
     setIsTyping(true);
-  }, []);
+  }, [isTyping]);
 
   const pauseStats = useCallback(() => {
+    if (!isTyping) return;
+
     lastMeasureTimeRef.current = null;
     setIsTyping(false);
-  }, []);
+  }, [isTyping]);
 
   const resumeStats = useCallback(() => {
+    if (isTyping) return;
+
     lastMeasureTimeRef.current = performance.now();
     setIsTyping(true);
-  }, []);
+  }, [isTyping]);
 
   const resetStats = useCallback(() => {
     setAccuracy(100);
@@ -76,13 +82,15 @@ export function useTypingStats() {
 
   const updateStats = useCallback(
     (isCorrect: boolean) => {
+      if (!isTyping) return;
+
       if (isCorrect) {
         setTotalCorrectTypeCount((prev) => prev + 1);
       } else {
         setTotalTypoCount((prev) => prev + 1);
       }
     },
-    [setTotalCorrectTypeCount, setTotalTypoCount],
+    [isTyping, setTotalCorrectTypeCount, setTotalTypoCount],
   );
 
   const restoreStats = useCallback(

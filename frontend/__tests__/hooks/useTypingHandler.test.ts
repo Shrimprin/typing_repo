@@ -45,7 +45,9 @@ describe('useTypingHandler', () => {
     const { result } = renderHook(() => useTypingHandler(props));
     await act(async () => {
       await result.current.setupTypingState(1);
+      result.current.startTyping();
     });
+
     return result;
   };
 
@@ -426,6 +428,7 @@ describe('useTypingHandler', () => {
         jest.spyOn(axios, 'patch').mockResolvedValueOnce(mockResponse);
 
         const result = await setupHook(typingProps);
+
         await userEvent.keyboard('def hello_world{Enter}');
         await userEvent.keyboard('pust');
 
@@ -535,6 +538,7 @@ describe('useTypingHandler', () => {
         jest.spyOn(axios, 'patch').mockRejectedValueOnce(new Error('Server Error'));
 
         const result = await setupHook(typingProps);
+
         await typeEntireContent();
 
         expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
@@ -693,6 +697,7 @@ describe('useTypingHandler', () => {
         (sortFileItems as jest.Mock).mockReturnValue(sortedResponse);
 
         await setupHook(typingProps);
+
         await typeEntireContent();
       });
 
