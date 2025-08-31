@@ -66,6 +66,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_20_075935) do
     t.datetime "updated_at", null: false
     t.integer "total_correct_type_count", default: 0, null: false
     t.index ["file_item_id"], name: "index_typing_progresses_on_file_item_id"
+    t.check_constraint "\"column\" >= 0", name: "typing_progresses_column_nonneg"
+    t.check_constraint "\"row\" >= 0", name: "typing_progresses_row_nonneg"
+    t.check_constraint "elapsed_seconds >= 0", name: "typing_progresses_elapsed_seconds_nonneg"
+    t.check_constraint "total_correct_type_count >= 0", name: "typing_progresses_total_correct_type_count_nonneg"
+    t.check_constraint "total_typo_count >= 0", name: "typing_progresses_total_typo_count_nonneg"
   end
 
   create_table "typos", force: :cascade do |t|
