@@ -70,6 +70,13 @@ export function useTypingStats() {
     setIsTyping(true);
   }, [isTyping]);
 
+  const completeStats = useCallback(() => {
+    if (!isTyping) return;
+
+    lastMeasureTimeRef.current = null;
+    setIsTyping(false);
+  }, [isTyping]);
+
   const resetStats = useCallback(() => {
     setAccuracy(100);
     setTotalCorrectTypeCount(0);
@@ -125,6 +132,7 @@ export function useTypingStats() {
     startStats,
     pauseStats,
     resumeStats,
+    completeStats,
     resetStats,
     updateStats,
     restoreStats,

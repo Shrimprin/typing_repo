@@ -135,6 +135,8 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
 
   const handleComplete = useCallback(async () => {
     try {
+      typingStats.completeStats();
+
       const url = `/api/repositories/${params.id}/file_items/${fileItem?.id}`;
       const accessToken = session?.user?.accessToken;
       const postData = {

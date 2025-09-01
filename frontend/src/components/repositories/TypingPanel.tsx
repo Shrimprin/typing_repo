@@ -50,6 +50,7 @@ export default function TypingPanel({ fileItem, typingHandler }: TypingPanelProp
           targetTextLines={targetTextLines}
           typedTextLines={typedTextLines}
           typingStatus={typingStatus}
+          stats={stats}
         />
         {(typingStatus === 'typing' || typingStatus === 'paused') && <TypingStats stats={stats} />}
       </div>
