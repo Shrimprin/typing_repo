@@ -1,4 +1,5 @@
 import type { Stats } from '@/types';
+import { formatTime } from '@/utils/time';
 
 type TypingStatsProps = {
   stats: Stats;
@@ -6,12 +7,6 @@ type TypingStatsProps = {
 
 export default function TypingStats({ stats }: TypingStatsProps) {
   const { accuracy, elapsedSeconds, totalTypoCount, wpm } = stats;
-
-  const formatTime = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
 
   return (
     <div className="bg-background/80 absolute right-4 bottom-4 rounded-lg border px-3 py-2 text-sm backdrop-blur-sm">
