@@ -25,16 +25,14 @@ export function useTypingStats() {
   }, [isTyping, elapsedSeconds]);
 
   useEffect(() => {
-    if (!isTyping || !lastMeasureTimeRef.current || totalCorrectTypeCount === 0 || elapsedSeconds === 0) return;
+    if (!lastMeasureTimeRef.current || totalCorrectTypeCount === 0 || elapsedSeconds === 0) return;
 
     const elapsedMinutes = elapsedSeconds / 60;
     const newWpm = Math.round((totalCorrectTypeCount / 5 / elapsedMinutes) * 10) / 10;
     setWpm(newWpm);
-  }, [isTyping, elapsedSeconds, totalCorrectTypeCount]);
+  }, [elapsedSeconds, totalCorrectTypeCount]);
 
   useEffect(() => {
-    if (!isTyping) return;
-
     const totalTypeCount = totalCorrectTypeCount + totalTypoCount;
     if (totalTypeCount > 0) {
       const newAccuracy = Math.round((totalCorrectTypeCount / totalTypeCount) * 1000) / 10;
@@ -42,7 +40,7 @@ export function useTypingStats() {
     } else {
       setAccuracy(100);
     }
-  }, [isTyping, totalCorrectTypeCount, totalTypoCount]);
+  }, [totalCorrectTypeCount, totalTypoCount]);
 
   const startStats = useCallback(() => {
     if (isTyping) return;
