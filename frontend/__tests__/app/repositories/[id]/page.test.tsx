@@ -135,7 +135,7 @@ describe('RepositoryDetailPage', () => {
       });
 
       const fileTreeItems = screen.getByTestId('file-tree').querySelectorAll('button');
-      expect(fileTreeItems.length).toBe(5);
+      expect(fileTreeItems).toHaveLength(5);
 
       expect(fileTreeItems[0].textContent).toContain('dir1');
       expect(fileTreeItems[1].textContent).toContain('dir2');
@@ -192,8 +192,8 @@ describe('RepositoryDetailPage', () => {
 
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(0);
-      expect(incorrectChars.length).toBe(0);
+      expect(correctChars).toHaveLength(0);
+      expect(incorrectChars).toHaveLength(0);
     });
   });
 
@@ -214,7 +214,7 @@ describe('RepositoryDetailPage', () => {
       await userEvent.keyboard('console');
 
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(7);
+      expect(correctChars).toHaveLength(7);
 
       const typedText = Array.from(correctChars)
         .map((span) => span.textContent)
@@ -226,7 +226,7 @@ describe('RepositoryDetailPage', () => {
       await userEvent.keyboard('d');
 
       const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(incorrectChars.length).toBe(1);
+      expect(incorrectChars).toHaveLength(1);
       expect(incorrectChars[0].textContent).toBe('c');
     });
 
@@ -235,7 +235,7 @@ describe('RepositoryDetailPage', () => {
       await userEvent.keyboard('{Backspace}');
 
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(2);
+      expect(correctChars).toHaveLength(2);
 
       const typedText = Array.from(correctChars)
         .map((span) => span.textContent)
@@ -250,7 +250,7 @@ describe('RepositoryDetailPage', () => {
 
       expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(0);
+      expect(correctChars).toHaveLength(0);
     });
 
     it('renders result with all typing statistics', async () => {
@@ -318,14 +318,14 @@ describe('RepositoryDetailPage', () => {
       expect(screen.getByText('Typed Code')).toBeInTheDocument();
 
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(24);
+      expect(correctChars).toHaveLength(24);
       const typedText = Array.from(correctChars)
         .map((span) => span.textContent)
         .join('');
       expect(typedText).toBe('console.log("Hello, !");');
 
       const typoChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(typoChars.length).toBe(5);
+      expect(typoChars).toHaveLength(5);
       const typoText = Array.from(typoChars)
         .map((span) => span.textContent)
         .join('');
@@ -349,8 +349,8 @@ describe('RepositoryDetailPage', () => {
     it('renders correct and incorrect characters', async () => {
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(5);
-      expect(incorrectChars.length).toBe(2);
+      expect(correctChars).toHaveLength(5);
+      expect(incorrectChars).toHaveLength(2);
     });
 
     it('renders resume button', async () => {
@@ -362,8 +362,8 @@ describe('RepositoryDetailPage', () => {
 
       const afterPausedCorrectChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       const afterPausedIncorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(afterPausedCorrectChars.length).toBe(5);
-      expect(afterPausedIncorrectChars.length).toBe(2);
+      expect(afterPausedCorrectChars).toHaveLength(5);
+      expect(afterPausedIncorrectChars).toHaveLength(2);
     });
 
     it('resumes typing when RESUME button is clicked', async () => {
@@ -372,8 +372,8 @@ describe('RepositoryDetailPage', () => {
 
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(9);
-      expect(incorrectChars.length).toBe(2);
+      expect(correctChars).toHaveLength(9);
+      expect(incorrectChars).toHaveLength(2);
     });
 
     it('restore typing progress when switch file', async () => {
@@ -418,8 +418,8 @@ describe('RepositoryDetailPage', () => {
 
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(5);
-      expect(incorrectChars.length).toBe(2);
+      expect(correctChars).toHaveLength(5);
+      expect(incorrectChars).toHaveLength(2);
     });
   });
 });
