@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import type { Stats } from '@/types';
 import { formatTime } from '@/utils/time';
@@ -20,9 +20,9 @@ export default function TypingResult({ stats, targetTextLines, typedTextLines }:
     }
   }, []);
 
-  const getTotalCharacters = (): number => {
+  const totalCharacters = useMemo(() => {
     return targetTextLines.reduce((total, line) => total + line.length, 0);
-  };
+  }, [targetTextLines]);
 
   return (
     <div className="h-full overflow-y-auto" id="typing-result-container">
@@ -45,7 +45,7 @@ export default function TypingResult({ stats, targetTextLines, typedTextLines }:
           </div>
           <div className="flex flex-col items-center space-y-2">
             <span>Characters</span>
-            <span className="text-2xl font-bold">{getTotalCharacters()}</span>
+            <span className="text-2xl font-bold">{totalCharacters.toLocaleString()}</span>
           </div>
           <div className="flex flex-col items-center space-y-2">
             <span>Typos</span>
