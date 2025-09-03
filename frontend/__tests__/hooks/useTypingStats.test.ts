@@ -161,7 +161,7 @@ describe('useTypingStats', () => {
           jest.advanceTimersByTime(1000);
         });
 
-        // ポーズ前の統計上を引き継いで更新されることを確認
+        // ポーズ前の統計情報を引き継いで更新されることを確認
         expect(result.current.accuracy).toBe(66.7);
         expect(result.current.elapsedSeconds).toBe(2);
         expect(result.current.totalCorrectTypeCount).toBe(2);
@@ -240,7 +240,7 @@ describe('useTypingStats', () => {
   });
 
   describe('during not typing', () => {
-    it('does not update statistics when typing', () => {
+    it('does not update statistics', () => {
       const { result } = renderHook(() => useTypingStats());
 
       act(() => {
