@@ -28,7 +28,7 @@ export default function TypingResult({ stats, targetTextLines, typedTextLines }:
     <div className="h-full overflow-y-auto" id="typing-result-container">
       <div className="flex flex-col gap-4 p-4">
         <h2 className="text-xl font-bold">Results</h2>
-        <div
+        <dl
           className={`
             grid grid-cols-1 gap-6
             sm:grid-cols-3
@@ -36,26 +36,26 @@ export default function TypingResult({ stats, targetTextLines, typedTextLines }:
           `}
         >
           <div className="flex flex-col items-center space-y-2">
-            <span>WPM</span>
-            <span className="text-2xl font-bold">{wpm.toFixed(1)}</span>
+            <dt>WPM</dt>
+            <dd className="text-2xl font-bold">{wpm.toFixed(1)}</dd>
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <span>Accuracy</span>
-            <span className="text-2xl font-bold">{accuracy} %</span>
+            <dt>Accuracy</dt>
+            <dd className="text-2xl font-bold">{accuracy} %</dd>
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <span>Characters</span>
-            <span className="text-2xl font-bold">{totalCharacters.toLocaleString()}</span>
+            <dt>Characters</dt>
+            <dd className="text-2xl font-bold">{totalCharacters.toLocaleString()}</dd>
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <span>Typos</span>
-            <span className="text-2xl font-bold">{totalTypoCount}</span>
+            <dt>Typos</dt>
+            <dd className="text-2xl font-bold">{totalTypoCount}</dd>
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <span>Time</span>
-            <span className="text-2xl font-bold">{formatTime(elapsedSeconds)}</span>
+            <dt>Time</dt>
+            <dd className="text-2xl font-bold">{formatTime(elapsedSeconds)}</dd>
           </div>
-        </div>
+        </dl>
         <div className="border-t" />
         <h2 className="text-xl font-bold">Typed Code</h2>
         <div className="bg-muted/20 rounded-lg border">
