@@ -25,9 +25,9 @@ export default function TypingContent({
         <div className="h-full overflow-auto px-4">
           <pre className="font-mono">
             {targetTextLines.map((textLine, row) => (
-              <p key={row} className="h-[1.4em] whitespace-pre">
+              <span key={row} className="h-[1.4em] whitespace-pre">
                 {textLine}
-              </p>
+              </span>
             ))}
           </pre>
         </div>
@@ -44,9 +44,9 @@ export default function TypingContent({
             />
           ))}
         </div>
-      ) : (
+      ) : typingStatus === 'completed' ? (
         <TypingResult stats={stats} targetTextLines={targetTextLines} typedTextLines={typedTextLines} />
-      )}
+      ) : null}
     </>
   );
 }

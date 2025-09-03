@@ -35,7 +35,7 @@ const TypingLine = React.memo(function TypingLine({
   };
 
   return (
-    <pre className="h-[1.4em] font-mono">
+    <pre className="font-mono">
       {targetTextLine.split('').map((char, column) => {
         const isCursorChar = column === cursorColumn;
         return (
