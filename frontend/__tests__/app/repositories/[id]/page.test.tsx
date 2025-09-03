@@ -197,7 +197,7 @@ describe('RepositoryDetailPage', () => {
     });
   });
 
-  describe('start typing', () => {
+  describe('during typing', () => {
     beforeEach(async () => {
       await clickButton('dir1');
       await clickButton('nested-file1.ts');
@@ -253,7 +253,9 @@ describe('RepositoryDetailPage', () => {
       expect(correctChars.length).toBe(0);
     });
 
-    it('renders result when type all characters', async () => {
+    it('renders result with all typing statistics', async () => {
+      Element.prototype.scrollTo = jest.fn();
+
       const mockFileItems = [
         {
           id: 1,
@@ -294,13 +296,44 @@ describe('RepositoryDetailPage', () => {
         return Promise.resolve({ data: mockFileItems });
       });
 
-      await userEvent.keyboard('console.log("Hello, world!");');
+      await userEvent.keyboard('console.log("Hello, sekai!");'); // world->sekaiにタイポ
 
-      expect(screen.getByText('Completed!!')).toBeInTheDocument(); // TODO: 完了画面を作ったら修正する
+      await screen.findByText('Results');
+
+      expect(screen.getByText('WPM')).toBeInTheDocument();
+      expect(screen.getByText('0.0')).toBeInTheDocument(); // 時間は計測しないため0.0
+
+      expect(screen.getByText('Accuracy')).toBeInTheDocument();
+      expect(screen.getByText('82.8 %')).toBeInTheDocument();
+
+      expect(screen.getByText('Characters')).toBeInTheDocument();
+      expect(screen.getByText('29')).toBeInTheDocument();
+
+      expect(screen.getByText('Typos')).toBeInTheDocument();
+      expect(screen.getByText('5')).toBeInTheDocument();
+
+      expect(screen.getByText('Time')).toBeInTheDocument();
+      expect(screen.getByText('00:00')).toBeInTheDocument(); // 時間は計測しないため00:00
+
+      expect(screen.getByText('Typed Code')).toBeInTheDocument();
+
+      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
+      expect(correctChars.length).toBe(24);
+      const typedText = Array.from(correctChars)
+        .map((span) => span.textContent)
+        .join('');
+      expect(typedText).toBe('console.log("Hello, !");');
+
+      const typoChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
+      expect(typoChars.length).toBe(5);
+      const typoText = Array.from(typoChars)
+        .map((span) => span.textContent)
+        .join('');
+      expect(typoText).toBe('world');
     });
   });
 
-  describe('pause typing', () => {
+  describe('during pausing', () => {
     beforeEach(async () => {
       jest.spyOn(axios, 'patch').mockImplementation(() => {
         return Promise.resolve({ data: mockUpdatedFileItem });
