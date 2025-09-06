@@ -9,6 +9,7 @@ import { mockAuth, mockUseSession } from '../../../mocks/auth';
 import { clickButton } from '../../../utils/testUtils';
 
 describe('RepositoryDetailPage', () => {
+  const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
   const CORRECT_CHARS_SELECTOR = '[class*="bg-secondary"]';
   const INCORRECT_CHARS_SELECTOR = '[class*="bg-destructive"]';
 
@@ -126,7 +127,6 @@ describe('RepositoryDetailPage', () => {
 
   describe('initial state', () => {
     it('renders file tree with directories, files order both in alphabetical order', async () => {
-      const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
       expect(axios.get).toHaveBeenCalledWith(`${BASE_URL}/api/repositories/1`, {
         headers: {
           Authorization: 'Bearer token_1234567890',
@@ -168,7 +168,6 @@ describe('RepositoryDetailPage', () => {
       await clickButton('dir1');
       await clickButton('nested-file1.ts');
 
-      const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
       expect(axios.get).toHaveBeenCalledWith(`${BASE_URL}/api/repositories/1/file_items/4`, {
         headers: {
           Authorization: 'Bearer token_1234567890',
@@ -253,7 +252,7 @@ describe('RepositoryDetailPage', () => {
       expect(correctChars).toHaveLength(0);
     });
 
-    it('renders result with all typing statistics', async () => {
+    it('renders result when typing is completed', async () => {
       Element.prototype.scrollTo = jest.fn();
 
       const mockFileItems = [
@@ -299,6 +298,55 @@ describe('RepositoryDetailPage', () => {
       await userEvent.keyboard('console.log("Hello, sekai!");'); // world->sekaiにタイポ
 
       await screen.findByText('Results');
+
+      expect(axios.patch).toHaveBeenCalledWith(
+        `${BASE_URL}/api/repositories/1/file_items/4`,
+        {
+          fileItem: {
+            status: 'typed',
+            typingProgress: {
+              row: 0,
+              column: 28,
+              elapsedSeconds: 0,
+              totalCorrectTypeCount: 24,
+              totalTypoCount: 5,
+              typosAttributes: [
+                {
+                  row: 0,
+                  column: 20,
+                  character: 's',
+                },
+                {
+                  row: 0,
+                  column: 21,
+                  character: 'e',
+                },
+                {
+                  row: 0,
+                  column: 22,
+                  character: 'k',
+                },
+                {
+                  row: 0,
+                  column: 23,
+                  character: 'a',
+                },
+                {
+                  row: 0,
+                  column: 24,
+                  character: 'i',
+                },
+              ],
+            },
+          },
+        },
+        {
+          headers: {
+            Authorization: 'Bearer token_1234567890',
+            'Content-Type': 'application/json',
+          },
+        },
+      );
 
       expect(screen.getByText('WPM')).toBeInTheDocument();
       expect(screen.getByText('0.0')).toBeInTheDocument(); // 時間は計測しないため0.0
