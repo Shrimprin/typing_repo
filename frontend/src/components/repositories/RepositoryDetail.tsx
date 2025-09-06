@@ -41,7 +41,7 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
 
     await typingHandler.setupTypingState(fileItem.id);
 
-    setTypingStatus(fileItem.status === 'typing' ? 'paused' : 'ready');
+    setTypingStatus(fileItem.status === 'typing' ? 'paused' : fileItem.status === 'typed' ? 'completed' : 'ready');
     setIsLoading(false);
   };
 
