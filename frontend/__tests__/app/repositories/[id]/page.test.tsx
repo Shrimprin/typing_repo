@@ -9,6 +9,7 @@ import { mockAuth, mockUseSession } from '../../../mocks/auth';
 import { clickButton } from '../../../utils/testUtils';
 
 describe('RepositoryDetailPage', () => {
+  const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
   const CORRECT_CHARS_SELECTOR = '[class*="bg-secondary"]';
   const INCORRECT_CHARS_SELECTOR = '[class*="bg-destructive"]';
 
@@ -126,7 +127,6 @@ describe('RepositoryDetailPage', () => {
 
   describe('initial state', () => {
     it('renders file tree with directories, files order both in alphabetical order', async () => {
-      const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
       expect(axios.get).toHaveBeenCalledWith(`${BASE_URL}/api/repositories/1`, {
         headers: {
           Authorization: 'Bearer token_1234567890',
@@ -135,7 +135,7 @@ describe('RepositoryDetailPage', () => {
       });
 
       const fileTreeItems = screen.getByTestId('file-tree').querySelectorAll('button');
-      expect(fileTreeItems.length).toBe(5);
+      expect(fileTreeItems).toHaveLength(5);
 
       expect(fileTreeItems[0].textContent).toContain('dir1');
       expect(fileTreeItems[1].textContent).toContain('dir2');
@@ -168,7 +168,6 @@ describe('RepositoryDetailPage', () => {
       await clickButton('dir1');
       await clickButton('nested-file1.ts');
 
-      const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
       expect(axios.get).toHaveBeenCalledWith(`${BASE_URL}/api/repositories/1/file_items/4`, {
         headers: {
           Authorization: 'Bearer token_1234567890',
@@ -192,12 +191,12 @@ describe('RepositoryDetailPage', () => {
 
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(0);
-      expect(incorrectChars.length).toBe(0);
+      expect(correctChars).toHaveLength(0);
+      expect(incorrectChars).toHaveLength(0);
     });
   });
 
-  describe('start typing', () => {
+  describe('during typing', () => {
     beforeEach(async () => {
       await clickButton('dir1');
       await clickButton('nested-file1.ts');
@@ -214,7 +213,7 @@ describe('RepositoryDetailPage', () => {
       await userEvent.keyboard('console');
 
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(7);
+      expect(correctChars).toHaveLength(7);
 
       const typedText = Array.from(correctChars)
         .map((span) => span.textContent)
@@ -226,7 +225,7 @@ describe('RepositoryDetailPage', () => {
       await userEvent.keyboard('d');
 
       const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(incorrectChars.length).toBe(1);
+      expect(incorrectChars).toHaveLength(1);
       expect(incorrectChars[0].textContent).toBe('c');
     });
 
@@ -235,7 +234,7 @@ describe('RepositoryDetailPage', () => {
       await userEvent.keyboard('{Backspace}');
 
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(2);
+      expect(correctChars).toHaveLength(2);
 
       const typedText = Array.from(correctChars)
         .map((span) => span.textContent)
@@ -250,57 +249,11 @@ describe('RepositoryDetailPage', () => {
 
       expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(0);
-    });
-
-    it('renders result when type all characters', async () => {
-      const mockFileItems = [
-        {
-          id: 1,
-          name: 'file1.ts',
-          type: 'file',
-          status: 'untyped',
-          path: 'file1.ts',
-          fileItems: [],
-        },
-        {
-          id: 2,
-          name: 'file2.ts',
-          type: 'file',
-          status: 'typed',
-          path: 'file2.ts',
-          fileItems: [],
-        },
-        {
-          id: 3,
-          name: 'dir1',
-          type: 'dir',
-          status: 'untyped',
-          path: 'dir1',
-          fileItems: [
-            {
-              id: 4,
-              name: 'nested-file1.ts',
-              type: 'file',
-              status: 'typed',
-              path: 'dir1/nested-file1.ts',
-              fileItems: [],
-            },
-          ],
-        },
-      ];
-
-      jest.spyOn(axios, 'patch').mockImplementation(() => {
-        return Promise.resolve({ data: mockFileItems });
-      });
-
-      await userEvent.keyboard('console.log("Hello, world!");');
-
-      expect(screen.getByText('Completed!!')).toBeInTheDocument(); // TODO: 完了画面を作ったら修正する
+      expect(correctChars).toHaveLength(0);
     });
   });
 
-  describe('pause typing', () => {
+  describe('during pausing', () => {
     beforeEach(async () => {
       jest.spyOn(axios, 'patch').mockImplementation(() => {
         return Promise.resolve({ data: mockUpdatedFileItem });
@@ -316,8 +269,8 @@ describe('RepositoryDetailPage', () => {
     it('renders correct and incorrect characters', async () => {
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(5);
-      expect(incorrectChars.length).toBe(2);
+      expect(correctChars).toHaveLength(5);
+      expect(incorrectChars).toHaveLength(2);
     });
 
     it('renders resume button', async () => {
@@ -329,8 +282,8 @@ describe('RepositoryDetailPage', () => {
 
       const afterPausedCorrectChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       const afterPausedIncorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(afterPausedCorrectChars.length).toBe(5);
-      expect(afterPausedIncorrectChars.length).toBe(2);
+      expect(afterPausedCorrectChars).toHaveLength(5);
+      expect(afterPausedIncorrectChars).toHaveLength(2);
     });
 
     it('resumes typing when RESUME button is clicked', async () => {
@@ -339,8 +292,8 @@ describe('RepositoryDetailPage', () => {
 
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(9);
-      expect(incorrectChars.length).toBe(2);
+      expect(correctChars).toHaveLength(9);
+      expect(incorrectChars).toHaveLength(2);
     });
 
     it('restore typing progress when switch file', async () => {
@@ -385,8 +338,155 @@ describe('RepositoryDetailPage', () => {
 
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(correctChars.length).toBe(5);
-      expect(incorrectChars.length).toBe(2);
+      expect(correctChars).toHaveLength(5);
+      expect(incorrectChars).toHaveLength(2);
+    });
+  });
+
+  describe('when completed', () => {
+    const mockFileItems = [
+      {
+        id: 1,
+        name: 'file1.ts',
+        type: 'file',
+        status: 'untyped',
+        path: 'file1.ts',
+        fileItems: [],
+      },
+      {
+        id: 2,
+        name: 'file2.ts',
+        type: 'file',
+        status: 'typed',
+        path: 'file2.ts',
+        fileItems: [],
+      },
+      {
+        id: 3,
+        name: 'dir1',
+        type: 'dir',
+        status: 'untyped',
+        path: 'dir1',
+        fileItems: [
+          {
+            id: 4,
+            name: 'nested-file1.ts',
+            type: 'file',
+            status: 'typed',
+            path: 'dir1/nested-file1.ts',
+            fileItems: [],
+          },
+        ],
+      },
+    ];
+
+    beforeEach(async () => {
+      Element.prototype.scrollTo = jest.fn();
+
+      jest.spyOn(axios, 'patch').mockImplementation(() => {
+        return Promise.resolve({ data: mockFileItems });
+      });
+
+      await clickButton('dir1');
+      await clickButton('nested-file1.ts');
+      await clickButton('PLAY');
+      await userEvent.keyboard('console.log("Hello, sekai!");'); // world->sekaiにタイポ
+      await screen.findByText('Results');
+    });
+
+    it('renders results', async () => {
+      expect(screen.getByText('Results')).toBeInTheDocument();
+
+      expect(screen.getByText('WPM')).toBeInTheDocument();
+      expect(screen.getByText('0.0')).toBeInTheDocument(); // 時間は計測しないため0.0
+
+      expect(screen.getByText('Accuracy')).toBeInTheDocument();
+      expect(screen.getByText('82.8 %')).toBeInTheDocument();
+
+      expect(screen.getByText('Characters')).toBeInTheDocument();
+      expect(screen.getByText('29')).toBeInTheDocument();
+
+      expect(screen.getByText('Typos')).toBeInTheDocument();
+      expect(screen.getByText('5')).toBeInTheDocument();
+
+      expect(screen.getByText('Time')).toBeInTheDocument();
+      expect(screen.getByText('00:00')).toBeInTheDocument(); // 時間は計測しないため00:00
+
+      expect(screen.getByText('Typed Code')).toBeInTheDocument();
+
+      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
+      expect(correctChars).toHaveLength(24);
+      const typedText = Array.from(correctChars)
+        .map((span) => span.textContent)
+        .join('');
+      expect(typedText).toBe('console.log("Hello, !");');
+
+      const typoChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
+      expect(typoChars).toHaveLength(5);
+      const typoText = Array.from(typoChars)
+        .map((span) => span.textContent)
+        .join('');
+      expect(typoText).toBe('world');
+    });
+
+    it('calls api to update file item', async () => {
+      expect(axios.patch).toHaveBeenCalledWith(
+        `${BASE_URL}/api/repositories/1/file_items/4`,
+        {
+          fileItem: {
+            status: 'typed',
+            typingProgress: {
+              row: 0,
+              column: 28,
+              elapsedSeconds: 0,
+              totalCorrectTypeCount: 24,
+              totalTypoCount: 5,
+              typosAttributes: [
+                {
+                  row: 0,
+                  column: 20,
+                  character: 's',
+                },
+                {
+                  row: 0,
+                  column: 21,
+                  character: 'e',
+                },
+                {
+                  row: 0,
+                  column: 22,
+                  character: 'k',
+                },
+                {
+                  row: 0,
+                  column: 23,
+                  character: 'a',
+                },
+                {
+                  row: 0,
+                  column: 24,
+                  character: 'i',
+                },
+              ],
+            },
+          },
+        },
+        {
+          headers: {
+            Authorization: 'Bearer token_1234567890',
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+    });
+
+    it('renders replay button', async () => {
+      expect(screen.getByRole('button', { name: 'REPLAY' })).toBeInTheDocument();
+    });
+
+    it('replays typing when REPLAY button is clicked', async () => {
+      await clickButton('REPLAY');
+      expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
     });
   });
 });

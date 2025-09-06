@@ -21,12 +21,14 @@ export default function TypingHeader({
   resetTyping,
 }: TypingHeaderProps) {
   const handleToggleTyping = () => {
-    if (typingStatus === 'ready' || typingStatus === 'completed') {
+    if (typingStatus === 'ready') {
       startTyping();
     } else if (typingStatus === 'typing') {
       pauseTyping();
     } else if (typingStatus === 'paused') {
       resumeTyping();
+    } else if (typingStatus === 'completed') {
+      resetTyping();
     }
   };
 

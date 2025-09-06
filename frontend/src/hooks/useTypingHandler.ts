@@ -16,6 +16,13 @@ type useTypingHandlerProps = {
   setTypingStatus: (status: TypingStatus) => void;
 };
 
+type HandleInputResult = {
+  newTypedTextLines: string[];
+  newCursorColumns: number[];
+  newCursorRow: number;
+  isCorrect?: boolean;
+};
+
 export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypingStatus }: useTypingHandlerProps) {
   const [targetTextLines, setTargetTextLines] = useState<string[]>([]);
   const [cursorColumns, setCursorColumns] = useState<number[]>([]);
@@ -133,47 +140,53 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
     setTypingStatus('ready');
   };
 
-  const handleComplete = useCallback(async () => {
-    try {
-      const url = `/api/repositories/${params.id}/file_items/${fileItem?.id}`;
-      const accessToken = session?.user?.accessToken;
-      const postData = {
-        fileItem: {
-          status: 'typed',
-          typingProgress: {
-            row: cursorRow,
-            column: cursorColumns[cursorRow],
-            elapsedSeconds: typingStats.elapsedSeconds,
-            totalCorrectTypeCount: typingStats.totalCorrectTypeCount,
-            totalTypoCount: typingStats.totalTypoCount,
-            typosAttributes: calculateTypos(typedTextLines, targetTextLines),
-          },
-        },
-      };
+  const handleComplete = useCallback(
+    async (isLastTypeCorrect: boolean) => {
+      try {
+        typingStats.completeStats();
 
-      const res = await axiosPatch(url, accessToken, postData);
-      const sortedFileItems: FileItem[] = sortFileItems(res.data);
-      setFileItems(sortedFileItems);
-      setTypingStatus('completed');
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage('An error occurred. Please try again.');
+        const url = `/api/repositories/${params.id}/file_items/${fileItem?.id}`;
+        const accessToken = session?.user?.accessToken;
+        const postData = {
+          fileItem: {
+            status: 'typed',
+            typingProgress: {
+              row: cursorRow,
+              column: cursorColumns[cursorRow],
+              elapsedSeconds: typingStats.elapsedSeconds,
+              // typingStatsには最後のタイプの結果が反映されていないため、ここで加算する
+              totalCorrectTypeCount: typingStats.totalCorrectTypeCount + (isLastTypeCorrect ? 1 : 0),
+              totalTypoCount: typingStats.totalTypoCount + (isLastTypeCorrect ? 0 : 1),
+              typosAttributes: calculateTypos(typedTextLines, targetTextLines),
+            },
+          },
+        };
+
+        const res = await axiosPatch(url, accessToken, postData);
+        const sortedFileItems: FileItem[] = sortFileItems(res.data);
+        setFileItems(sortedFileItems);
+        setTypingStatus('completed');
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          setErrorMessage(error.message);
+        } else {
+          setErrorMessage('An error occurred. Please try again.');
+        }
       }
-    }
-  }, [
-    fileItem?.id,
-    params,
-    session,
-    cursorRow,
-    cursorColumns,
-    typedTextLines,
-    targetTextLines,
-    typingStats,
-    setFileItems,
-    setTypingStatus,
-  ]);
+    },
+    [
+      fileItem?.id,
+      params,
+      session,
+      cursorRow,
+      cursorColumns,
+      typedTextLines,
+      targetTextLines,
+      typingStats,
+      setFileItems,
+      setTypingStatus,
+    ],
+  );
 
   const isComplete = useCallback(
     (newCursorColumns: number[]) => {
@@ -198,11 +211,10 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
 
       const targetChar = targetTextLines[cursorRow]?.[cursorColumns[cursorRow]];
       const isCorrect = targetChar === character;
-      typingStats.updateStats(isCorrect);
 
-      return { newTypedTextLines, newCursorColumns, newCursorRow };
+      return { newTypedTextLines, newCursorColumns, newCursorRow, isCorrect };
     },
-    [typedTextLines, cursorColumns, cursorRow, targetTextLines, typingStats],
+    [typedTextLines, cursorColumns, cursorRow, targetTextLines],
   );
 
   const handleBackspace = useCallback(() => {
@@ -227,10 +239,10 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
     (e: KeyboardEvent) => {
       if (typingStatus !== 'typing') return;
 
-      let result: {
-        newTypedTextLines: string[];
-        newCursorColumns: number[];
-        newCursorRow: number;
+      let result: HandleInputResult = {
+        newTypedTextLines: [],
+        newCursorColumns: [],
+        newCursorRow: 0,
       };
 
       if (e.key.length === 1) {
@@ -251,11 +263,15 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
       setCursorColumns(result.newCursorColumns);
       setCursorRow(result.newCursorRow);
 
+      if (result.isCorrect !== undefined) {
+        typingStats.updateStats(result.isCorrect);
+      }
+
       if (isComplete(result.newCursorColumns)) {
-        handleComplete();
+        handleComplete(result.isCorrect ?? true);
       }
     },
-    [typingStatus, handleCharacterInput, handleBackspace, isComplete, handleComplete],
+    [typingStatus, handleCharacterInput, handleBackspace, isComplete, handleComplete, typingStats],
   );
 
   useEffect(() => {

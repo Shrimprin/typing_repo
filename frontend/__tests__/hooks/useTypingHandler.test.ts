@@ -713,7 +713,7 @@ describe('useTypingHandler', () => {
                 row: 2,
                 column: 3,
                 elapsedSeconds: 0,
-                totalCorrectTypeCount: 38,
+                totalCorrectTypeCount: 39,
                 totalTypoCount: 2,
                 typosAttributes: [
                   {

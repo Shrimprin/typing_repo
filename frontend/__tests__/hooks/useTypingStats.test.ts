@@ -161,7 +161,7 @@ describe('useTypingStats', () => {
           jest.advanceTimersByTime(1000);
         });
 
-        // ポーズ前の統計上を引き継いで更新されることを確認
+        // ポーズ前の統計情報を引き継いで更新されることを確認
         expect(result.current.accuracy).toBe(66.7);
         expect(result.current.elapsedSeconds).toBe(2);
         expect(result.current.totalCorrectTypeCount).toBe(2);
@@ -188,10 +188,59 @@ describe('useTypingStats', () => {
       expect(result.current.totalTypoCount).toBe(0);
       expect(result.current.wpm).toBe(0);
     });
+
+    it('can complete', () => {
+      const { result } = renderHook(() => useTypingStats());
+
+      const mockPerformanceNow = jest.spyOn(performance, 'now');
+      try {
+        mockPerformanceNow.mockReturnValue(1000);
+
+        act(() => {
+          result.current.startStats();
+        });
+
+        act(() => {
+          result.current.updateStats(true);
+          result.current.updateStats(false);
+        });
+
+        mockPerformanceNow.mockReturnValue(2000);
+        act(() => {
+          jest.advanceTimersByTime(1000);
+        });
+
+        // 完了前の統計情報の確認
+        expect(result.current.accuracy).toBe(50.0);
+        expect(result.current.elapsedSeconds).toBe(1);
+        expect(result.current.totalCorrectTypeCount).toBe(1);
+        expect(result.current.totalTypoCount).toBe(1);
+        expect(result.current.wpm).toBe(12);
+
+        act(() => {
+          result.current.completeStats();
+        });
+
+        mockPerformanceNow.mockReturnValue(3000);
+
+        act(() => {
+          jest.advanceTimersByTime(1000);
+        });
+
+        // 完了後に統計情報が更新されないことを確認
+        expect(result.current.accuracy).toBe(50.0);
+        expect(result.current.elapsedSeconds).toBe(1);
+        expect(result.current.totalCorrectTypeCount).toBe(1);
+        expect(result.current.totalTypoCount).toBe(1);
+        expect(result.current.wpm).toBe(12);
+      } finally {
+        mockPerformanceNow.mockRestore();
+      }
+    });
   });
 
   describe('during not typing', () => {
-    it('does not update statistics when typing', () => {
+    it('does not update statistics', () => {
       const { result } = renderHook(() => useTypingStats());
 
       act(() => {
