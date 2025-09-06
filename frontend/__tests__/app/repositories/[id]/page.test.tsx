@@ -251,134 +251,6 @@ describe('RepositoryDetailPage', () => {
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
       expect(correctChars).toHaveLength(0);
     });
-
-    it('renders result when typing is completed', async () => {
-      Element.prototype.scrollTo = jest.fn();
-
-      const mockFileItems = [
-        {
-          id: 1,
-          name: 'file1.ts',
-          type: 'file',
-          status: 'untyped',
-          path: 'file1.ts',
-          fileItems: [],
-        },
-        {
-          id: 2,
-          name: 'file2.ts',
-          type: 'file',
-          status: 'typed',
-          path: 'file2.ts',
-          fileItems: [],
-        },
-        {
-          id: 3,
-          name: 'dir1',
-          type: 'dir',
-          status: 'untyped',
-          path: 'dir1',
-          fileItems: [
-            {
-              id: 4,
-              name: 'nested-file1.ts',
-              type: 'file',
-              status: 'typed',
-              path: 'dir1/nested-file1.ts',
-              fileItems: [],
-            },
-          ],
-        },
-      ];
-
-      jest.spyOn(axios, 'patch').mockImplementation(() => {
-        return Promise.resolve({ data: mockFileItems });
-      });
-
-      await userEvent.keyboard('console.log("Hello, sekai!");'); // world->sekaiにタイポ
-
-      await screen.findByText('Results');
-
-      expect(axios.patch).toHaveBeenCalledWith(
-        `${BASE_URL}/api/repositories/1/file_items/4`,
-        {
-          fileItem: {
-            status: 'typed',
-            typingProgress: {
-              row: 0,
-              column: 28,
-              elapsedSeconds: 0,
-              totalCorrectTypeCount: 24,
-              totalTypoCount: 5,
-              typosAttributes: [
-                {
-                  row: 0,
-                  column: 20,
-                  character: 's',
-                },
-                {
-                  row: 0,
-                  column: 21,
-                  character: 'e',
-                },
-                {
-                  row: 0,
-                  column: 22,
-                  character: 'k',
-                },
-                {
-                  row: 0,
-                  column: 23,
-                  character: 'a',
-                },
-                {
-                  row: 0,
-                  column: 24,
-                  character: 'i',
-                },
-              ],
-            },
-          },
-        },
-        {
-          headers: {
-            Authorization: 'Bearer token_1234567890',
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-
-      expect(screen.getByText('WPM')).toBeInTheDocument();
-      expect(screen.getByText('0.0')).toBeInTheDocument(); // 時間は計測しないため0.0
-
-      expect(screen.getByText('Accuracy')).toBeInTheDocument();
-      expect(screen.getByText('82.8 %')).toBeInTheDocument();
-
-      expect(screen.getByText('Characters')).toBeInTheDocument();
-      expect(screen.getByText('29')).toBeInTheDocument();
-
-      expect(screen.getByText('Typos')).toBeInTheDocument();
-      expect(screen.getByText('5')).toBeInTheDocument();
-
-      expect(screen.getByText('Time')).toBeInTheDocument();
-      expect(screen.getByText('00:00')).toBeInTheDocument(); // 時間は計測しないため00:00
-
-      expect(screen.getByText('Typed Code')).toBeInTheDocument();
-
-      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
-      expect(correctChars).toHaveLength(24);
-      const typedText = Array.from(correctChars)
-        .map((span) => span.textContent)
-        .join('');
-      expect(typedText).toBe('console.log("Hello, !");');
-
-      const typoChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
-      expect(typoChars).toHaveLength(5);
-      const typoText = Array.from(typoChars)
-        .map((span) => span.textContent)
-        .join('');
-      expect(typoText).toBe('world');
-    });
   });
 
   describe('during pausing', () => {
@@ -468,6 +340,153 @@ describe('RepositoryDetailPage', () => {
       const incorrectChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
       expect(correctChars).toHaveLength(5);
       expect(incorrectChars).toHaveLength(2);
+    });
+  });
+
+  describe('when completed', () => {
+    const mockFileItems = [
+      {
+        id: 1,
+        name: 'file1.ts',
+        type: 'file',
+        status: 'untyped',
+        path: 'file1.ts',
+        fileItems: [],
+      },
+      {
+        id: 2,
+        name: 'file2.ts',
+        type: 'file',
+        status: 'typed',
+        path: 'file2.ts',
+        fileItems: [],
+      },
+      {
+        id: 3,
+        name: 'dir1',
+        type: 'dir',
+        status: 'untyped',
+        path: 'dir1',
+        fileItems: [
+          {
+            id: 4,
+            name: 'nested-file1.ts',
+            type: 'file',
+            status: 'typed',
+            path: 'dir1/nested-file1.ts',
+            fileItems: [],
+          },
+        ],
+      },
+    ];
+
+    beforeEach(async () => {
+      Element.prototype.scrollTo = jest.fn();
+
+      jest.spyOn(axios, 'patch').mockImplementation(() => {
+        return Promise.resolve({ data: mockFileItems });
+      });
+
+      await clickButton('dir1');
+      await clickButton('nested-file1.ts');
+      await clickButton('PLAY');
+      await userEvent.keyboard('console.log("Hello, sekai!");'); // world->sekaiにタイポ
+      await screen.findByText('Results');
+    });
+
+    it('renders results', async () => {
+      expect(screen.getByText('Results')).toBeInTheDocument();
+
+      expect(screen.getByText('WPM')).toBeInTheDocument();
+      expect(screen.getByText('0.0')).toBeInTheDocument(); // 時間は計測しないため0.0
+
+      expect(screen.getByText('Accuracy')).toBeInTheDocument();
+      expect(screen.getByText('82.8 %')).toBeInTheDocument();
+
+      expect(screen.getByText('Characters')).toBeInTheDocument();
+      expect(screen.getByText('29')).toBeInTheDocument();
+
+      expect(screen.getByText('Typos')).toBeInTheDocument();
+      expect(screen.getByText('5')).toBeInTheDocument();
+
+      expect(screen.getByText('Time')).toBeInTheDocument();
+      expect(screen.getByText('00:00')).toBeInTheDocument(); // 時間は計測しないため00:00
+
+      expect(screen.getByText('Typed Code')).toBeInTheDocument();
+
+      const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
+      expect(correctChars).toHaveLength(24);
+      const typedText = Array.from(correctChars)
+        .map((span) => span.textContent)
+        .join('');
+      expect(typedText).toBe('console.log("Hello, !");');
+
+      const typoChars = document.querySelectorAll(INCORRECT_CHARS_SELECTOR);
+      expect(typoChars).toHaveLength(5);
+      const typoText = Array.from(typoChars)
+        .map((span) => span.textContent)
+        .join('');
+      expect(typoText).toBe('world');
+    });
+
+    it('calls api to update file item', async () => {
+      expect(axios.patch).toHaveBeenCalledWith(
+        `${BASE_URL}/api/repositories/1/file_items/4`,
+        {
+          fileItem: {
+            status: 'typed',
+            typingProgress: {
+              row: 0,
+              column: 28,
+              elapsedSeconds: 0,
+              totalCorrectTypeCount: 24,
+              totalTypoCount: 5,
+              typosAttributes: [
+                {
+                  row: 0,
+                  column: 20,
+                  character: 's',
+                },
+                {
+                  row: 0,
+                  column: 21,
+                  character: 'e',
+                },
+                {
+                  row: 0,
+                  column: 22,
+                  character: 'k',
+                },
+                {
+                  row: 0,
+                  column: 23,
+                  character: 'a',
+                },
+                {
+                  row: 0,
+                  column: 24,
+                  character: 'i',
+                },
+              ],
+            },
+          },
+        },
+        {
+          headers: {
+            Authorization: 'Bearer token_1234567890',
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+    });
+
+    it('renders replay button', async () => {
+      expect(screen.getByRole('button', { name: 'REPLAY' })).toBeInTheDocument();
+    });
+
+    it('replays typing when REPLAY button is clicked', async () => {
+      await clickButton('REPLAY');
+      expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
     });
   });
 });
