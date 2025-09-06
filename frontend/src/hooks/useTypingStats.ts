@@ -84,7 +84,7 @@ export function useTypingStats() {
 
   const updateStats = useCallback(
     (isCorrect: boolean) => {
-      if (!isTyping) return null;
+      if (!isTyping) return;
 
       setStats((prev) => {
         const newCorrectCount = isCorrect ? prev.totalCorrectTypeCount + 1 : prev.totalCorrectTypeCount;
