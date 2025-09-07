@@ -194,11 +194,23 @@ RSpec.describe 'Api::FileItems', type: :request do
         expect(response).to have_http_status(:ok)
       end
 
-      it 'returns all file items' do
+      it 'returns repository with file items and progress' do
         expect(response).to have_http_status(:ok)
         json = response.parsed_body
-        expect(json.length).to eq(4)
-        expect(json.find { |item| item['type'] == 'dir' }['file_items'].length).to eq(2)
+        repository.reload
+
+        expect(json).to have_json_attributes(
+          id: repository.id,
+          name: repository.name,
+          last_typed_at: repository.last_typed_at.as_json,
+          progress: repository.progress
+        )
+        expect(json['file_items'].length).to eq(4)
+        expect(json['file_items'][0]['file_items'].length).to eq(2)
+
+        file_items = json['file_items']
+        expect(file_items.length).to eq(4)
+        expect(file_items.find { |item| item['type'] == 'dir' }['file_items'].length).to eq(2)
       end
 
       it 'updates the file item status to typed' do

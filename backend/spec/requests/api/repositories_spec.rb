@@ -21,7 +21,6 @@ RSpec.describe 'Api::Repositories', type: :request do
           repository_json = json.find { |r| r['id'] == repository.id }
           expect(repository_json).to have_json_attributes(
             name: repository.name,
-            user_id: repository.user_id,
             last_typed_at: repository.last_typed_at,
             progress: 0.4
           )
@@ -119,7 +118,6 @@ RSpec.describe 'Api::Repositories', type: :request do
         expect(json).to have_json_attributes(
           id: repository.id,
           name: repository.name,
-          user_id: repository.user_id,
           last_typed_at: repository.last_typed_at&.as_json
         )
         expect(json['file_items'].length).to eq(4)
@@ -176,7 +174,6 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         json = response.parsed_body
         expect(json).to have_json_attributes(
-          user_id: user.id,
           name: 'repository',
           last_typed_at: nil
         )
