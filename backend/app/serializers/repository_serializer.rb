@@ -3,7 +3,7 @@
 class RepositorySerializer
   include Alba::Serializer
 
-  attributes :id, :last_typed_at, :name, :user_id
+  attributes :id, :last_typed_at, :name
 
   attribute :file_items, if: proc { params[:file_items] } do |repository|
     file_items_grouped_by_parent = repository.file_items_grouped_by_parent

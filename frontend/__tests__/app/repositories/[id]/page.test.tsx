@@ -13,80 +13,81 @@ describe('RepositoryDetailPage', () => {
   const CORRECT_CHARS_SELECTOR = '[class*="bg-secondary"]';
   const INCORRECT_CHARS_SELECTOR = '[class*="bg-destructive"]';
 
+  const mockFileItems = [
+    {
+      id: 1,
+      name: 'file1.ts',
+      type: 'file',
+      status: 'untyped',
+      path: 'file1.ts',
+      fileItems: [],
+    },
+    {
+      id: 2,
+      name: 'file2.ts',
+      type: 'file',
+      status: 'typed',
+      path: 'file2.ts',
+      fileItems: [],
+    },
+    {
+      id: 3,
+      name: 'dir1',
+      type: 'dir',
+      status: 'untyped',
+      path: 'dir1',
+      fileItems: [
+        {
+          id: 4,
+          name: 'nested-file1.ts',
+          type: 'file',
+          status: 'untyped',
+          path: 'dir1/nested-file1.ts',
+          fileItems: [],
+        },
+        {
+          id: 5,
+          name: 'nested-file2.ts',
+          type: 'file',
+          status: 'typing',
+          path: 'dir1/nested-file2.ts',
+          fileItems: [],
+        },
+      ],
+    },
+    {
+      id: 6,
+      name: 'dir2',
+      type: 'dir',
+      status: 'untyped',
+      path: 'dir2',
+      fileItems: [
+        {
+          id: 7,
+          name: 'nested-file3.ts',
+          type: 'file',
+          status: 'untyped',
+          path: 'dir2/nested-file3.ts',
+          fileItems: [],
+        },
+      ],
+    },
+    {
+      id: 8,
+      name: 'file3.ts',
+      type: 'file',
+      status: 'untyped',
+      path: 'file3.ts',
+      fileItems: [],
+    },
+  ];
+
   const mockRepository = {
     data: {
       id: 1,
       name: 'test-repo',
       lastTypedAt: null,
-      userId: 1,
-      fileItems: [
-        {
-          id: 1,
-          name: 'file1.ts',
-          type: 'file',
-          status: 'untyped',
-          path: 'file1.ts',
-          fileItems: [],
-        },
-        {
-          id: 2,
-          name: 'file2.ts',
-          type: 'file',
-          status: 'typed',
-          path: 'file2.ts',
-          fileItems: [],
-        },
-        {
-          id: 3,
-          name: 'dir1',
-          type: 'dir',
-          status: 'untyped',
-          path: 'dir1',
-          fileItems: [
-            {
-              id: 4,
-              name: 'nested-file1.ts',
-              type: 'file',
-              status: 'untyped',
-              path: 'dir1/nested-file1.ts',
-              fileItems: [],
-            },
-            {
-              id: 5,
-              name: 'nested-file2.ts',
-              type: 'file',
-              status: 'untyped',
-              path: 'dir1/nested-file2.ts',
-              fileItems: [],
-            },
-          ],
-        },
-        {
-          id: 6,
-          name: 'dir2',
-          type: 'dir',
-          status: 'untyped',
-          path: 'dir2',
-          fileItems: [
-            {
-              id: 7,
-              name: 'nested-file3.ts',
-              type: 'file',
-              status: 'untyped',
-              path: 'dir2/nested-file3.ts',
-              fileItems: [],
-            },
-          ],
-        },
-        {
-          id: 8,
-          name: 'file3.ts',
-          type: 'file',
-          status: 'untyped',
-          path: 'file3.ts',
-          fileItems: [],
-        },
-      ],
+      fileItems: mockFileItems,
     },
   };
 
@@ -98,16 +99,18 @@ describe('RepositoryDetailPage', () => {
       status: 'untyped',
       content: 'console.log("Hello, world!");',
       path: 'dir1/nested-file1.ts',
+      fileItems: [],
     },
   };
 
   const mockUpdatedFileItem = {
-    id: 4,
-    name: 'nested-file1.ts',
-    type: 'file',
+    ...mockFileItem.data,
     status: 'typing',
-    path: 'dir1/nested-file1.ts',
-    fileItems: [],
+  };
+
+  const mockCompleteFileItem = {
+    ...mockFileItem.data,
+    status: 'typed',
   };
 
   beforeEach(async () => {
@@ -256,7 +259,15 @@ describe('RepositoryDetailPage', () => {
   describe('during pausing', () => {
     beforeEach(async () => {
       jest.spyOn(axios, 'patch').mockImplementation(() => {
-        return Promise.resolve({ data: mockUpdatedFileItem });
+        return Promise.resolve({
+          data: {
+            id: '1',
+            name: 'test-repo',
+            lastTypedAt: new Date().toISOString(),
+            progress: 0.3,
+            fileItems: [mockUpdatedFileItem],
+          },
+        });
       });
 
       await clickButton('dir1');
@@ -302,22 +313,9 @@ describe('RepositoryDetailPage', () => {
           id: 5,
           name: 'nested-file2.ts',
           type: 'file',
-          status: 'untyped',
-          content: 'console.log("This is a test!");',
-          path: 'dir1/nested-file2.ts',
-        },
-      });
-
-      await clickButton('nested-file2.ts');
-
-      expect(screen.getByText('dir1/nested-file2.ts')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
-      expect(screen.getByText('console.log("This is a test!");')).toBeInTheDocument();
-
-      jest.spyOn(axios, 'get').mockResolvedValueOnce({
-        data: {
-          ...mockFileItem.data,
           status: 'typing',
+          content: 'console.log("Hello, world!");',
+          path: 'dir1/nested-file2.ts',
           typingProgress: {
             row: 0,
             column: 7,
@@ -331,9 +329,9 @@ describe('RepositoryDetailPage', () => {
         },
       });
 
-      await clickButton('nested-file1.ts');
+      await clickButton('nested-file2.ts');
 
-      expect(screen.getByText('dir1/nested-file1.ts')).toBeInTheDocument();
+      expect(screen.getByText('dir1/nested-file2.ts')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'RESUME' })).toBeInTheDocument();
 
       const correctChars = document.querySelectorAll(CORRECT_CHARS_SELECTOR);
@@ -344,47 +342,18 @@ describe('RepositoryDetailPage', () => {
   });
 
   describe('when completed', () => {
-    const mockFileItems = [
-      {
-        id: 1,
-        name: 'file1.ts',
-        type: 'file',
-        status: 'untyped',
-        path: 'file1.ts',
-        fileItems: [],
-      },
-      {
-        id: 2,
-        name: 'file2.ts',
-        type: 'file',
-        status: 'typed',
-        path: 'file2.ts',
-        fileItems: [],
-      },
-      {
-        id: 3,
-        name: 'dir1',
-        type: 'dir',
-        status: 'untyped',
-        path: 'dir1',
-        fileItems: [
-          {
-            id: 4,
-            name: 'nested-file1.ts',
-            type: 'file',
-            status: 'typed',
-            path: 'dir1/nested-file1.ts',
-            fileItems: [],
-          },
-        ],
-      },
-    ];
-
     beforeEach(async () => {
       Element.prototype.scrollTo = jest.fn();
 
       jest.spyOn(axios, 'patch').mockImplementation(() => {
-        return Promise.resolve({ data: mockFileItems });
+        return Promise.resolve({
+          data: {
+            ...mockRepository.data,
+            lastTypedAt: new Date().toISOString(),
+            progress: 0.33,
+            fileItems: [mockCompleteFileItem],
+          },
+        });
       });
 
       await clickButton('dir1');
@@ -487,6 +456,33 @@ describe('RepositoryDetailPage', () => {
     it('replays typing when REPLAY button is clicked', async () => {
       await clickButton('REPLAY');
       expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
+    });
+  });
+
+  describe('when repository progress is 100%', () => {
+    beforeEach(async () => {
+      Element.prototype.scrollTo = jest.fn();
+
+      jest.spyOn(axios, 'patch').mockImplementation(() => {
+        return Promise.resolve({
+          data: {
+            ...mockRepository.data,
+            lastTypedAt: new Date().toISOString(),
+            progress: 1.0,
+            fileItems: [mockCompleteFileItem],
+          },
+        });
+      });
+
+      await clickButton('file1.ts');
+      await clickButton('PLAY');
+      await userEvent.keyboard('console.log("Hello, world!");');
+      await screen.findByText('Results');
+    });
+
+    it('shows congratulation modal when repository progress reaches 100%', async () => {
+      expect(screen.getByText('CONGRATULATIONS')).toBeInTheDocument();
+      expect(screen.getByText('All files have been typed in this repository.')).toBeInTheDocument();
     });
   });
 });

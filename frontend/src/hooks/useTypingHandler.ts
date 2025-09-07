@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 
-import { FileItem, Stats, TypingStatus, Typo } from '@/types';
+import { FileItem, Repository, Stats, TypingStatus, Typo } from '@/types';
 import { axiosPatch } from '@/utils/axios';
 import { fetcher } from '@/utils/fetcher';
 import { sortFileItems } from '@/utils/sort';
@@ -12,6 +12,7 @@ import { useTypingStats } from './useTypingStats';
 type useTypingHandlerProps = {
   typingStatus: TypingStatus;
   fileItem?: FileItem;
+  onRepositoryCompleted?: () => void;
   setFileItems: Dispatch<SetStateAction<FileItem[]>>;
   setTypingStatus: (status: TypingStatus) => void;
 };
@@ -23,7 +24,13 @@ type HandleInputResult = {
   isCorrect?: boolean;
 };
 
-export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypingStatus }: useTypingHandlerProps) {
+export function useTypingHandler({
+  typingStatus,
+  fileItem,
+  onRepositoryCompleted,
+  setFileItems,
+  setTypingStatus,
+}: useTypingHandlerProps) {
   const [targetTextLines, setTargetTextLines] = useState<string[]>([]);
   const [cursorColumns, setCursorColumns] = useState<number[]>([]);
   const [typedTextLines, setTypedTextLines] = useState<string[]>([]);
@@ -163,8 +170,14 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
         };
 
         const res = await axiosPatch(url, accessToken, postData);
-        const sortedFileItems: FileItem[] = sortFileItems(res.data);
+        const repository: Repository = res.data;
+        const sortedFileItems: FileItem[] = sortFileItems(repository.fileItems);
         setFileItems(sortedFileItems);
+
+        if (repository.progress === 1.0 && onRepositoryCompleted) {
+          onRepositoryCompleted();
+        }
+
         setTypingStatus('completed');
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -185,6 +198,7 @@ export function useTypingHandler({ typingStatus, fileItem, setFileItems, setTypi
       typingStats,
       setFileItems,
       setTypingStatus,
+      onRepositoryCompleted,
     ],
   );
 
