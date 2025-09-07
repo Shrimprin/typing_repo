@@ -29,7 +29,6 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
     typingStatus,
     fileItem: selectedFileItem,
     onRepositoryCompleted: handleRepositoryCompleted,
-
     setFileItems,
     setTypingStatus,
   });
