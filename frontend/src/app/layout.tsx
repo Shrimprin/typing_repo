@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
-import { Quantico } from 'next/font/google';
+import { Play } from 'next/font/google';
 
 import AuthProvider from '@/providers/Auth';
 
 import './globals.css';
 
-const quantico = Quantico({
-  variable: '--font-quantico',
+const play = Play({
+  variable: '--font-play',
   subsets: ['latin'],
   weight: ['400'],
 });
@@ -26,7 +26,7 @@ export default function RootLayout({
       <body
         className={`
           antialiased
-          ${quantico.variable}
+          ${play.variable}
           font-sans
         `}
       >
