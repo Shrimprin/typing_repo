@@ -231,16 +231,22 @@ describe('useTypingHandler', () => {
     });
 
     it('can complete typing', async () => {
-      const mockResponse = [
-        {
-          id: '1',
-          path: 'test-file-path',
-          name: 'test-file-name',
-          status: 'typed',
-          type: 'file',
-          fileItems: [],
-        },
-      ];
+      const mockResponse = {
+        id: '1',
+        name: 'test-repo',
+        progress: 0.5,
+        lastTypedAt: new Date().toISOString(),
+        fileItems: [
+          {
+            id: '1',
+            path: 'test-file-path',
+            name: 'test-file-name',
+            status: 'typed',
+            type: 'file',
+            fileItems: [],
+          },
+        ],
+      };
 
       jest.spyOn(axios, 'patch').mockResolvedValueOnce({
         data: mockResponse,
@@ -693,7 +699,14 @@ describe('useTypingHandler', () => {
       ];
 
       beforeEach(async () => {
-        jest.spyOn(axios, 'patch').mockResolvedValueOnce({ data: mockResponse });
+        jest.spyOn(axios, 'patch').mockResolvedValueOnce({
+          data: {
+            id: '1',
+            name: 'test-repo',
+            progress: 0.67,
+            fileItems: mockResponse,
+          },
+        });
         (sortFileItems as jest.Mock).mockReturnValue(sortedResponse);
 
         await setupHook(typingProps);
