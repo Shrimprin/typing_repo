@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useTypingHandler } from '@/hooks/useTypingHandler';
 import type { FileItem, TypingStatus } from '@/types';
 import { Card } from '../ui/card';
 import Loading from '../ui/loading';
+import CongratulationModal from './CongratulationModal';
 import FileTree from './FileTree';
 import TypingPanel from './TypingPanel';
 
@@ -18,10 +19,17 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
   const [selectedFileItem, setSelectedFileItem] = useState<FileItem | undefined>();
   const [typingStatus, setTypingStatus] = useState<TypingStatus>('ready');
   const [isLoading, setIsLoading] = useState(false);
+  const [showCongratulationModal, setShowCongratulationModal] = useState(false);
+
+  const handleRepositoryCompleted = useCallback(() => {
+    setShowCongratulationModal(true);
+  }, []);
 
   const typingHandler = useTypingHandler({
     typingStatus,
     fileItem: selectedFileItem,
+    onRepositoryCompleted: handleRepositoryCompleted,
+
     setFileItems,
     setTypingStatus,
   });
@@ -66,6 +74,8 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
           </Card>
         </div>
       </div>
+
+      <CongratulationModal isOpen={showCongratulationModal} onClose={() => setShowCongratulationModal(false)} />
     </div>
   );
 }
