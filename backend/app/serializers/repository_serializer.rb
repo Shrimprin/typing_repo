@@ -12,8 +12,5 @@ class RepositorySerializer
     FileItemSerializer.new(top_level_file_items, params: { children: true, file_items_grouped_by_parent: })
   end
 
-  # attribute :progress, if: proc { params[:progress] }, &:progress
-  attribute :progress do |repository|
-    1
-  end
+  attribute :progress, if: proc { params[:progress] }, &:progress
 end
