@@ -74,13 +74,7 @@ module Api
     end
 
     def typed_file_items_response
-      file_items_grouped_by_parent = @repository.file_items_grouped_by_parent
-      top_level_file_items = file_items_grouped_by_parent[nil] || []
-
-      FileItemSerializer.new(
-        top_level_file_items,
-        params: { children: true, file_items_grouped_by_parent: }
-      )
+      RepositorySerializer.new(@repository, params: { file_items: true, progress: true })
     end
   end
 end
