@@ -232,7 +232,7 @@ describe('useTypingHandler', () => {
 
     it('can complete typing', async () => {
       const mockResponse = {
-        id: '1',
+        id: 1,
         name: 'test-repo',
         progress: 0.5,
         lastTypedAt: new Date().toISOString(),
