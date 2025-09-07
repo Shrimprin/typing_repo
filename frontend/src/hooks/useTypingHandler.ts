@@ -27,9 +27,9 @@ type HandleInputResult = {
 export function useTypingHandler({
   typingStatus,
   fileItem,
+  onRepositoryCompleted,
   setFileItems,
   setTypingStatus,
-  onRepositoryCompleted,
 }: useTypingHandlerProps) {
   const [targetTextLines, setTargetTextLines] = useState<string[]>([]);
   const [cursorColumns, setCursorColumns] = useState<number[]>([]);
