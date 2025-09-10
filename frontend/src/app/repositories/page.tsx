@@ -44,13 +44,15 @@ export default async function RepositoriesPage({ searchParams }: Props) {
   const sortedRepositories = sortRepositories(repositoriesResponse.repositories);
 
   return (
-    <div className="flex h-screen flex-col">
+    <div>
       <Header title="Repositories" />
       <div className="flex-1">
         <div className="flex min-h-full flex-col px-2">
           <RepositoryList repositories={sortedRepositories} pagination={repositoriesResponse.pagination} />
-          <RepositoryFooter />
         </div>
+      </div>
+      <div className="px-2">
+        <RepositoryFooter />
       </div>
     </div>
   );
