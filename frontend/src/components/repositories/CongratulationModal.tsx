@@ -1,6 +1,6 @@
 'use client';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 type CongratulationModalProps = {
   isOpen: boolean;
@@ -26,9 +26,9 @@ export default function CongratulationModal({ isOpen, onClose }: CongratulationM
             CONGRATULATIONS
           </DialogTitle>
 
-          <div className="space-y-3 text-center">
-            <p>All files have been typed in this repository.</p>
-          </div>
+          <DialogDescription className="space-y-3 text-center">
+            <span>All files have been typed in this repository.</span>
+          </DialogDescription>
         </DialogHeader>
       </DialogContent>
     </Dialog>
