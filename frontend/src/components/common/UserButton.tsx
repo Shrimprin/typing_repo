@@ -34,8 +34,6 @@ export default async function UserButton() {
           <DropdownMenuLabel>
             <div className="flex flex-col space-y-1">
               <p className="text-sm leading-none font-medium">{session.user.name}</p>
-              {/* // 確認用 */}
-              <p className="text-muted-foreground text-xs leading-none">{session.user.accessToken}</p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuItem asChild>
