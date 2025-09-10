@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Play } from 'next/font/google';
 
+import Footer from '@/components/common/Footer';
 import AuthProvider from '@/providers/Auth';
 
 import './globals.css';
@@ -28,11 +29,12 @@ export default function RootLayout({
         className={`
           antialiased
           ${play.variable}
-          font-sans
+          flex min-h-screen flex-col font-sans
         `}
       >
         <AuthProvider>
-          <main>{children}</main>
+          <main className="flex-1">{children}</main>
+          <Footer />
         </AuthProvider>
       </body>
     </html>
