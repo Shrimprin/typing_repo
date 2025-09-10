@@ -208,21 +208,21 @@ RSpec.describe 'Api::Repositories', type: :request do
         allow(github_client_mock).to receive(:commits).with(valid_repository_url).and_return([commit])
       end
 
-      it 'returns unprocessable_entity status' do
+      it 'returns unprocessable_content status' do
         post api_repositories_path, params: { repository: { url: valid_url } }, headers: headers
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json['name']).to eq(['can\'t be blank'])
       end
     end
 
     context 'when url is invalid' do
-      it 'returns unprocessable_entity status' do
+      it 'returns unprocessable_content status' do
         invalid_url = 'https://invalid_url.com'
         post api_repositories_path, params: { repository: { url: invalid_url } }, headers: headers
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json['error']).to eq('Invalid URL')
       end
@@ -364,11 +364,11 @@ RSpec.describe 'Api::Repositories', type: :request do
     end
 
     context 'when url is invalid' do
-      it 'returns unprocessable_entity status' do
+      it 'returns unprocessable_content status' do
         invalid_url = 'https://invalid_url.com'
         get preview_api_repositories_path, params: { repository_preview: { url: invalid_url } }, headers: headers
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json['error']).to eq('Invalid URL')
       end

@@ -46,7 +46,7 @@ RSpec.describe 'Api::Auth', type: :request do
         invalid_params = { auth: { github_id: '12345' } }
         post '/api/auth/callback/github', params: invalid_params
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json).to have_key('error')
       end
