@@ -2,10 +2,14 @@ import { Github } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Footer() {
+  const currentYear = new Date().getFullYear();
+  const startYear = 2025;
+  const yearRange = currentYear === startYear ? startYear : `${startYear} - ${currentYear}`;
+
   return (
     <footer className="bg-background border-border mt-auto border-t">
       <div className="container mx-auto px-8 py-6">
-        <div className="text-md mb-4 flex items-center justify-center gap-8">
+        <div className="mb-4 flex items-center justify-center gap-8 text-sm">
           <Link
             href="/terms"
             className={`
@@ -40,7 +44,7 @@ export default function Footer() {
         </div>
 
         <div className="text-center">
-          <span className="text-muted-foreground text-sm">2025 TypingRepo. All rights reserved.</span>
+          <span className="text-muted-foreground text-sm">{yearRange} TypingRepo. All rights reserved.</span>
         </div>
       </div>
     </footer>
