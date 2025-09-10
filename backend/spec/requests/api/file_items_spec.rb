@@ -304,7 +304,7 @@ RSpec.describe 'Api::FileItems', type: :request do
         patch api_repository_file_item_path(repository_id: repository.id, id: untyped_file_item.id),
               params: { file_item: { status: :typed } }, headers: headers
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json['typing_progress.row']).to include("can't be blank")
         expect(json['typing_progress.column']).to include("can't be blank")
@@ -313,7 +313,7 @@ RSpec.describe 'Api::FileItems', type: :request do
         patch api_repository_file_item_path(repository_id: repository.id, id: untyped_file_item.id),
               params: { file_item: { status: :typing } }, headers: headers
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
         expect(json['typing_progress.row']).to include("can't be blank")
         expect(json['typing_progress.column']).to include("can't be blank")

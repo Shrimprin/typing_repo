@@ -9,7 +9,7 @@ module Api
       access_token = JsonWebToken.encode(user_id: user.id)
       render json: { access_token: access_token }, status: :ok
     rescue ActiveRecord::RecordInvalid => e
-      render json: { error: e.message }, status: :unprocessable_entity
+      render json: { error: e.message }, status: :unprocessable_content
     rescue StandardError => e
       render json: { error: e.message }, status: :internal_server_error
     end

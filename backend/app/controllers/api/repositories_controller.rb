@@ -21,7 +21,7 @@ module Api
       repository_url = UrlUtils.extract_github_repository_path(url)
 
       if repository_url.nil?
-        render json: { error: 'Invalid URL' }, status: :unprocessable_entity
+        render json: { error: 'Invalid URL' }, status: :unprocessable_content
         return
       end
 
@@ -31,7 +31,7 @@ module Api
       if repository.save_with_file_items(client)
         render json: RepositorySerializer.new(repository), status: :created
       else
-        render json: repository.errors, status: :unprocessable_entity
+        render json: repository.errors, status: :unprocessable_content
       end
     rescue Octokit::NotFound
       render json: { error: 'Repository not found' }, status: :not_found
@@ -48,7 +48,7 @@ module Api
       repository_url = UrlUtils.extract_github_repository_path(url)
 
       if repository_url.nil?
-        render json: { error: 'Invalid URL' }, status: :unprocessable_entity
+        render json: { error: 'Invalid URL' }, status: :unprocessable_content
         return
       end
 
