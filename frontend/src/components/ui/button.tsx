@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { cn } from '@/libs/shadcn/utils';
 
-const primaryBase = `bg-primary text-primary-foreground shadow-xs`;
+const primaryBase = `bg-primary text-primary-foreground shadow-[0_0_15px_rgba(34,211,238,0.4),0_0_30px_rgba(34,211,238,0.3)]`;
 
 const buttonVariants = cva(
   `
@@ -26,8 +26,10 @@ const buttonVariants = cva(
         `,
         primary: `
           ${primaryBase}
-          hover:bg-primary/80 hover:shadow-[0_0_15px_hsl(var(--primary)_/_0.6),0_0_30px_hsl(var(--primary)_/_0.3)]
-          dark:hover:bg-primary/70
+          hover:bg-[rgba(34,211,238,0.95)]
+          hover:shadow-[0_0_25px_rgba(34,211,238,0.9),0_0_50px_rgba(34,211,238,0.7),0_0_75px_rgba(34,211,238,0.5)]
+          dark:hover:bg-[rgba(34,211,238,0.95)]
+          dark:hover:shadow-[0_0_25px_rgba(34,211,238,1.0),0_0_50px_rgba(34,211,238,0.8),0_0_75px_rgba(34,211,238,0.6)]
         `,
         destructive: `
           bg-destructive text-white shadow-xs

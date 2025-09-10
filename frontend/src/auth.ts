@@ -21,10 +21,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     authorized({ request, auth }) {
       const { pathname } = request.nextUrl;
+
       if (pathname.startsWith('/repositories') && !auth) {
         return Response.redirect(new URL('/', request.nextUrl));
         // TODO: メッセージを表示する
       }
+
+      if (pathname === '/' && auth) {
+        return Response.redirect(new URL('/repositories', request.nextUrl));
+      }
+
       return true;
     },
     async signIn({ user, account, profile }) {
@@ -57,6 +63,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.accessToken = token.accessToken as string;
       }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      // 相対URLの場合はbaseUrlと結合
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      // 同じオリジンのURLの場合はそのまま
+      else if (new URL(url).origin === baseUrl) return url;
+      // デフォルトは/repositories（サインイン時）
+      return `${baseUrl}/repositories`;
     },
   },
 });
