@@ -1,126 +1,171 @@
-import Header from '@/components/common/Header';
+import { IconKeyboard } from '@tabler/icons-react';
+import { Github } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+
+import Header from '@/components/common/Header';
+import { Button } from '@/components/ui/button';
 
 export default function Home() {
   return (
-    <div className="flex h-screen flex-col">
-      <Header title="Typing Repo" />
-      <div className="flex-1 overflow-hidden">
+    <div className="flex min-h-screen flex-col">
+      <Header />
+
+      <section className="bg-background relative flex-1 overflow-hidden">
         <div
           className={`
-            grid min-h-full grid-rows-[20px_1fr_20px] items-center justify-items-center gap-16 p-8 pb-20
-            font-[family-name:var(--font-geist-sans)]
-            sm:p-20
+            absolute inset-0 animate-pulse
+            bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)]
+            bg-[size:50px_50px]
           `}
-        >
-          <main
+        />
+
+        <div
+          className={`
+            bg-primary/10 absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 animate-pulse
+            rounded-full blur-3xl
+          `}
+        />
+        <div
+          className={`
+            bg-secondary/10 absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 animate-pulse
+            rounded-full blur-3xl delay-1000
+          `}
+        />
+
+        <div className="relative z-10 container mx-auto flex min-h-[50vh] items-center justify-center px-6">
+          <div className="mx-auto text-center">
+            <h1 className="text-foreground mb-6 text-5xl font-bold">
+              Practice Typing Through{' '}
+              <span className="from-primary to-secondary bg-gradient-to-r bg-clip-text text-transparent">
+                Real Code
+              </span>
+            </h1>
+            <p className="text-foreground mb-8 text-xl">Import code from GitHub repository and practice typing it.</p>
+            <Button variant="primary" asChild size="lg">
+              <Link href="/repositories">
+                <Github className="mr-2 h-5 w-5 flex-shrink-0" />
+                Sign in with GitHub to Start
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-background relative py-16">
+        <div className="relative z-10 container mx-auto px-6">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-foreground mb-4 text-3xl font-bold">How to Use TypingRepo</h2>
+            <p className="text-muted-foreground mb-16 text-lg">
+              Get started with just 2 simple steps to improve your typing skills.
+            </p>
+          </div>
+
+          <div
             className={`
-              row-start-2 flex flex-col items-center gap-[32px]
-              sm:items-start
+              grid gap-8
+              md:grid-cols-2
             `}
           >
-            <Image className="dark:invert" src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
-            <ol
+            <div
               className={`
-                list-inside list-decimal text-center text-sm/6
-                font-[family-name:var(--font-geist-mono)]
-                sm:text-left
+                group border-border/50 bg-card/50 flex flex-col rounded-sm border p-8 transition-all duration-300
+                hover:border-primary/50
               `}
             >
-              <li className="mb-2 tracking-[-.01em]">
-                Get started by editing{' '}
-                <code
+              <div className="mb-6 flex items-center gap-4">
+                <div
                   className={`
-                    rounded bg-black/[.05] px-1 py-0.5 font-semibold
-                    font-[family-name:var(--font-geist-mono)]
-                    dark:bg-white/[.06]
+                    bg-primary/20 flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300
+                    group-hover:bg-primary/30 group-hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]
                   `}
                 >
-                  src/app/page.tsx
-                </code>
-                .
-              </li>
-              <li className="tracking-[-.01em]">Save and see your changes instantly.</li>
-            </ol>
+                  <span className="text-primary text-xl font-bold">1</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Github className="text-primary h-8 w-8 flex-shrink-0" />
+                  <h3 className="text-foreground text-2xl font-bold">Import GitHub Repository</h3>
+                </div>
+              </div>
+              <p className="text-foreground mb-4">
+                Input a GitHub repository URL you want to practice with. Select the extensions you want to type and
+                import the source code.
+              </p>
+              <div className="group relative mt-auto">
+                <Image
+                  className={`
+                    border-border/20 h-64 w-full rounded-sm border object-cover transition-opacity duration-300
+                    group-hover:opacity-0
+                  `}
+                  src="/videos/step1_thumbnail.png"
+                  alt="Import GitHub Repository demonstration"
+                  width={800}
+                  height={256}
+                />
+                <Image
+                  className={`
+                    border-border/20 absolute inset-0 h-64 w-full rounded-sm border object-cover opacity-0
+                    transition-opacity duration-300
+                    group-hover:opacity-100
+                  `}
+                  src="/videos/step1_import-repository.gif"
+                  alt="Import GitHub Repository demonstration"
+                  width={800}
+                  height={256}
+                />
+              </div>
+            </div>
 
             <div
               className={`
-                flex flex-col items-center gap-4
-                sm:flex-row
+                group border-border/50 bg-card/50 flex flex-col rounded-sm border p-8 transition-all duration-300
+                hover:border-secondary/50
               `}
             >
-              <a
-                className={`
-                  bg-foreground text-background flex h-10 items-center justify-center gap-2 rounded-full border
-                  border-solid border-transparent px-4 text-sm font-medium transition-colors
-                  hover:bg-[#383838]
-                  sm:h-12 sm:w-auto sm:px-5 sm:text-base
-                  dark:hover:bg-[#ccc]
-                `}
-                href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Image className="dark:invert" src="/vercel.svg" alt="Vercel logomark" width={20} height={20} />
-                Deploy now
-              </a>
-              <a
-                className={`
-                  flex h-10 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-4
-                  text-sm font-medium transition-colors
-                  hover:border-transparent hover:bg-[#f2f2f2]
-                  sm:h-12 sm:w-auto sm:px-5 sm:text-base
-                  md:w-[158px]
-                  dark:border-white/[.145] dark:hover:bg-[#1a1a1a]
-                `}
-                href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Read our docs
-              </a>
+              <div className="mb-6 flex items-center gap-4">
+                <div
+                  className={`
+                    bg-secondary/20 flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300
+                    group-hover:bg-secondary/30 group-hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]
+                  `}
+                >
+                  <span className="text-secondary text-xl font-bold">2</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <IconKeyboard className="text-secondary h-8 w-8 flex-shrink-0" />
+                  <h3 className="text-foreground text-2xl font-bold">Start Typing Practice</h3>
+                </div>
+              </div>
+              <p className="text-foreground mb-4">
+                Select the file and begin typing. You can track your accuracy and speed in real-time.
+              </p>
+              <div className="group relative mt-auto">
+                <Image
+                  className={`
+                    border-border/20 h-64 w-full rounded-sm border object-cover transition-opacity duration-300
+                    group-hover:opacity-0
+                  `}
+                  src="/videos/step2_thumbnail.png"
+                  alt="Typing practice demonstration"
+                  width={800}
+                  height={256}
+                />
+                <Image
+                  className={`
+                    border-border/20 absolute inset-0 h-64 w-full rounded-sm border object-cover opacity-0
+                    transition-opacity duration-300
+                    group-hover:opacity-100
+                  `}
+                  src="/videos/step2_typing.gif"
+                  alt="Typing practice demonstration"
+                  width={800}
+                  height={256}
+                />
+              </div>
             </div>
-          </main>
-          <footer className={`row-start-3 flex flex-wrap items-center justify-center gap-[24px]`}>
-            <a
-              className={`
-                flex items-center gap-2
-                hover:underline hover:underline-offset-4
-              `}
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Image aria-hidden src="/file.svg" alt="File icon" width={16} height={16} />
-              Learn
-            </a>
-            <a
-              className={`
-                flex items-center gap-2
-                hover:underline hover:underline-offset-4
-              `}
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Image aria-hidden src="/window.svg" alt="Window icon" width={16} height={16} />
-              Examples
-            </a>
-            <a
-              className={`
-                flex items-center gap-2
-                hover:underline hover:underline-offset-4
-              `}
-              href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Image aria-hidden src="/globe.svg" alt="Globe icon" width={16} height={16} />
-              Go to nextjs.org →
-            </a>
-          </footer>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
