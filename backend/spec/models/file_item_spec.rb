@@ -121,6 +121,51 @@ RSpec.describe FileItem, type: :model do
     end
   end
 
+  describe '.contains_non_ascii?' do
+    context 'when content is blank' do
+      it 'returns false' do
+        expect(described_class.contains_non_ascii?(nil)).to be false
+        expect(described_class.contains_non_ascii?('')).to be false
+      end
+    end
+
+    context 'when content contains only ASCII characters' do
+      it 'returns false' do
+        expect(described_class.contains_non_ascii?('Hello, World! 123')).to be false
+      end
+    end
+
+    context 'when content contains non-ASCII characters' do
+      it 'returns true' do
+        expect(described_class.contains_non_ascii?('Hello, 世界!')).to be true
+      end
+    end
+
+    context 'when content contains Japanese characters' do
+      it 'returns true' do
+        expect(described_class.contains_non_ascii?('こんにちは、世界！')).to be true
+      end
+    end
+
+    context 'when content contains Chinese characters' do
+      it 'returns true' do
+        expect(described_class.contains_non_ascii?('你好，世界！')).to be true
+      end
+    end
+
+    context 'when content contains Korean characters' do
+      it 'returns true' do
+        expect(described_class.contains_non_ascii?('안녕하세요, 세계!')).to be true
+      end
+    end
+
+    context 'when content contains Arabic characters' do
+      it 'returns true' do
+        expect(described_class.contains_non_ascii?('مرحبا بالعالم!')).to be true
+      end
+    end
+  end
+
   describe '#full_path' do
     let(:root_dir) { create(:file_item, :directory, name: 'root_dir', repository:) }
     let(:middle_dir) { create(:file_item, :directory, name: 'middle_dir', repository:, parent: root_dir) }

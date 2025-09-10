@@ -14,6 +14,21 @@ type RepositoryDetailProps = {
   initialFileItems: FileItem[];
 };
 
+const updateFileItemInTree = (fileItems: FileItem[], updatedFileItem: FileItem): FileItem[] => {
+  return fileItems.map((fileItem) => {
+    if (fileItem.id === updatedFileItem.id) {
+      return updatedFileItem;
+    }
+    if (fileItem.fileItems && fileItem.fileItems.length > 0) {
+      return {
+        ...fileItem,
+        fileItems: updateFileItemInTree(fileItem.fileItems, updatedFileItem),
+      };
+    }
+    return fileItem;
+  });
+};
+
 export default function RepositoryDetail({ initialFileItems }: RepositoryDetailProps) {
   const [fileItems, setFileItems] = useState<FileItem[]>(initialFileItems);
   const [selectedFileItem, setSelectedFileItem] = useState<FileItem | undefined>();
@@ -33,7 +48,7 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
     setTypingStatus,
   });
 
-  const handleFileSelect = async (fileItem: FileItem) => {
+  const handleFileSelect = async (selectedFileItem: FileItem) => {
     if (typingStatus === 'typing') {
       const confirmSwitch = window.confirm(
         'Are you sure you want to switch files? The data you are typing will be lost.',
@@ -43,12 +58,27 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
       }
     }
 
-    setSelectedFileItem(fileItem);
     setIsLoading(true);
 
-    await typingHandler.setupTypingState(fileItem.id);
+    const setupFileItem = await typingHandler.setupTypingState(selectedFileItem.id);
+    const updatedFileItem = setupFileItem || selectedFileItem;
+    setSelectedFileItem(updatedFileItem);
+    setFileItems((prevFileItems) => updateFileItemInTree(prevFileItems, updatedFileItem));
 
-    setTypingStatus(fileItem.status === 'typing' ? 'paused' : fileItem.status === 'typed' ? 'completed' : 'ready');
+    switch (updatedFileItem.status) {
+      case 'unsupported':
+        setTypingStatus('ready');
+        break;
+      case 'typing':
+        setTypingStatus('paused');
+        break;
+      case 'typed':
+        setTypingStatus('completed');
+        break;
+      default:
+        setTypingStatus('ready');
+        break;
+    }
     setIsLoading(false);
   };
 
@@ -67,6 +97,13 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
               <div className="p-6 text-center">{typingHandler.errorMessage}</div>
             ) : !selectedFileItem ? (
               <div className="p-6 text-center">Select a file to start typing.</div>
+            ) : selectedFileItem.status === 'unsupported' ? (
+              <div className="p-6 text-center">
+                <div className="mb-2 text-lg font-semibold">This file cannot be typed</div>
+                <div className="text-muted-foreground text-base">
+                  This file contains non-English characters. Please select another file.
+                </div>
+              </div>
             ) : (
               <TypingPanel fileItem={selectedFileItem} typingHandler={typingHandler} />
             )}
