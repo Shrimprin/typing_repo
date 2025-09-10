@@ -38,7 +38,7 @@ export default async function UserButton() {
               <p className="text-muted-foreground text-xs leading-none">{session.user.accessToken}</p>
             </div>
           </DropdownMenuLabel>
-          <DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <SignOut />
           </DropdownMenuItem>
         </DropdownMenuContent>

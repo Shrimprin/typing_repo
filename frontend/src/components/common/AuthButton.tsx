@@ -21,14 +21,19 @@ export function SignIn({ provider, children }: { provider?: string; children?: R
 export function SignOut() {
   return (
     <form
-      className="w-full"
       action={async () => {
         'use server';
-        await signOut();
+        await signOut({ redirectTo: '/' });
       }}
     >
-      <button className="flex h-auto items-center gap-2">
-        <LogOut />
+      <button
+        type="submit"
+        className={`
+          hover:bg-accent
+          flex w-full items-center gap-2 px-2 py-1.5 text-sm
+        `}
+      >
+        <LogOut className="h-4 w-4" />
         Sign out
       </button>
     </form>
