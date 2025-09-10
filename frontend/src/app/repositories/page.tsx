@@ -51,7 +51,9 @@ export default async function RepositoriesPage({ searchParams }: Props) {
           <RepositoryList repositories={sortedRepositories} pagination={repositoriesResponse.pagination} />
         </div>
       </div>
-      <RepositoryFooter />
+      <div className="px-2">
+        <RepositoryFooter />
+      </div>
     </div>
   );
 }
