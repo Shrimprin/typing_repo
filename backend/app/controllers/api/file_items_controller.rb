@@ -68,9 +68,11 @@ module Api
       file_content = client.contents(@repository.url, path: @file_item.path, ref: @repository.commit_hash)[
         :content
       ]
-
       decoded_file_content = FileItem.decode_file_content(file_content)
-      @file_item.update(content: decoded_file_content)
+
+      update_params = { content: decoded_file_content }
+      update_params[:status] = :unsupported if FileItem.contains_non_ascii?(decoded_file_content)
+      @file_item.update(update_params)
     end
 
     def typed_file_items_response
