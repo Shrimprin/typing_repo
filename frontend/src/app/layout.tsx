@@ -34,8 +34,8 @@ export default function RootLayout({
       >
         <AuthProvider>
           <main className="flex-1">{children}</main>
-          <Footer />
         </AuthProvider>
+        <Footer />
       </body>
     </html>
   );
