@@ -94,7 +94,7 @@ export default function Home() {
                     group-hover:opacity-0
                   `}
                   src="/videos/step1_thumbnail.png"
-                  alt="Import GitHub Repository demonstration"
+                  alt="Import GitHub Repository demonstration thumbnail"
                   width={800}
                   height={256}
                 />
@@ -105,7 +105,7 @@ export default function Home() {
                     group-hover:opacity-100
                   `}
                   src="/videos/step1_import-repository.gif"
-                  alt="Import GitHub Repository demonstration"
+                  alt="Import GitHub Repository demonstration GIF"
                   width={800}
                   height={256}
                 />
@@ -142,7 +142,7 @@ export default function Home() {
                     group-hover:opacity-0
                   `}
                   src="/videos/step2_thumbnail.png"
-                  alt="Typing practice demonstration"
+                  alt="Typing practice demonstration thumbnail"
                   width={800}
                   height={256}
                 />
@@ -153,7 +153,7 @@ export default function Home() {
                     group-hover:opacity-100
                   `}
                   src="/videos/step2_typing.gif"
-                  alt="Typing practice demonstration"
+                  alt="Typing practice demonstration GIF"
                   width={800}
                   height={256}
                 />
