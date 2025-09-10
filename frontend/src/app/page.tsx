@@ -1,10 +1,9 @@
 import { IconKeyboard } from '@tabler/icons-react';
 import { Github } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 
+import { SignIn } from '@/components/common/AuthButton';
 import Header from '@/components/common/Header';
-import { Button } from '@/components/ui/button';
 
 export default function Home() {
   return (
@@ -42,12 +41,9 @@ export default function Home() {
               </span>
             </h1>
             <p className="text-foreground mb-8 text-xl">Import code from GitHub repository and practice typing it.</p>
-            <Button variant="primary" asChild size="lg">
-              <Link href="/repositories">
-                <Github className="mr-2 h-5 w-5 flex-shrink-0" />
-                Sign in with GitHub to Start
-              </Link>
-            </Button>
+            <div className="flex justify-center">
+              <SignIn provider="github">Sign in with GitHub to Start</SignIn>
+            </div>
           </div>
         </div>
       </section>
