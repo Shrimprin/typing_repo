@@ -23,7 +23,7 @@ export default function Header({ title = '', moreComponent }: HeaderProps) {
         >
           LOGO
         </Link>
-        <h1 className="text-lg font-bold">{title}</h1>
+        {title && <h1 className="text-lg font-bold">{title}</h1>}
         {moreComponent && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
