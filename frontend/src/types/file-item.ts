@@ -1,7 +1,7 @@
 import type { Stats } from './stats';
 
 type FileItemType = 'dir' | 'file';
-type FileItemStatus = 'untyped' | 'typing' | 'typed';
+type FileItemStatus = 'untyped' | 'typing' | 'typed' | 'unsupported';
 
 export type Typo = {
   row: number;

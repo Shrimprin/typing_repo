@@ -91,12 +91,40 @@ RSpec.describe 'Api::FileItems', type: :request do
           .and_return({ content: })
       end
 
-      it 'updates the file item content' do
+      it 'updates the file item content and sets status to unsupported' do
         expect(FileItem.find(nil_content_file_item.id).content).to be_nil
+        expect(FileItem.find(nil_content_file_item.id).status).to eq('untyped')
 
         get api_repository_file_item_path(repository_id: repository.id, id: nil_content_file_item.id), headers: headers
 
-        expect(FileItem.find(nil_content_file_item.id).content).to eq('こんにちは、世界！')
+        updated_file_item = FileItem.find(nil_content_file_item.id)
+        expect(updated_file_item.content).to eq('こんにちは、世界！')
+        expect(updated_file_item.status).to eq('unsupported')
+      end
+    end
+
+    context 'when content contains only ASCII characters' do
+      let(:ascii_file_item) { create(:file_item, :nil_content, repository:) }
+
+      before do
+        github_client_mock = instance_double(Octokit::Client)
+        allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
+        content = Base64.strict_encode64('Hello, World! 123')
+        allow(github_client_mock)
+          .to receive(:contents)
+          .with(repository.url, path: ascii_file_item.path, ref: repository.commit_hash)
+          .and_return({ content: })
+      end
+
+      it 'updates the file item content and keeps status as untyped' do
+        expect(FileItem.find(ascii_file_item.id).content).to be_nil
+        expect(FileItem.find(ascii_file_item.id).status).to eq('untyped')
+
+        get api_repository_file_item_path(repository_id: repository.id, id: ascii_file_item.id), headers: headers
+
+        updated_file_item = FileItem.find(ascii_file_item.id)
+        expect(updated_file_item.content).to eq('Hello, World! 123')
+        expect(updated_file_item.status).to eq('untyped')
       end
     end
 

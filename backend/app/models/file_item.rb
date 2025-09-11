@@ -20,8 +20,16 @@ class FileItem < ApplicationRecord
   enum :status, {
     untyped: 0,
     typing: 1,
-    typed: 2
+    typed: 2,
+    unsupported: 3
   }
+
+  def self.contains_non_ascii?(file_content)
+    return false if file_content.blank?
+
+    # ASCII文字以外（英数字、記号、空白文字以外）が含まれているかチェック
+    file_content.match?(/[^\x00-\x7F]/)
+  end
 
   def self.decode_file_content(file_content)
     decoded_file_content = Base64.decode64(file_content).force_encoding('UTF-8')
