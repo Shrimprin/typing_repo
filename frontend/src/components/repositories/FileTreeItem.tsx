@@ -64,7 +64,7 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
               `}
             >
               <Folder size={16} className="mr-1 flex-shrink-0" />
-              <span>{fileItem.name}</span>
+              <span className="truncate">{fileItem.name}</span>
             </div>
             {isTyped && <Check size={16} className="text-secondary mr-2 ml-auto flex-shrink-0" />}
           </>
