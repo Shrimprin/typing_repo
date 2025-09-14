@@ -12,7 +12,8 @@ RSpec.describe 'ApplicationController', type: :request do
       end
     end
   end
-  let(:token) { JsonWebToken.encode(user_id: user.id) }
+  let(:expires_at) { 30.days.from_now }
+  let(:token) { JsonWebToken.encode(user.id, expires_at) }
   let(:headers) { { 'Authorization' => "Bearer #{token}" } }
 
   # テスト用のダミーコントローラーとroutesを定義
@@ -50,7 +51,7 @@ RSpec.describe 'ApplicationController', type: :request do
     end
 
     context 'when user is not found' do
-      let(:non_existent_user_token) { JsonWebToken.encode(user_id: -9999) }
+      let(:non_existent_user_token) { JsonWebToken.encode(-9999, expires_at) }
       let(:headers) { { 'Authorization' => "Bearer #{non_existent_user_token}" } }
 
       it 'returns unauthorized status' do
