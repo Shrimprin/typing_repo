@@ -36,7 +36,7 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
   const sortedFileItems = sortFileItems(fileItems);
   const isDir = fileItem.type === 'dir';
 
-  const fileNameColorClass = () => {
+  const getFileNameClass = () => {
     if (isSelected) return 'text-primary font-bold';
     if (isTyped) return 'text-secondary';
     if (isUnsupported) return 'text-muted-foreground';
@@ -57,22 +57,29 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
             <span className="mr-1 flex-shrink-0">
               {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </span>
-            <Folder size={16} className="mr-1 flex-shrink-0" />
-            <span className={fileNameColorClass()}>{fileItem.name}</span>
+            <div
+              className={`
+                flex items-center
+                ${getFileNameClass()}
+              `}
+            >
+              <Folder size={16} className="mr-1 flex-shrink-0" />
+              <span>{fileItem.name}</span>
+            </div>
             {isTyped && <Check size={16} className="text-secondary mr-2 ml-auto flex-shrink-0" />}
           </>
         ) : (
           <>
             <div className="mr-1 w-4 flex-shrink-0"></div>
-            <File size={16} className="mr-1 flex-shrink-0" />
-            <span
+            <div
               className={`
-                truncate
-                ${fileNameColorClass()}
+                flex items-center
+                ${getFileNameClass()}
               `}
             >
-              {fileItem.name}
-            </span>
+              <File size={16} className="mr-1 flex-shrink-0" />
+              <span className="truncate">{fileItem.name}</span>
+            </div>
             {isTyped ? (
               <Check size={16} className="text-secondary mr-2 ml-auto flex-shrink-0" />
             ) : isTyping ? (
