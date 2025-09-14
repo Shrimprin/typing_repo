@@ -6,6 +6,7 @@ import axiosCaseConverter from 'simple-axios-case-converter';
 declare module 'next-auth' {
   interface User {
     accessToken: string;
+    tokenExpiresAt: number;
   }
 }
 
@@ -43,6 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const response = await axios.post(url, params);
         if (response.status === 200) {
           user.accessToken = response.data.accessToken;
+          user.tokenExpiresAt = response.data.expiresAt;
           return true;
         } else {
           return false;
@@ -56,20 +58,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user?.accessToken) {
         token.accessToken = user.accessToken;
       }
+      if (user?.tokenExpiresAt) {
+        token.tokenExpiresAt = user.tokenExpiresAt;
+      }
+
+      if (token.tokenExpiresAt && Math.floor(Date.now() / 1000) > (token.tokenExpiresAt as number)) {
+        return null;
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (token.accessToken) {
         session.user.accessToken = token.accessToken as string;
       }
+      session.expires = new Date((token.tokenExpiresAt as number) * 1000).toISOString() as string & Date;
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // 相対URLの場合はbaseUrlと結合
       if (url.startsWith('/')) return `${baseUrl}${url}`;
-      // 同じオリジンのURLの場合はそのまま
       else if (new URL(url).origin === baseUrl) return url;
-      // デフォルトは/repositories（サインイン時）
       return `${baseUrl}/repositories`;
     },
   },

@@ -41,6 +41,21 @@ RSpec.describe 'Api::Auth', type: :request do
       end
     end
 
+    context 'when existing user with different name' do
+      it 'updates name' do
+        existing_user = create(:user, github_id: valid_params[:auth][:github_id], name: 'old_name')
+        new_name = 'new_name'
+        updated_params = { auth: { github_id: valid_params[:auth][:github_id], name: new_name } }
+
+        expect do
+          post '/api/auth/callback/github', params: updated_params
+        end.not_to change(User, :count)
+
+        existing_user.reload
+        expect(existing_user.name).to eq(new_name)
+      end
+    end
+
     context 'when invalid params' do
       it 'returns validation error' do
         invalid_params = { auth: { github_id: '12345' } }
@@ -54,7 +69,7 @@ RSpec.describe 'Api::Auth', type: :request do
 
     context 'when unexpected error occurs' do
       it 'returns error message' do
-        allow(User).to receive(:find_or_create_by!).and_raise(StandardError.new('テストエラー'))
+        allow(User).to receive(:find_or_initialize_by).and_raise(StandardError.new('テストエラー'))
 
         post '/api/auth/callback/github', params: valid_params
 
