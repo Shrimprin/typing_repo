@@ -6,8 +6,12 @@ module Api
 
     def login
       user = User.find_or_create_by!(login_params)
-      access_token = JsonWebToken.encode(user_id: user.id)
-      render json: { access_token: access_token }, status: :ok
+      expires_at = 30.days.from_now
+      access_token = JsonWebToken.encode(user.id, expires_at)
+      render json: {
+        access_token:,
+        expires_at: expires_at.to_i
+      }, status: :ok
     rescue ActiveRecord::RecordInvalid => e
       render json: { error: e.message }, status: :unprocessable_content
     rescue StandardError => e
