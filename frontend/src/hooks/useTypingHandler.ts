@@ -41,7 +41,7 @@ export function useTypingHandler({
   const params = useParams();
   const typingStats = useTypingStats();
 
-  const setupTypingState = async (fileItemId: number) => {
+  const setupTypingState = async (fileItemId: number): Promise<FileItem | null> => {
     setErrorMessage(null);
 
     try {
@@ -59,7 +59,7 @@ export function useTypingHandler({
         setTypedTextLines(initialTypedTextLines);
         setCursorRow(0);
         typingStats.resetStats();
-        return;
+        return fetchedFileItem;
       }
 
       const { row: currentRow, column: currentColumn, typos = [] } = fetchedFileItem.typingProgress;
@@ -86,12 +86,15 @@ export function useTypingHandler({
 
       const { accuracy, elapsedSeconds, totalCorrectTypeCount, totalTypoCount, wpm } = fetchedFileItem.typingProgress;
       typingStats.restoreStats(accuracy, elapsedSeconds, totalCorrectTypeCount, totalTypoCount, wpm);
+
+      return fetchedFileItem;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.message);
       } else {
         setErrorMessage('An error occurred. Please try again.');
       }
+      return null;
     }
   };
 

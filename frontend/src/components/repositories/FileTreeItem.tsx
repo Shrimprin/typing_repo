@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, ChevronDown, ChevronRight, File, Folder } from 'lucide-react';
+import { AlertTriangle, Check, ChevronDown, ChevronRight, File, Folder } from 'lucide-react';
 import { useState } from 'react';
 
 import type { FileItem } from '@/types';
@@ -31,13 +31,15 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
   const isSelected = selectedFileItem?.id === fileItem.id;
   const isTyped = fileItem.status === 'typed';
   const isTyping = fileItem.status === 'typing';
-  const fileItems: FileItem[] = fileItem.fileItems;
+  const isUnsupported = fileItem.status === 'unsupported';
+  const fileItems: FileItem[] = fileItem.fileItems || [];
   const sortedFileItems = sortFileItems(fileItems);
   const isDir = fileItem.type === 'dir';
 
   const fileNameColorClass = () => {
     if (isSelected) return 'text-primary font-bold';
     if (isTyped) return 'text-secondary';
+    if (isUnsupported) return 'text-muted-foreground';
     return '';
   };
 
@@ -77,6 +79,8 @@ export default function FileTreeItem({ fileItem, level, selectedFileItem, onSele
               <div className="mr-2 ml-auto flex h-4 w-4 flex-shrink-0 items-center justify-center">
                 <div className="bg-muted-foreground h-2 w-2 rounded-full shadow-lg" />
               </div>
+            ) : isUnsupported ? (
+              <AlertTriangle size={16} className="text-muted-foreground mr-2 ml-auto flex-shrink-0" />
             ) : null}
           </>
         )}
