@@ -23,7 +23,7 @@ class Repository < ApplicationRecord
     if files.empty?
       1.0
     else
-      typed_count = files.where(status: :typed).count
+      typed_count = files.where(status: %i[typed unsupported]).count
       typed_count.to_f / files.count
     end
   end
