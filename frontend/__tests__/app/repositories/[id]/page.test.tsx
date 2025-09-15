@@ -53,17 +53,25 @@ describe('RepositoryDetailPage', () => {
           path: 'dir1/nested-file2.ts',
           fileItems: [],
         },
+        {
+          id: 6,
+          name: 'japanese-file.ts',
+          type: 'file',
+          status: 'unsupported',
+          path: 'dir1/japanese-file.ts',
+          fileItems: [],
+        },
       ],
     },
     {
-      id: 6,
+      id: 7,
       name: 'dir2',
       type: 'dir',
       status: 'untyped',
       path: 'dir2',
       fileItems: [
         {
-          id: 7,
+          id: 8,
           name: 'nested-file3.ts',
           type: 'file',
           status: 'untyped',
@@ -73,7 +81,7 @@ describe('RepositoryDetailPage', () => {
       ],
     },
     {
-      id: 8,
+      id: 9,
       name: 'file3.ts',
       type: 'file',
       status: 'untyped',
@@ -103,6 +111,18 @@ describe('RepositoryDetailPage', () => {
     },
   };
 
+  const mockUnsupportedFileItem = {
+    data: {
+      id: 6,
+      name: 'japanese-file.ts',
+      type: 'file',
+      status: 'unsupported',
+      content: 'console.log("こんにちは、世界！");',
+      path: 'dir1/japanese-file.ts',
+      fileItems: [],
+    },
+  };
+
   const mockUpdatedFileItem = {
     ...mockFileItem.data,
     status: 'typing',
@@ -119,7 +139,9 @@ describe('RepositoryDetailPage', () => {
     mockUseSession();
     (useParams as jest.Mock).mockReturnValue({ id: '1' });
     jest.spyOn(axios, 'get').mockImplementation((url) => {
-      if (url.includes('/file_items/')) {
+      if (url.includes('/file_items/6')) {
+        return Promise.resolve(mockUnsupportedFileItem);
+      } else if (url.includes('/file_items/')) {
         return Promise.resolve(mockFileItem);
       }
       return Promise.resolve(mockRepository);
@@ -186,6 +208,13 @@ describe('RepositoryDetailPage', () => {
       expect(screen.getByText('dir1/nested-file1.ts')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'PLAY' })).toBeInTheDocument();
       expect(screen.getByText('console.log("Hello, world!");')).toBeInTheDocument();
+    });
+
+    it('renders unsupported file message when file status is unsupported', async () => {
+      await clickButton('dir1');
+      await clickButton('japanese-file.ts');
+
+      expect(screen.getByText('This file contains non-English characters, so it cannot be typed.')).toBeInTheDocument();
     });
 
     it('does not render highlight text', async () => {
