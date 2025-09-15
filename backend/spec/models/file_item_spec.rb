@@ -121,6 +121,27 @@ RSpec.describe FileItem, type: :model do
     end
   end
 
+  describe '.contains_non_ascii?' do
+    context 'when content is blank' do
+      it 'returns false' do
+        expect(described_class.contains_non_ascii?(nil)).to be false
+        expect(described_class.contains_non_ascii?('')).to be false
+      end
+    end
+
+    context 'when content contains only ASCII characters' do
+      it 'returns false' do
+        expect(described_class.contains_non_ascii?('Hello, World!')).to be false
+      end
+    end
+
+    context 'when content contains non-ASCII characters' do
+      it 'returns true' do
+        expect(described_class.contains_non_ascii?('こんにちは、世界！')).to be true
+      end
+    end
+  end
+
   describe '#full_path' do
     let(:root_dir) { create(:file_item, :directory, name: 'root_dir', repository:) }
     let(:middle_dir) { create(:file_item, :directory, name: 'middle_dir', repository:, parent: root_dir) }

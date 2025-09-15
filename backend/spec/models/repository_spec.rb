@@ -15,9 +15,9 @@ RSpec.describe Repository, type: :model do
     end
 
     context 'when only root level file_items' do
-      let!(:readme_file) { create(:file_item, repository: repository, parent: nil) }
-      let!(:license_file) { create(:file_item, repository: repository, parent: nil) }
-      let!(:src_directory) { create(:file_item, :directory, repository: repository, parent: nil) }
+      let!(:readme_file) { create(:file_item, repository:, parent: nil) }
+      let!(:license_file) { create(:file_item, repository:, parent: nil) }
+      let!(:src_directory) { create(:file_item, :directory, repository:, parent: nil) }
 
       it 'groups all file_items under nil key' do
         result = repository.file_items_grouped_by_parent
@@ -28,13 +28,13 @@ RSpec.describe Repository, type: :model do
     end
 
     context 'when nested file structure' do
-      let!(:root_dir) { create(:file_item, :directory, repository: repository, parent: nil) }
-      let!(:sub_dir) { create(:file_item, :directory, repository: repository, parent: root_dir) }
-      let!(:readme_file) { create(:file_item, repository: repository, parent: nil) }
-      let!(:main_file) { create(:file_item, repository: repository, parent: nil) }
-      let!(:controller_file) { create(:file_item, repository: repository, parent: root_dir) }
-      let!(:model_file) { create(:file_item, repository: repository, parent: root_dir) }
-      let!(:config_file) { create(:file_item, repository: repository, parent: sub_dir) }
+      let!(:root_dir) { create(:file_item, :directory, repository:, parent: nil) }
+      let!(:sub_dir) { create(:file_item, :directory, repository:, parent: root_dir) }
+      let!(:readme_file) { create(:file_item, repository:, parent: nil) }
+      let!(:main_file) { create(:file_item, repository:, parent: nil) }
+      let!(:controller_file) { create(:file_item, repository:, parent: root_dir) }
+      let!(:model_file) { create(:file_item, repository:, parent: root_dir) }
+      let!(:config_file) { create(:file_item, repository:, parent: sub_dir) }
 
       it 'groups file_items by their parent_id correctly' do
         result = repository.file_items_grouped_by_parent
@@ -47,10 +47,10 @@ RSpec.describe Repository, type: :model do
     end
 
     context 'when multiple children under same parent' do
-      let!(:parent_dir) { create(:file_item, :directory, repository: repository, parent: nil) }
-      let!(:service_file) { create(:file_item, repository: repository, parent: parent_dir) }
-      let!(:helper_file) { create(:file_item, repository: repository, parent: parent_dir) }
-      let!(:utils_directory) { create(:file_item, :directory, repository: repository, parent: parent_dir) }
+      let!(:parent_dir) { create(:file_item, :directory, repository:, parent: nil) }
+      let!(:service_file) { create(:file_item, repository:, parent: parent_dir) }
+      let!(:helper_file) { create(:file_item, repository:, parent: parent_dir) }
+      let!(:utils_directory) { create(:file_item, :directory, repository:, parent: parent_dir) }
 
       it 'groups multiple children under the same parent_id' do
         result = repository.file_items_grouped_by_parent
@@ -71,8 +71,8 @@ RSpec.describe Repository, type: :model do
 
     context 'when some files are typed (50%)' do
       it 'returns 0.5' do
-        create(:file_item, :typed, repository: repository)
-        create(:file_item, repository: repository, status: :untyped)
+        create(:file_item, :typed, repository:)
+        create(:file_item, repository:, status: :untyped)
 
         expect(repository.progress).to eq(0.5)
       end
@@ -80,10 +80,19 @@ RSpec.describe Repository, type: :model do
 
     context 'when all files are typed (100%)' do
       it 'returns 1.0' do
-        create(:file_item, :typed, repository: repository)
-        create(:file_item, :typed, repository: repository)
+        create(:file_item, :typed, repository:)
+        create(:file_item, :typed, repository:)
 
         expect(repository.progress).to eq(1.0)
+      end
+    end
+
+    context 'when some files are unsupported (50%)' do
+      it 'returns 0.5' do
+        create(:file_item, repository:, status: :unsupported)
+        create(:file_item, repository:, status: :untyped)
+
+        expect(repository.progress).to eq(0.5)
       end
     end
   end

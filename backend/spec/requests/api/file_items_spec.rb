@@ -80,23 +80,49 @@ RSpec.describe 'Api::FileItems', type: :request do
       end
     end
 
-    context 'when content is nil' do
+    context 'when content is nil and fetched content is ASCII' do
       before do
         github_client_mock = instance_double(Octokit::Client)
         allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
-        content = '44GT44KT44Gr44Gh44Gv44CB5LiW55WM77yB' # こんにちは、世界！
+        content = Base64.strict_encode64('Hello, World!')
         allow(github_client_mock)
           .to receive(:contents)
           .with(repository.url, path: nil_content_file_item.path, ref: repository.commit_hash)
           .and_return({ content: })
       end
 
-      it 'updates the file item content' do
-        expect(FileItem.find(nil_content_file_item.id).content).to be_nil
+      it 'updates the file item content and keeps status as untyped' do
+        expect(nil_content_file_item.content).to be_nil
+        expect(nil_content_file_item.status).to eq('untyped')
 
         get api_repository_file_item_path(repository_id: repository.id, id: nil_content_file_item.id), headers: headers
 
-        expect(FileItem.find(nil_content_file_item.id).content).to eq('こんにちは、世界！')
+        nil_content_file_item.reload
+        expect(nil_content_file_item.content).to eq('Hello, World!')
+        expect(nil_content_file_item.status).to eq('untyped')
+      end
+    end
+
+    context 'when content is nil and fetched content is non-ASCII' do
+      before do
+        github_client_mock = instance_double(Octokit::Client)
+        allow(Octokit::Client).to receive(:new).and_return(github_client_mock)
+        content = Base64.strict_encode64('こんにちは、世界！')
+        allow(github_client_mock)
+          .to receive(:contents)
+          .with(repository.url, path: nil_content_file_item.path, ref: repository.commit_hash)
+          .and_return({ content: })
+      end
+
+      it 'updates the file item content and sets status as unsupported' do
+        expect(nil_content_file_item.content).to be_nil
+        expect(nil_content_file_item.status).to eq('untyped')
+
+        get api_repository_file_item_path(repository_id: repository.id, id: nil_content_file_item.id), headers: headers
+
+        nil_content_file_item.reload
+        expect(nil_content_file_item.content).to eq('こんにちは、世界！')
+        expect(nil_content_file_item.status).to eq('unsupported')
       end
     end
 
