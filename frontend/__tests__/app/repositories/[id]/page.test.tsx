@@ -210,11 +210,12 @@ describe('RepositoryDetailPage', () => {
       expect(screen.getByText('console.log("Hello, world!");')).toBeInTheDocument();
     });
 
-    it('renders unsupported file message when file status is unsupported', async () => {
+    it('renders unsupported file message and does not render play button when file status is unsupported', async () => {
       await clickButton('dir1');
       await clickButton('japanese-file.ts');
 
       expect(screen.getByText('This file contains non-English characters, so it cannot be typed.')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'PLAY' })).not.toBeInTheDocument();
     });
 
     it('does not render highlight text', async () => {
