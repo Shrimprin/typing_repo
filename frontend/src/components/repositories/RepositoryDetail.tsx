@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 
 import { useTypingHandler } from '@/hooks/useTypingHandler';
 import type { FileItem, TypingStatus } from '@/types';
+import { updateFileItemInTree } from '@/utils/file-item';
 import { Card } from '../ui/card';
 import Loading from '../ui/loading';
 import CongratulationModal from './CongratulationModal';
@@ -33,7 +34,7 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
     setTypingStatus,
   });
 
-  const handleFileSelect = async (fileItem: FileItem) => {
+  const handleFileSelect = async (selectedFileItem: FileItem) => {
     if (typingStatus === 'typing') {
       const confirmSwitch = window.confirm(
         'Are you sure you want to switch files? The data you are typing will be lost.',
@@ -43,12 +44,27 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
       }
     }
 
-    setSelectedFileItem(fileItem);
     setIsLoading(true);
 
-    await typingHandler.setupTypingState(fileItem.id);
+    const setupFileItem = await typingHandler.setupTypingState(selectedFileItem.id);
+    const updatedFileItem = setupFileItem || selectedFileItem;
+    setSelectedFileItem(updatedFileItem);
+    setFileItems((prevFileItems) => updateFileItemInTree(prevFileItems, updatedFileItem));
 
-    setTypingStatus(fileItem.status === 'typing' ? 'paused' : fileItem.status === 'typed' ? 'completed' : 'ready');
+    switch (updatedFileItem.status) {
+      case 'unsupported':
+        setTypingStatus('unsupported');
+        break;
+      case 'typing':
+        setTypingStatus('paused');
+        break;
+      case 'typed':
+        setTypingStatus('completed');
+        break;
+      default:
+        setTypingStatus('ready');
+        break;
+    }
     setIsLoading(false);
   };
 

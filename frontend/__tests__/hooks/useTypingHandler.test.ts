@@ -512,8 +512,8 @@ describe('useTypingHandler', () => {
           },
         ] as FileItem[];
 
-        const updateFunction = mockSetFileItems.mock.calls[0][0]; // (prev) => updateFileItemRecursively(prev, response.data)が格納される
-        const result = updateFunction(prevFileItems); // updateFileItemRecursively(prevFileItems, updatedFileItem)が呼ばれる
+        const updateFunction = mockSetFileItems.mock.calls[0][0]; // (prev) => updateFileItemInTree(prev, response.data)が格納される
+        const result = updateFunction(prevFileItems); // updateFileItemInTree(prevFileItems, updatedFileItem)が呼ばれる
 
         expect(result[0].status).toBe('typing');
         expect(result[1].fileItems?.[0].status).toBe('untyped');

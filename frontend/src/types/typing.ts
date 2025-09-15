@@ -1,1 +1,1 @@
-export type TypingStatus = 'ready' | 'typing' | 'paused' | 'completed';
+export type TypingStatus = 'ready' | 'typing' | 'paused' | 'completed' | 'unsupported';

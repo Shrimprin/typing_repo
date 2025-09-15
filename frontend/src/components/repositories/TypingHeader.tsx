@@ -62,19 +62,21 @@ export default function TypingHeader({
   return (
     <div className="flex items-center justify-between border-b px-4 pb-2">
       <div className="truncate">{fileItemName}</div>
-      <div className="flex gap-2">
-        <Button variant="outline" size="sm" onClick={handleToggleTyping} aria-label={buttonLabel}>
-          {buttonIcon}
-          <span className="ml-1">{buttonLabel}</span>
-        </Button>
-
-        {(typingStatus === 'typing' || typingStatus === 'paused') && (
-          <Button variant="outline" size="sm" onClick={resetTyping} aria-label="RESET">
-            <RotateCcw size={16} />
-            <span className="ml-1">RESET</span>
+      {typingStatus !== 'unsupported' && (
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleToggleTyping} aria-label={buttonLabel}>
+            {buttonIcon}
+            <span className="ml-1">{buttonLabel}</span>
           </Button>
-        )}
-      </div>
+
+          {(typingStatus === 'typing' || typingStatus === 'paused') && (
+            <Button variant="outline" size="sm" onClick={resetTyping} aria-label="RESET">
+              <RotateCcw size={16} />
+              <span className="ml-1">RESET</span>
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

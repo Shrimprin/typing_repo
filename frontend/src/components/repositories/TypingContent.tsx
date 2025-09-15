@@ -46,6 +46,10 @@ export default function TypingContent({
         </div>
       ) : typingStatus === 'completed' ? (
         <TypingResult stats={stats} targetTextLines={targetTextLines} typedTextLines={typedTextLines} />
+      ) : typingStatus === 'unsupported' ? (
+        <div className="h-full overflow-auto px-4">
+          <div className="p-6 text-center">This file contains non-English characters, so it cannot be typed.</div>
+        </div>
       ) : null}
     </>
   );
