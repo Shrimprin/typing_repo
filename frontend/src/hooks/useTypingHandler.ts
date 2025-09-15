@@ -6,6 +6,7 @@ import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'reac
 import { FileItem, Repository, Stats, TypingStatus, Typo } from '@/types';
 import { axiosPatch } from '@/utils/axios';
 import { fetcher } from '@/utils/fetcher';
+import { updateFileItemInTree } from '@/utils/file-item';
 import { sortFileItems } from '@/utils/sort';
 import { useTypingStats } from './useTypingStats';
 
@@ -124,7 +125,7 @@ export function useTypingHandler({
       };
 
       const response = await axiosPatch(url, accessToken, postData);
-      setFileItems((prev) => updateFileItemRecursively(prev, response.data));
+      setFileItems((prev) => updateFileItemInTree(prev, response.data));
       setTypingStatus('paused');
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -381,14 +382,4 @@ function restoreTypedTextLine(row: number, targetTextLine: string, typos: Typo[]
   const typoMap = new Map(typos.filter((typo) => typo.row === row).map((typo) => [typo.column, typo.character]));
 
   return [...targetTextLine].map((char, index) => typoMap.get(index) ?? char).join('');
-}
-
-function updateFileItemRecursively(fileItems: FileItem[], updatedFileItem: FileItem): FileItem[] {
-  return fileItems.map((fileItem) => {
-    if (fileItem.id === updatedFileItem.id) return updatedFileItem;
-
-    return fileItem.fileItems?.length
-      ? { ...fileItem, fileItems: updateFileItemRecursively(fileItem.fileItems, updatedFileItem) }
-      : fileItem;
-  });
 }

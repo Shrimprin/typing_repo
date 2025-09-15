@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 
 import { useTypingHandler } from '@/hooks/useTypingHandler';
 import type { FileItem, TypingStatus } from '@/types';
+import { updateFileItemInTree } from '@/utils/file-item';
 import { Card } from '../ui/card';
 import Loading from '../ui/loading';
 import CongratulationModal from './CongratulationModal';
@@ -32,21 +33,6 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
     setFileItems,
     setTypingStatus,
   });
-
-  const updateFileItemInTree = (fileItems: FileItem[], updatedFileItem: FileItem): FileItem[] => {
-    return fileItems.map((fileItem) => {
-      if (fileItem.id === updatedFileItem.id) {
-        return updatedFileItem;
-      }
-      if (fileItem.fileItems && fileItem.fileItems.length > 0) {
-        return {
-          ...fileItem,
-          fileItems: updateFileItemInTree(fileItem.fileItems, updatedFileItem),
-        };
-      }
-      return fileItem;
-    });
-  };
 
   const handleFileSelect = async (selectedFileItem: FileItem) => {
     if (typingStatus === 'typing') {
