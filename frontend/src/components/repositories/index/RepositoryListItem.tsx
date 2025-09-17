@@ -1,15 +1,7 @@
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import type { Repository } from '@/types/repository';
 import RepositoryProgress from './RepositoryProgress';
 
@@ -42,17 +34,6 @@ export default function RepositoryListItem({ repository }: Props) {
           )}
         </div>
       </div>
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="settings">
-            <MoreHorizontal className="h-5 w-5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem>TODO: 設定メニューを開く</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
     </div>
   );
 }
