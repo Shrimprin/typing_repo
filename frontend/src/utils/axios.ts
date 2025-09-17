@@ -31,3 +31,13 @@ export async function axiosPatch<P>(url: string, accessToken: string | undefined
 
   return await axios.patch(`${BASE_URL}${url}`, params, { headers });
 }
+
+export async function axiosDelete(url: string, accessToken: string | undefined) {
+  axiosCaseConverter(axios);
+  const headers = {
+    Authorization: `Bearer ${accessToken}`,
+    'Content-Type': 'application/json',
+  };
+
+  return await axios.delete(`${BASE_URL}${url}`, { headers });
+}
