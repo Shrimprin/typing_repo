@@ -128,12 +128,12 @@ describe('RepositoriesPage', () => {
     });
 
     it('renders modal when more-button is clicked', async () => {
-      const moreButtons = screen.getAllByRole('button', { name: 'settings' });
+      const moreButtons = screen.getAllByLabelText('more');
       const firstMoreButton = moreButtons[0];
 
       await userEvent.click(firstMoreButton);
 
-      expect(screen.getByText('TODO: 設定メニューを開く')).toBeInTheDocument();
+      expect(screen.getByText('Delete Repository')).toBeInTheDocument();
     });
   });
 
