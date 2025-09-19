@@ -518,12 +518,12 @@ describe('RepositoryDetailPage', () => {
 
   describe('when delete repository button is clicked', () => {
     it('calls api and navigates when confirmed', async () => {
-      const push = jest.fn();
-      (useRouter as jest.Mock).mockReturnValue({ push });
+      const mockPush = jest.fn();
+      (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
       jest.spyOn(axios, 'delete').mockResolvedValueOnce({ message: 'Repository deleted successfully' });
       jest.spyOn(window, 'confirm').mockReturnValueOnce(true);
 
-      await userEvent.click(screen.getByLabelText('settings'));
+      await userEvent.click(screen.getByLabelText('more'));
       await userEvent.click(screen.getByText('Delete Repository'));
 
       expect(axios.delete).toHaveBeenCalledWith(`${BASE_URL}/api/repositories/1`, {
@@ -533,18 +533,18 @@ describe('RepositoryDetailPage', () => {
         },
       });
 
-      expect(push).toHaveBeenCalledWith('/repositories');
+      expect(mockPush).toHaveBeenCalledWith('/repositories');
     });
 
     it('does not call api and navigate when canceled', async () => {
-      const push = jest.fn();
-      (useRouter as jest.Mock).mockReturnValue({ push });
+      const mockPush = jest.fn();
+      (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
       jest.spyOn(window, 'confirm').mockReturnValueOnce(false);
 
-      await userEvent.click(screen.getByLabelText('settings'));
+      await userEvent.click(screen.getByLabelText('more'));
       await userEvent.click(screen.getByText('Delete Repository'));
 
-      expect(push).not.toHaveBeenCalledWith('/repositories');
+      expect(mockPush).not.toHaveBeenCalledWith('/repositories');
     });
   });
 });
