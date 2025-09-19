@@ -2,7 +2,11 @@ import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import Link from 'next/link';
 
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Repository } from '@/types/repository';
+import { MoreHorizontal } from 'lucide-react';
+import DeleteRepositoryDialog from '../DeleteRepositoryDialog';
 import RepositoryProgress from './RepositoryProgress';
 
 type Props = {
@@ -34,6 +38,16 @@ export default function RepositoryListItem({ repository }: Props) {
           )}
         </div>
       </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" aria-label="more">
+            <MoreHorizontal className="h-5 w-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DeleteRepositoryDialog repository={repository} />
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
