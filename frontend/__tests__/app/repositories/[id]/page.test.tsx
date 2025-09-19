@@ -523,7 +523,7 @@ describe('RepositoryDetailPage', () => {
       jest.spyOn(axios, 'delete').mockResolvedValueOnce({ message: 'Repository deleted successfully' });
       jest.spyOn(window, 'confirm').mockReturnValueOnce(true);
 
-      await userEvent.click(screen.getByLabelText('more'));
+      await userEvent.click(screen.getByLabelText('more-menu'));
       await userEvent.click(screen.getByText('Delete Repository'));
 
       expect(axios.delete).toHaveBeenCalledWith(`${BASE_URL}/api/repositories/1`, {
@@ -541,7 +541,7 @@ describe('RepositoryDetailPage', () => {
       (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
       jest.spyOn(window, 'confirm').mockReturnValueOnce(false);
 
-      await userEvent.click(screen.getByLabelText('more'));
+      await userEvent.click(screen.getByLabelText('more-menu'));
       await userEvent.click(screen.getByText('Delete Repository'));
 
       expect(mockPush).not.toHaveBeenCalledWith('/repositories');

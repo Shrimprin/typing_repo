@@ -126,9 +126,9 @@ describe('RepositoriesPage', () => {
       expect(repositoryLinks[5]).toHaveAttribute('href', '/repositories/6');
     });
 
-    it('renders more-buttons', async () => {
-      const moreButtons = screen.getAllByLabelText('more');
-      expect(moreButtons.length).toBe(6);
+    it('renders more-menu-buttons', async () => {
+      const Buttons = screen.getAllByLabelText('more-menu');
+      expect(Buttons.length).toBe(6);
     });
   });
 
