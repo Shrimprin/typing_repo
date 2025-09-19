@@ -1,16 +1,12 @@
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Repository } from '@/types/repository';
+import { MoreHorizontal } from 'lucide-react';
+import DeleteRepositoryDialog from '../DeleteRepositoryDialog';
 import RepositoryProgress from './RepositoryProgress';
 
 type Props = {
@@ -42,15 +38,14 @@ export default function RepositoryListItem({ repository }: Props) {
           )}
         </div>
       </div>
-
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="settings">
+          <Button variant="ghost" size="icon" aria-label="more-menu">
             <MoreHorizontal className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem>TODO: 設定メニューを開く</DropdownMenuItem>
+          <DeleteRepositoryDialog repository={repository} />
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

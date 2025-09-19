@@ -2,6 +2,7 @@
 
 module Api
   class RepositoriesController < ApplicationController
+    before_action :set_repository, only: %i[show destroy]
     after_action { pagy_headers_merge(@pagy) if @pagy }
 
     def index
@@ -10,10 +11,7 @@ module Api
     end
 
     def show
-      repository = @current_user.repositories.find(params[:id])
-      render json: RepositorySerializer.new(repository, params: { file_items: true }), status: :ok
-    rescue ActiveRecord::RecordNotFound
-      render json: { error: 'Repository not found' }, status: :not_found
+      render json: RepositorySerializer.new(@repository, params: { file_items: true }), status: :ok
     end
 
     def create
@@ -66,6 +64,11 @@ module Api
       render json: { error: 'An error occurred. Please try again.' }, status: :internal_server_error
     end
 
+    def destroy
+      @repository.destroy
+      render json: { message: 'Repository deleted successfully' }, status: :ok
+    end
+
     private
 
     def repository_params
@@ -74,6 +77,12 @@ module Api
 
     def preview_params
       params.expect(repository_preview: [:url])
+    end
+
+    def set_repository
+      @repository = @current_user.repositories.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: 'Repository not found' }, status: :not_found
     end
 
     def build_repository(client, repository_url)

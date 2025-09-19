@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import axios, { AxiosError } from 'axios';
 
 import RepositoriesPage from '@/app/repositories/page';
@@ -11,70 +10,70 @@ jest.mock('next/navigation', () => ({
   useSearchParams: () => mockSearchParams,
 }));
 
-const mockRepositoriesData = [
-  {
-    id: '1',
-    name: 'test-repo-1',
-    url: 'https://github.com/test/test-repo-1',
-    fileItems: [],
-    lastTypedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1日前
-    progress: 75.55,
-  },
-  {
-    id: '2',
-    name: 'test-repo-2',
-    url: 'https://github.com/test/test-repo-2',
-    fileItems: [],
-    lastTypedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(), // 5分前
-    progress: 30.54,
-  },
-  {
-    id: '3',
-    name: 'test-repo-3',
-    url: 'https://github.com/test/test-repo-3',
-    fileItems: [],
-    lastTypedAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(), // 1時間前
-    progress: 10.0,
-  },
-  {
-    id: '4',
-    name: 'test-repo-4',
-    url: 'https://github.com/test/test-repo-4',
-    fileItems: [],
-    lastTypedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 1週間前
-    progress: 5.0,
-  },
-  {
-    id: '5',
-    name: 'test-repo-5',
-    url: 'https://github.com/test/test-repo-5',
-    fileItems: [],
-    lastTypedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 1カ月前
-    progress: 0.0,
-  },
-  {
-    id: '6',
-    name: 'test-repo-6',
-    url: 'https://github.com/test/test-repo-6',
-    fileItems: [],
-    lastTypedAt: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString(), // 1年前
-    progress: 15.0,
-  },
-];
-
-const renderRepositoriesPage = async (searchParams = {}) => {
-  const repositoriesPage = await RepositoriesPage({ searchParams: Promise.resolve(searchParams) });
-  render(repositoriesPage);
-};
-
-const getRepositoryLinks = () => {
-  const allLinks = screen.getAllByRole('link');
-  return allLinks.filter(
-    (link) => link.getAttribute('href')?.startsWith('/repositories/') && !link.getAttribute('href')?.includes('new'),
-  );
-};
-
 describe('RepositoriesPage', () => {
+  const mockRepositoriesData = [
+    {
+      id: '1',
+      name: 'test-repo-1',
+      url: 'https://github.com/test/test-repo-1',
+      fileItems: [],
+      lastTypedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1日前
+      progress: 75.55,
+    },
+    {
+      id: '2',
+      name: 'test-repo-2',
+      url: 'https://github.com/test/test-repo-2',
+      fileItems: [],
+      lastTypedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(), // 5分前
+      progress: 30.54,
+    },
+    {
+      id: '3',
+      name: 'test-repo-3',
+      url: 'https://github.com/test/test-repo-3',
+      fileItems: [],
+      lastTypedAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(), // 1時間前
+      progress: 10.0,
+    },
+    {
+      id: '4',
+      name: 'test-repo-4',
+      url: 'https://github.com/test/test-repo-4',
+      fileItems: [],
+      lastTypedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 1週間前
+      progress: 5.0,
+    },
+    {
+      id: '5',
+      name: 'test-repo-5',
+      url: 'https://github.com/test/test-repo-5',
+      fileItems: [],
+      lastTypedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 1カ月前
+      progress: 0.0,
+    },
+    {
+      id: '6',
+      name: 'test-repo-6',
+      url: 'https://github.com/test/test-repo-6',
+      fileItems: [],
+      lastTypedAt: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString(), // 1年前
+      progress: 15.0,
+    },
+  ];
+
+  const renderRepositoriesPage = async (searchParams = {}) => {
+    const repositoriesPage = await RepositoriesPage({ searchParams: Promise.resolve(searchParams) });
+    render(repositoriesPage);
+  };
+
+  const getRepositoryLinks = () => {
+    const allLinks = screen.getAllByRole('link');
+    return allLinks.filter(
+      (link) => link.getAttribute('href')?.startsWith('/repositories/') && !link.getAttribute('href')?.includes('new'),
+    );
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockAuth();
@@ -127,13 +126,9 @@ describe('RepositoriesPage', () => {
       expect(repositoryLinks[5]).toHaveAttribute('href', '/repositories/6');
     });
 
-    it('renders modal when more-button is clicked', async () => {
-      const moreButtons = screen.getAllByRole('button', { name: 'settings' });
-      const firstMoreButton = moreButtons[0];
-
-      await userEvent.click(firstMoreButton);
-
-      expect(screen.getByText('TODO: 設定メニューを開く')).toBeInTheDocument();
+    it('renders more-menu-buttons', async () => {
+      const Buttons = screen.getAllByLabelText('more-menu');
+      expect(Buttons.length).toBe(6);
     });
   });
 

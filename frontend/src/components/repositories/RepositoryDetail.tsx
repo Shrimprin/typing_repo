@@ -39,9 +39,7 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
       const confirmSwitch = window.confirm(
         'Are you sure you want to switch files? The data you are typing will be lost.',
       );
-      if (!confirmSwitch) {
-        return;
-      }
+      if (!confirmSwitch) return;
     }
 
     setIsLoading(true);

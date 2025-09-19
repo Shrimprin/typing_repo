@@ -31,5 +31,11 @@ FactoryBot.define do
         create(:typing_progress, file_item:)
       end
     end
+
+    trait :with_typing_progress_and_typos do
+      after(:create) do |file_item|
+        create(:typing_progress, :with_typos, file_item:)
+      end
+    end
   end
 end

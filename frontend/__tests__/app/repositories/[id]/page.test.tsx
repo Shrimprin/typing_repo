@@ -2,9 +2,9 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
+import { useParams, useRouter } from 'next/navigation';
 
 import RepositoryDetailPage from '@/app/repositories/[id]/page';
-import { useParams } from 'next/navigation';
 import { mockAuth, mockUseSession } from '../../../mocks/auth';
 import { clickButton } from '../../../utils/testUtils';
 
@@ -513,6 +513,38 @@ describe('RepositoryDetailPage', () => {
     it('shows congratulation modal when repository progress reaches 100%', async () => {
       expect(screen.getByText('CONGRATULATIONS')).toBeInTheDocument();
       expect(screen.getByText('All files have been typed in this repository.')).toBeInTheDocument();
+    });
+  });
+
+  describe('when delete repository button is clicked', () => {
+    it('calls api and navigates when confirmed', async () => {
+      const mockPush = jest.fn();
+      (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
+      jest.spyOn(axios, 'delete').mockResolvedValueOnce({ message: 'Repository deleted successfully' });
+      jest.spyOn(window, 'confirm').mockReturnValueOnce(true);
+
+      await userEvent.click(screen.getByLabelText('more-menu'));
+      await userEvent.click(screen.getByText('Delete Repository'));
+
+      expect(axios.delete).toHaveBeenCalledWith(`${BASE_URL}/api/repositories/1`, {
+        headers: {
+          Authorization: 'Bearer token_1234567890',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      expect(mockPush).toHaveBeenCalledWith('/repositories');
+    });
+
+    it('does not call api and navigate when canceled', async () => {
+      const mockPush = jest.fn();
+      (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
+      jest.spyOn(window, 'confirm').mockReturnValueOnce(false);
+
+      await userEvent.click(screen.getByLabelText('more-menu'));
+      await userEvent.click(screen.getByText('Delete Repository'));
+
+      expect(mockPush).not.toHaveBeenCalledWith('/repositories');
     });
   });
 });

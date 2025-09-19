@@ -440,4 +440,61 @@ RSpec.describe 'Api::Repositories', type: :request do
       end
     end
   end
+
+  describe 'DELETE /api/repositories/:id' do
+    let!(:repository) { create(:repository, :with_extensions, :with_file_items, user:) }
+
+    context 'when repository exists' do
+      before do
+        create(:file_item, :with_typing_progress_and_typos, repository:)
+      end
+
+      it 'deletes the repository and returns success status' do
+        expect { delete api_repository_path(repository), headers: headers }
+          .to change(Repository, :count).by(-1)
+
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json['message']).to eq('Repository deleted successfully')
+      end
+
+      it 'deletes associated file items' do
+        expect(repository.file_items.count).to eq(7)
+        expect { delete api_repository_path(repository), headers: headers }
+          .to change(FileItem, :count).by(-7)
+      end
+
+      it 'deletes associated extensions' do
+        expect(repository.extensions.count).to eq(2)
+        expect { delete api_repository_path(repository), headers: headers }
+          .to change(Extension, :count).by(-2)
+      end
+
+      it 'deletes associated typing progress' do
+        expect(TypingProgress.joins(file_item: :repository)
+                             .where(repositories: { id: repository.id }).count)
+          .to eq(1)
+        expect { delete api_repository_path(repository), headers: headers }
+          .to change(TypingProgress, :count).by(-1)
+      end
+
+      it 'deletes associated typos' do
+        expect(Typo.joins(typing_progress: { file_item: :repository })
+                   .where(repositories: { id: repository.id }).count)
+          .to eq(2)
+        expect { delete api_repository_path(repository), headers: headers }
+          .to change(Typo, :count).by(-2)
+      end
+    end
+
+    context 'when repository does not exist' do
+      it 'returns not found status' do
+        delete api_repository_path(id: 0), headers: headers
+
+        expect(response).to have_http_status(:not_found)
+        json = response.parsed_body
+        expect(json['error']).to eq('Repository not found')
+      end
+    end
+  end
 end
