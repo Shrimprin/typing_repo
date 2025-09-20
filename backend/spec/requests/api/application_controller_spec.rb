@@ -46,7 +46,7 @@ RSpec.describe 'ApplicationController', type: :request do
         get '/test_authentication', headers: headers
 
         expect(response).to have_http_status(:unauthorized)
-        expect(response.parsed_body['error']).to eq('ログインしてください')
+        expect(response.parsed_body['error']).to eq('Please login.')
       end
     end
 
@@ -58,7 +58,7 @@ RSpec.describe 'ApplicationController', type: :request do
         get '/test_authentication', headers: headers
 
         expect(response).to have_http_status(:unauthorized)
-        expect(response.parsed_body['error']).to eq('ログインしてください')
+        expect(response.parsed_body['error']).to eq('Please login.')
       end
     end
 
@@ -70,7 +70,7 @@ RSpec.describe 'ApplicationController', type: :request do
         get '/test_authentication', headers: headers
 
         expect(response).to have_http_status(:unauthorized)
-        expect(response.parsed_body['error']).to eq('ログインしてください')
+        expect(response.parsed_body['error']).to eq('Please login.')
       end
     end
   end
