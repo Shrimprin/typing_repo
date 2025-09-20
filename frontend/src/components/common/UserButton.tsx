@@ -1,5 +1,6 @@
 import { auth } from '@/auth';
 import { SignIn, SignOut } from '@/components/common/AuthButton';
+import DeleteAccountDialog from '@/components/common/DeleteAccountDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -7,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
@@ -36,8 +38,13 @@ export default async function UserButton() {
               <p className="text-sm leading-none font-medium">{session.user.name}</p>
             </div>
           </DropdownMenuLabel>
+          <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <SignOut />
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <DeleteAccountDialog />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

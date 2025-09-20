@@ -7,6 +7,7 @@ declare module 'next-auth' {
   interface User {
     accessToken: string;
     tokenExpiresAt: number;
+    userId: number;
   }
 }
 
@@ -45,6 +46,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (response.status === 200) {
           user.accessToken = response.data.accessToken;
           user.tokenExpiresAt = response.data.expiresAt;
+          user.userId = response.data.userId;
           return true;
         } else {
           return false;
@@ -61,6 +63,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user?.tokenExpiresAt) {
         token.tokenExpiresAt = user.tokenExpiresAt;
       }
+      if (user?.userId) {
+        token.userId = user.userId;
+      }
 
       if (token.tokenExpiresAt && Math.floor(Date.now() / 1000) > (token.tokenExpiresAt as number)) {
         return null;
@@ -71,6 +76,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       if (token.accessToken) {
         session.user.accessToken = token.accessToken as string;
+      }
+      if (token.userId) {
+        session.user.userId = token.userId as number;
       }
       session.expires = new Date((token.tokenExpiresAt as number) * 1000).toISOString() as string & Date;
       return session;
