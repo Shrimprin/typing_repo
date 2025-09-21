@@ -13,7 +13,8 @@ module Api
       access_token = JsonWebToken.encode(user.id, expires_at)
       render json: {
         access_token:,
-        expires_at: expires_at.to_i
+        expires_at: expires_at.to_i,
+        user_id: user.id
       }, status: :ok
     rescue ActiveRecord::RecordInvalid => e
       render json: { error: e.message }, status: :unprocessable_content

@@ -7,7 +7,7 @@ RSpec.describe 'Api::Auth', type: :request do
     let(:valid_params) { { auth: { github_id: '12345', name: 'テストユーザー' } } }
 
     context 'when new user' do
-      it 'creates user and returns access token' do
+      it 'creates user and returns user data' do
         expect do
           post '/api/auth/callback/github', params: valid_params
         end.to change(User, :count).by(1)
@@ -15,16 +15,19 @@ RSpec.describe 'Api::Auth', type: :request do
         expect(response).to have_http_status(:ok)
         json = response.parsed_body
         expect(json).to have_key('access_token')
+        expect(json).to have_key('user_id')
+        expect(json).to have_key('expires_at')
 
         token = json['access_token']
         decoded_token = JsonWebToken.decode(token)
         expect(decoded_token).to have_key(:user_id)
         expect(User.exists?(decoded_token[:user_id])).to be true
+        expect(json['user_id']).to eq(decoded_token[:user_id])
       end
     end
 
     context 'when existing user' do
-      it 'returns access token' do
+      it 'returns user data' do
         existing_user = create(:user, github_id: valid_params[:auth][:github_id], name: valid_params[:auth][:name])
         expect do
           post '/api/auth/callback/github', params: valid_params
@@ -33,11 +36,14 @@ RSpec.describe 'Api::Auth', type: :request do
         expect(response).to have_http_status(:ok)
         json = response.parsed_body
         expect(json).to have_key('access_token')
+        expect(json).to have_key('user_id')
+        expect(json).to have_key('expires_at')
 
         token = json['access_token']
         decoded_token = JsonWebToken.decode(token)
         expect(decoded_token).to have_key(:user_id)
         expect(decoded_token[:user_id]).to eq(existing_user.id)
+        expect(json['user_id']).to eq(existing_user.id)
       end
     end
 

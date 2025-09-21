@@ -43,7 +43,7 @@ Style/FrozenStringLiteralComment:
 
 # exampleの行数をチェック
 RSpec/ExampleLength:
-  Max: 20
+  Max: 30
 
 # テストファイルのtypeを設定する（書かないとルーティングのヘルパーメソッドが読み込まれない）
 RSpecRails/InferredSpecType:
