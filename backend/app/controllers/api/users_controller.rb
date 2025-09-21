@@ -6,7 +6,7 @@ module Api
       user_id = params[:id].to_i
 
       if @current_user.id != user_id
-        render json: { error: 'Unauthorized access' }, status: :forbidden
+        render json: { error: 'Unauthorized access.' }, status: :forbidden
         return
       end
 
