@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Play } from 'next/font/google';
 
 import Footer from '@/components/common/Footer';
+import ToastListener from '@/components/common/ToastListener';
+import { Toaster } from '@/components/ui/sonner';
 import AuthProvider from '@/providers/Auth';
 
 import './globals.css';
@@ -36,6 +38,8 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
         </AuthProvider>
         <Footer />
+        <ToastListener />
+        <Toaster />
       </body>
     </html>
   );
