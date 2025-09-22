@@ -1,12 +1,15 @@
+import { Github, LogOut } from 'lucide-react';
+
+import { setToast } from '@/actions/toast';
 import { signIn, signOut } from '@/auth';
 import { Button } from '@/components/ui/button';
-import { Github, LogOut } from 'lucide-react';
 
 export function SignIn({ provider, children }: { provider?: string; children?: React.ReactNode }) {
   return (
     <form
       action={async () => {
         'use server';
+        await setToast({ message: 'Signed in successfully.', type: 'success' });
         await signIn(provider);
       }}
     >
@@ -23,6 +26,7 @@ export function SignOut() {
     <form
       action={async () => {
         'use server';
+        await setToast({ message: 'Signed out successfully.', type: 'success' });
         await signOut({ redirectTo: '/' });
       }}
     >

@@ -4,6 +4,7 @@ import { LoaderCircle, Trash } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 import { useState } from 'react';
 
+import { setToast } from '@/actions/toast';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { axiosDelete } from '@/utils/axios';
 
@@ -32,10 +33,10 @@ export default function DeleteAccountDialog() {
     setIsDeleting(true);
     try {
       await deleteUser();
+      await setToast({ message: 'Account deleted.', type: 'success' });
       await signOut({ redirectTo: '/' });
-    } catch (error) {
-      // TODO: toastなどで表示する
-      console.error('Failed to delete account:', error);
+    } catch {
+      await setToast({ message: 'Failed to delete account.', type: 'warning' });
       setIsDeleting(false);
     }
   };

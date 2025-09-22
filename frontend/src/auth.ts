@@ -3,6 +3,8 @@ import NextAuth from 'next-auth';
 import GitHub from 'next-auth/providers/github';
 import axiosCaseConverter from 'simple-axios-case-converter';
 
+import { setToast } from './actions/toast';
+
 declare module 'next-auth' {
   interface User {
     accessToken: string;
@@ -21,12 +23,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   basePath: '/api/auth',
   callbacks: {
-    authorized({ request, auth }) {
+    async authorized({ request, auth }) {
       const { pathname } = request.nextUrl;
 
       if (pathname.startsWith('/repositories') && !auth) {
+        await setToast({ message: 'Please sign in.', type: 'warning' });
         return Response.redirect(new URL('/', request.nextUrl));
-        // TODO: メッセージを表示する
       }
 
       if (pathname === '/' && auth) {
@@ -51,8 +53,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         } else {
           return false;
         }
-      } catch (error) {
-        console.error(error); // TODO: toastとかにする
+      } catch {
+        await setToast({ message: 'Failed to sign in.', type: 'warning' });
         return false;
       }
     },
