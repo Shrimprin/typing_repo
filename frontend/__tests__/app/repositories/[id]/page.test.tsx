@@ -8,6 +8,10 @@ import RepositoryDetailPage from '@/app/repositories/[id]/page';
 import { mockAuth, mockUseSession } from '../../../mocks/auth';
 import { clickButton } from '../../../utils/testUtils';
 
+jest.mock('@/actions/toast', () => ({
+  setToast: jest.fn().mockResolvedValue(undefined),
+}));
+
 describe('RepositoryDetailPage', () => {
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
   const CORRECT_CHARS_SELECTOR = '[class*="bg-secondary"]';
