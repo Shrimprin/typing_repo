@@ -8,6 +8,7 @@ import { axiosPatch } from '@/utils/axios';
 import { fetcher } from '@/utils/fetcher';
 import { updateFileItemInTree } from '@/utils/file-item';
 import { sortFileItems } from '@/utils/sort';
+import { toast } from 'sonner';
 import { useTypingStats } from './useTypingStats';
 
 type useTypingHandlerProps = {
@@ -127,6 +128,7 @@ export function useTypingHandler({
       const response = await axiosPatch(url, accessToken, postData);
       setFileItems((prev) => updateFileItemInTree(prev, response.data));
       setTypingStatus('paused');
+      toast.success('Typing paused and progress saved.');
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.message);
@@ -149,6 +151,7 @@ export function useTypingHandler({
     setCursorRow(0);
     typingStats.resetStats();
     setTypingStatus('ready');
+    toast.success('Reset progress.');
   };
 
   const handleComplete = useCallback(

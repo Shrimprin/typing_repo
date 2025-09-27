@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { setToast } from '@/actions/toast';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import type { Repository } from '@/types/repository';
 import { axiosDelete } from '@/utils/axios';
@@ -28,10 +29,10 @@ export default function DeleteRepositoryDialog({ repository }: Props) {
     setIsDeleting(true);
     try {
       await axiosDelete(`/api/repositories/${repository.id}`, accessToken);
+      await setToast({ message: 'Repository deleted.', type: 'success' });
       router.push('/repositories');
-    } catch (error) {
-      // TODO: toastなどで表示する
-      console.error('Failed to delete repository:', error);
+    } catch {
+      await setToast({ message: 'Failed to delete repository.', type: 'error' });
     } finally {
       setIsDeleting(false);
     }
