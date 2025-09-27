@@ -36,7 +36,7 @@ export default function DeleteAccountDialog() {
       await setToast({ message: 'Account deleted.', type: 'success' });
       await signOut({ redirectTo: '/' });
     } catch {
-      await setToast({ message: 'Failed to delete account.', type: 'warning' });
+      await setToast({ message: 'Failed to delete account.', type: 'error' });
       setIsDeleting(false);
     }
   };

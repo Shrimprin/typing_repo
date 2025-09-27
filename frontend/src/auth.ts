@@ -54,7 +54,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return false;
         }
       } catch {
-        await setToast({ message: 'Failed to sign in.', type: 'warning' });
+        await setToast({ message: 'Failed to sign in.', type: 'error' });
         return false;
       }
     },

@@ -32,7 +32,7 @@ export default function DeleteRepositoryDialog({ repository }: Props) {
       await setToast({ message: 'Repository deleted.', type: 'success' });
       router.push('/repositories');
     } catch {
-      await setToast({ message: 'Failed to delete repository.', type: 'warning' });
+      await setToast({ message: 'Failed to delete repository.', type: 'error' });
     } finally {
       setIsDeleting(false);
     }
