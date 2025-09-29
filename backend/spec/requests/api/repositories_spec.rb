@@ -131,7 +131,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:not_found)
         json = response.parsed_body
-        expect(json['error']).to eq('Repository not found')
+        expect(json['message']).to eq('Repository not found.')
       end
     end
   end
@@ -224,7 +224,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
-        expect(json['error']).to eq('Invalid URL')
+        expect(json['message']).to eq('Invalid URL.')
       end
     end
 
@@ -242,7 +242,7 @@ RSpec.describe 'Api::Repositories', type: :request do
       it 'returns not found status' do
         expect(response).to have_http_status(:not_found)
         json = response.parsed_body
-        expect(json['error']).to eq('Repository not found')
+        expect(json['message']).to eq('Repository not found.')
       end
     end
 
@@ -258,7 +258,7 @@ RSpec.describe 'Api::Repositories', type: :request do
       it 'returns too_many_requests status' do
         expect(response).to have_http_status(:too_many_requests)
         json = response.parsed_body
-        expect(json['error']).to eq('Too many requests. Please try again later.')
+        expect(json['message']).to eq('Too many requests. Please try again later.')
       end
     end
 
@@ -274,7 +274,7 @@ RSpec.describe 'Api::Repositories', type: :request do
       it 'returns unauthorized status' do
         expect(response).to have_http_status(:unauthorized)
         json = response.parsed_body
-        expect(json['error']).to eq('Invalid access token')
+        expect(json['message']).to eq('Invalid access token.')
       end
     end
 
@@ -290,7 +290,7 @@ RSpec.describe 'Api::Repositories', type: :request do
       it 'returns internal_server_error status' do
         expect(response).to have_http_status(:internal_server_error)
         json = response.parsed_body
-        expect(json['error']).to eq('An error occurred. Please try again.')
+        expect(json['message']).to eq('An error occurred. Please try again later.')
       end
     end
   end
@@ -370,7 +370,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
-        expect(json['error']).to eq('Invalid URL')
+        expect(json['message']).to eq('Invalid URL.')
       end
     end
 
@@ -388,7 +388,7 @@ RSpec.describe 'Api::Repositories', type: :request do
       it 'returns not found status' do
         expect(response).to have_http_status(:not_found)
         json = response.parsed_body
-        expect(json['error']).to eq('Repository not found')
+        expect(json['message']).to eq('Repository not found.')
       end
     end
 
@@ -404,7 +404,7 @@ RSpec.describe 'Api::Repositories', type: :request do
       it 'returns too_many_requests status' do
         expect(response).to have_http_status(:too_many_requests)
         json = response.parsed_body
-        expect(json['error']).to eq('Too many requests. Please try again later.')
+        expect(json['message']).to eq('Too many requests. Please try again later.')
       end
     end
 
@@ -420,7 +420,7 @@ RSpec.describe 'Api::Repositories', type: :request do
       it 'returns unauthorized status' do
         expect(response).to have_http_status(:unauthorized)
         json = response.parsed_body
-        expect(json['error']).to eq('Invalid access token')
+        expect(json['message']).to eq('Invalid access token.')
       end
     end
 
@@ -436,7 +436,7 @@ RSpec.describe 'Api::Repositories', type: :request do
       it 'returns internal_server_error status' do
         expect(response).to have_http_status(:internal_server_error)
         json = response.parsed_body
-        expect(json['error']).to eq('An error occurred. Please try again.')
+        expect(json['message']).to eq('An error occurred. Please try again later.')
       end
     end
   end
@@ -455,7 +455,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:ok)
         json = response.parsed_body
-        expect(json['message']).to eq('Repository deleted successfully')
+        expect(json['message']).to eq('Repository deleted successfully.')
       end
 
       it 'deletes associated file items' do
@@ -493,7 +493,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:not_found)
         json = response.parsed_body
-        expect(json['error']).to eq('Repository not found')
+        expect(json['message']).to eq('Repository not found.')
       end
     end
   end
