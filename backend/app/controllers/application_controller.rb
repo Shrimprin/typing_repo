@@ -15,9 +15,9 @@ class ApplicationController < ActionController::API
     if decoded_token
       @current_user = User.find(decoded_token[:user_id])
     else
-      render json: { error: 'Please login.' }, status: :unauthorized
+      render json: { message: 'Please login.' }, status: :unauthorized
     end
   rescue ActiveRecord::RecordNotFound, JWT::DecodeError
-    render json: { error: 'Please login.' }, status: :unauthorized
+    render json: { message: 'Please login.' }, status: :unauthorized
   end
 end

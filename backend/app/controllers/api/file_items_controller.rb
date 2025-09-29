@@ -12,11 +12,11 @@ module Api
         params: { content: true, typing_progress: true, children: true }
       ), status: :ok
     rescue Octokit::TooManyRequests
-      render json: { error: 'Too many requests. Please try again later.' }, status: :too_many_requests
+      render json: { message: 'Too many requests. Please try again later.' }, status: :too_many_requests
     rescue Octokit::Unauthorized
-      render json: { error: 'Invalid access token' }, status: :unauthorized
+      render json: { message: 'Invalid access token.' }, status: :unauthorized
     rescue StandardError
-      render json: { error: 'An error occurred. Please try again.' }, status: :internal_server_error
+      render json: { message: 'An error occurred. Please try again later.' }, status: :internal_server_error
     end
 
     def update
@@ -34,7 +34,7 @@ module Api
           render json: @file_item.errors, status: :unprocessable_content
         end
       else
-        render json: { error: 'Invalid status' }, status: :bad_request
+        render json: { message: 'Invalid status.' }, status: :bad_request
       end
     end
 
@@ -51,14 +51,14 @@ module Api
     def set_repository
       @repository = @current_user.repositories.find(params[:repository_id])
     rescue ActiveRecord::RecordNotFound
-      render json: { error: 'Repository not found' }, status: :not_found
+      render json: { message: 'Repository not found.' }, status: :not_found
     end
 
     def set_file_item
       repository = @repository || @current_user.repositories.find(params[:repository_id])
       @file_item = repository.file_items.find(params[:id])
     rescue ActiveRecord::RecordNotFound
-      render json: { error: 'File not found' }, status: :not_found
+      render json: { message: 'File not found.' }, status: :not_found
     end
 
     def fetch_file_content

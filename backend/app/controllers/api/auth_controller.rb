@@ -16,10 +16,11 @@ module Api
         expires_at: expires_at.to_i,
         user_id: user.id
       }, status: :ok
-    rescue ActiveRecord::RecordInvalid => e
-      render json: { error: e.message }, status: :unprocessable_content
-    rescue StandardError => e
-      render json: { error: e.message }, status: :internal_server_error
+    rescue ActiveRecord::RecordInvalid
+      render json: { message: 'Please provide valid user information.' }, status: :unprocessable_content
+    rescue StandardError
+      render json: { message: 'An error occurred during authentication. Please try again later.' },
+             status: :internal_server_error
     end
 
     private
