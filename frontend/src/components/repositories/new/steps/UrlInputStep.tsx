@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import axios from 'axios';
 import { ChevronRightIcon, LoaderCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
@@ -13,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import type { RepositoryPreview, WizardData } from '@/types';
 import { axiosGet } from '@/utils/axios';
+import { extractErrorMessage } from '@/utils/error-handler';
 
 type FormValues = {
   url: string;
@@ -61,11 +61,7 @@ export default function UrlInputStep({ initialUrl, isLoading, setIsLoading, onNe
         selectedExtensions: repositoryPreview.extensions,
       });
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage('An error occurred. Please try again.');
-      }
+      setErrorMessage(extractErrorMessage(error));
     } finally {
       setIsLoading(false);
     }

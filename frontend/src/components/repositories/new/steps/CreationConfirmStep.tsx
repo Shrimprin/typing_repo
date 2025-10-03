@@ -1,6 +1,5 @@
 'use client';
 
-import axios from 'axios';
 import { CheckCircle, ChevronLeftIcon, File, LoaderCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
@@ -9,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { WizardData } from '@/types';
 import { axiosPost } from '@/utils/axios';
+import { extractErrorMessage } from '@/utils/error-handler';
 import RepositoryCard from '../common/RepositoryCard';
 
 type CreationConfirmStepProps = {
@@ -49,11 +49,7 @@ export default function CreationConfirmStep({
 
       onComplete(response.data.id);
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage('An error occurred. Please try again.');
-      }
+      setErrorMessage(extractErrorMessage(error));
       setIsLoading(false);
     }
   };

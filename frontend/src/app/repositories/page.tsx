@@ -1,11 +1,11 @@
 import { auth } from '@/auth';
-import { AxiosError } from 'axios';
 
 import Header from '@/components/common/Header';
 import RepositoryFooter from '@/components/repositories/index/RepositoryFooter';
 import RepositoryList from '@/components/repositories/index/RepositoryList';
 import { PAGINATION } from '@/constants/pagination';
 import { RepositoriesResponse } from '@/types/repository';
+import { extractErrorMessage } from '@/utils/error-handler';
 import { repositoriesFetcher } from '@/utils/fetcher';
 import { sortRepositories } from '@/utils/sort';
 
@@ -36,8 +36,8 @@ export default async function RepositoriesPage({ searchParams }: Props) {
 
   try {
     repositoriesResponse = await repositoriesFetcher(url, accessToken);
-  } catch (error: AxiosError | unknown) {
-    const errorMessage = error instanceof AxiosError ? error.message : 'An error occurred. Please try again.';
+  } catch (error) {
+    const errorMessage = extractErrorMessage(error);
     return <div className="flex h-screen items-center justify-center p-8">{errorMessage}</div>;
   }
 

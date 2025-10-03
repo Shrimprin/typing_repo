@@ -1,10 +1,9 @@
-import { AxiosError } from 'axios';
-
 import { auth } from '@/auth';
 import Header from '@/components/common/Header';
 import DeleteRepositoryDialog from '@/components/repositories/DeleteRepositoryDialog';
 import RepositoryDetail from '@/components/repositories/RepositoryDetail';
 import { FileItem, Repository } from '@/types';
+import { extractErrorMessage } from '@/utils/error-handler';
 import { fetcher } from '@/utils/fetcher';
 import { sortFileItems } from '@/utils/sort';
 
@@ -21,8 +20,8 @@ export default async function RepositoryDetailPage({ params }: RepositoryDetailP
 
   try {
     repository = await fetcher(url, accessToken);
-  } catch (error: AxiosError | unknown) {
-    const errorMessage = error instanceof AxiosError ? error.message : 'An error occurred. Please try again.';
+  } catch (error) {
+    const errorMessage = extractErrorMessage(error);
     return <div className="flex h-screen items-center justify-center p-8">{errorMessage}</div>;
   }
 
