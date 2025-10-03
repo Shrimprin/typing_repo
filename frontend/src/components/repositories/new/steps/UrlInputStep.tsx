@@ -21,9 +21,9 @@ type FormValues = {
 const schema = z.object({
   url: z
     .string()
-    .nonempty('URL is required')
-    .url('Enter a valid URL')
-    .regex(/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/, 'Enter a valid GitHub repository URL'),
+    .nonempty('URL is required.')
+    .url('Enter a valid URL.')
+    .regex(/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/, 'Enter a valid GitHub repository URL.'),
 });
 
 type UrlInputStepProps = {
