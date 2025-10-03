@@ -4,6 +4,8 @@ type ErrorResponse = {
   message?: string;
 };
 
+const DEFAULT_ERROR_MESSAGE = 'An unexpected error occurred. Please try again later.';
+
 export function extractErrorMessage(error: unknown): string {
   if (isAxiosError(error)) {
     return extractAxiosErrorMessage(error);
@@ -13,7 +15,7 @@ export function extractErrorMessage(error: unknown): string {
     return error.message;
   }
 
-  return 'An unexpected error occurred. Please try again later.';
+  return DEFAULT_ERROR_MESSAGE;
 }
 
 function isAxiosError(error: unknown): error is AxiosError {
@@ -34,15 +36,10 @@ function extractAxiosErrorMessage(error: AxiosError): string {
     return 'The request is taking too long. Please try again later.';
   }
 
-  return 'An error occurred. Please try again later.';
+  return DEFAULT_ERROR_MESSAGE;
 }
 
 function extractBackendErrorMessage(error: AxiosError): string | null {
   const responseData = error.response?.data as ErrorResponse;
-
-  if (!responseData.message) {
-    return null;
-  }
-
-  return responseData.message;
+  return responseData?.message ? responseData.message : null;
 }
