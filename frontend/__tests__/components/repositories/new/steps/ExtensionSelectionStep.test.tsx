@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 
 import ExtensionSelectionStep from '@/components/repositories/new/steps/ExtensionSelectionStep';
 import { Extension, RepositoryPreview } from '@/types';
-import { clickButton, clickCheckboxByText, getCheckboxByText } from '../../../../utils/testUtils';
+import { clickButton, clickCheckboxByText, getCheckboxByText } from '../../../../helpers/interactions';
 
 describe('ExtensionSelectionStep', () => {
   const mockRepositoryPreview: RepositoryPreview = {

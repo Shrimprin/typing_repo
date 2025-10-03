@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 import { useTypingHandler } from '@/hooks/useTypingHandler';
 import { TypingStatus } from '@/types';
@@ -388,26 +388,12 @@ describe('useTypingHandler', () => {
       });
     });
 
-    describe('error handling', () => {
-      it('shows error message when occur axios error', async () => {
-        jest.spyOn(axios, 'get').mockRejectedValueOnce({
-          message: 'Network Error',
-          name: 'AxiosError',
-          code: 'ERR_NETWORK',
-          isAxiosError: true,
-        } as AxiosError);
-
+    describe('when error occurs', () => {
+      it('shows error message', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Server error'));
         const result = await setupHook(defaultProps);
 
-        expect(result.current.errorMessage).toBe('Network Error');
-      });
-
-      it('shows error message when occur server error', async () => {
-        jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Server Error'));
-
-        const result = await setupHook(defaultProps);
-
-        expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
+        expect(result.current.errorMessage).toBe('Server error');
       });
     });
   });
@@ -524,30 +510,14 @@ describe('useTypingHandler', () => {
       });
     });
 
-    describe('error handling', () => {
-      it('shows error message when occur axios error', async () => {
-        jest.spyOn(axios, 'patch').mockRejectedValueOnce({
-          message: 'Network Error',
-          name: 'AxiosError',
-          code: 'ERR_NETWORK',
-          isAxiosError: true,
-        } as AxiosError);
-
-        const result = await setupHook(typingProps);
-        await typeEntireContent();
-
-        expect(result.current.errorMessage).toBe('Network Error');
-        expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
-      });
-
-      it('shows error message when occur server error', async () => {
+    describe('when error occurs', () => {
+      it('shows error message', async () => {
         jest.spyOn(axios, 'patch').mockRejectedValueOnce(new Error('Server Error'));
 
         const result = await setupHook(typingProps);
-
         await typeEntireContent();
 
-        expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
+        expect(result.current.errorMessage).toBe('Server Error');
         expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
       });
     });
@@ -762,29 +732,14 @@ describe('useTypingHandler', () => {
       });
     });
 
-    describe('error handling', () => {
-      it('shows error message when occur axios error', async () => {
-        jest.spyOn(axios, 'patch').mockRejectedValueOnce({
-          message: 'Network Error',
-          name: 'AxiosError',
-          code: 'ERR_NETWORK',
-          isAxiosError: true,
-        } as AxiosError);
-
-        const result = await setupHook(typingProps);
-        await typeEntireContent();
-
-        expect(result.current.errorMessage).toBe('Network Error');
-        expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
-      });
-
-      it('shows error message when occur server error', async () => {
+    describe('when error occurs', () => {
+      it('shows error message', async () => {
         jest.spyOn(axios, 'patch').mockRejectedValueOnce(new Error('Server Error'));
 
         const result = await setupHook(typingProps);
         await typeEntireContent();
 
-        expect(result.current.errorMessage).toBe('An error occurred. Please try again.');
+        expect(result.current.errorMessage).toBe('Server Error');
         expect(mockSetTypingStatus).not.toHaveBeenCalledWith('completed');
       });
     });

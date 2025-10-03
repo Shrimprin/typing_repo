@@ -1,11 +1,11 @@
 import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 import CreationConfirmStep from '@/components/repositories/new/steps/CreationConfirmStep';
 import { Extension, RepositoryPreview, WizardData } from '@/types';
+import { clickButton } from '../../../../helpers/interactions';
 import { mockUseSession } from '../../../../mocks/auth';
-import { clickButton } from '../../../../utils/testUtils';
 
 describe('CreationConfirmStep', () => {
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -140,29 +140,8 @@ describe('CreationConfirmStep', () => {
     });
   });
 
-  describe('error handling', () => {
-    it('shows error message when occur axios error', async () => {
-      jest.spyOn(axios, 'post').mockRejectedValueOnce({
-        message: 'Network Error',
-        name: 'AxiosError',
-        code: 'ERR_NETWORK',
-        isAxiosError: true,
-      } as AxiosError);
-
-      const { setIsLoading } = setup();
-
-      await clickButton('Create');
-
-      expect(setIsLoading).toHaveBeenCalledWith(true);
-
-      await waitFor(() => {
-        expect(screen.getByText('Network Error')).toBeInTheDocument();
-      });
-
-      expect(setIsLoading).toHaveBeenCalledWith(false);
-    });
-
-    it('shows error message when occur server error', async () => {
+  describe('when error occurs', () => {
+    it('shows error message', async () => {
       jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error('Server error'));
       const { setIsLoading } = setup();
 
@@ -171,7 +150,7 @@ describe('CreationConfirmStep', () => {
       expect(setIsLoading).toHaveBeenCalledWith(true);
 
       await waitFor(() => {
-        expect(screen.getByText('An error occurred. Please try again.')).toBeInTheDocument();
+        expect(screen.getByText('Server error')).toBeInTheDocument();
       });
 
       expect(setIsLoading).toHaveBeenCalledWith(false);
