@@ -29,12 +29,12 @@ function extractAxiosErrorMessage(error: AxiosError): string {
     return backendMessage;
   }
 
-  if (!error.response && error.request) {
-    return 'Unable to connect to the server. Please try again later.';
-  }
-
   if (error.code === 'ECONNABORTED') {
     return 'The request is taking too long. Please try again later.';
+  }
+
+  if (!error.response && error.request) {
+    return 'Unable to connect to the server. Please try again later.';
   }
 
   return DEFAULT_ERROR_MESSAGE;
