@@ -78,7 +78,9 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
             {isLoading ? (
               <Loading text="Loading file..." />
             ) : typingHandler.errorMessage ? (
-              <div className="p-6 text-center">{typingHandler.errorMessage}</div>
+              <div className="p-6 text-center whitespace-pre-line">
+                <div className="inline-block text-left">{typingHandler.errorMessage}</div>
+              </div>
             ) : !selectedFileItem ? (
               <div className="p-6 text-center">Select a file to start typing.</div>
             ) : (

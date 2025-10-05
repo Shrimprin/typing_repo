@@ -98,7 +98,11 @@ export default function CreationConfirmStep({
         </div>
       </div>
 
-      {errorMessage && <div className="text-destructive text-sm">{errorMessage}</div>}
+      {errorMessage && (
+        <div className="text-destructive text-sm whitespace-pre-line">
+          <div className="inline-block text-left">{errorMessage}</div>
+        </div>
+      )}
 
       <div className="flex justify-between">
         <Button variant="outline" onClick={onBack} disabled={isLoading}>

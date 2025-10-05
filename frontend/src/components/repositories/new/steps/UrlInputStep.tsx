@@ -84,7 +84,11 @@ export default function UrlInputStep({ initialUrl, isLoading, setIsLoading, onNe
           )}
         />
 
-        {errorMessage && <div className="text-destructive text-sm">{errorMessage}</div>}
+        {errorMessage && (
+          <div className="text-destructive text-sm whitespace-pre-line">
+            <div className="inline-block text-left">{errorMessage}</div>
+          </div>
+        )}
 
         <div className="flex justify-end">
           <Button type="submit" variant="outline" disabled={isLoading}>

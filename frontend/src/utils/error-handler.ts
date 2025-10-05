@@ -2,6 +2,7 @@ import { AxiosError } from 'axios';
 
 type ErrorResponse = {
   message?: string;
+  errors?: Record<string, string[]>;
 };
 
 const DEFAULT_ERROR_MESSAGE = 'An unexpected error occurred. Please try again later.';
@@ -41,5 +42,16 @@ function extractAxiosErrorMessage(error: AxiosError): string {
 
 function extractBackendErrorMessage(error: AxiosError): string | null {
   const responseData = error.response?.data as ErrorResponse;
-  return responseData?.message ? responseData.message : null;
+
+  if (responseData?.errors) {
+    return formatValidationErrors(responseData.errors);
+  }
+
+  return responseData?.message || null;
+}
+
+function formatValidationErrors(errors: Record<string, string[]>): string {
+  return Object.entries(errors)
+    .flatMap(([key, errorArray]) => errorArray.map((errorMessage) => `- ${key} ${errorMessage}`))
+    .join('\n');
 }

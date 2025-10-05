@@ -55,5 +55,23 @@ describe('errorHandler', () => {
 
       expect(extractErrorMessage(error)).toBe('An unexpected error occurred. Please try again later.');
     });
+
+    it('returns all  errors when multiple errors exist', () => {
+      const error = createAxiosError({
+        response: {
+          data: {
+            errors: {
+              name: ['is required', 'is too short'],
+              url: ['is invalid'],
+              commit_hash: ['is required'],
+            },
+          },
+        },
+      });
+
+      expect(extractErrorMessage(error)).toBe(
+        '- name is required\n- name is too short\n- url is invalid\n- commit_hash is required',
+      );
+    });
   });
 });
