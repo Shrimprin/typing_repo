@@ -25,13 +25,13 @@ module Api
         if @file_item.update_with_parent(file_item_params) && @repository.update(last_typed_at: Time.zone.now)
           render json: typed_file_items_response, status: :ok
         else
-          render json: @file_item.errors, status: :unprocessable_content
+          render json: { errors: @file_item.errors }, status: :unprocessable_content
         end
       when 'typing'
         if @file_item.update_with_typing_progress(file_item_params) && @repository.update(last_typed_at: Time.zone.now)
           render json: FileItemSerializer.new(@file_item, params: { children: true }), status: :ok
         else
-          render json: @file_item.errors, status: :unprocessable_content
+          render json: { errors: @file_item.errors }, status: :unprocessable_content
         end
       else
         render json: { message: 'Invalid status.' }, status: :bad_request

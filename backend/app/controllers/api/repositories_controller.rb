@@ -29,7 +29,7 @@ module Api
       if repository.save_with_file_items(client)
         render json: RepositorySerializer.new(repository), status: :created
       else
-        render json: repository.errors, status: :unprocessable_content
+        render json: { errors: repository.errors }, status: :unprocessable_content
       end
     rescue Octokit::NotFound
       render json: { message: 'Repository not found.' }, status: :not_found

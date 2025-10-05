@@ -213,7 +213,7 @@ RSpec.describe 'Api::Repositories', type: :request do
 
         expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
-        expect(json['name']).to eq(['can\'t be blank'])
+        expect(json['errors']['name']).to eq(['can\'t be blank'])
       end
     end
 
