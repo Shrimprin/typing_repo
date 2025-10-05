@@ -390,10 +390,10 @@ describe('useTypingHandler', () => {
 
     describe('when error occurs', () => {
       it('shows error message', async () => {
-        jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Server error'));
+        jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Server Error'));
         const result = await setupHook(defaultProps);
 
-        expect(result.current.errorMessage).toBe('Server error');
+        expect(result.current.errorMessage).toBe('Server Error');
       });
     });
   });

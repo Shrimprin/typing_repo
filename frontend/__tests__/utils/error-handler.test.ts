@@ -56,7 +56,7 @@ describe('errorHandler', () => {
       expect(extractErrorMessage(error)).toBe('An unexpected error occurred. Please try again later.');
     });
 
-    it('returns all  errors when multiple errors exist', () => {
+    it('returns all errors when multiple errors exist', () => {
       const error = createAxiosError({
         response: {
           data: {
