@@ -149,7 +149,7 @@ RSpec.describe 'Api::FileItems', type: :request do
 
         expect(response).to have_http_status(:too_many_requests)
         json = response.parsed_body
-        expect(json['error']).to eq('Too many requests. Please try again later.')
+        expect(json['message']).to eq('Too many requests. Please try again later.')
       end
     end
 
@@ -168,7 +168,7 @@ RSpec.describe 'Api::FileItems', type: :request do
 
         expect(response).to have_http_status(:unauthorized)
         json = response.parsed_body
-        expect(json['error']).to eq('Invalid access token')
+        expect(json['message']).to eq('Invalid access token.')
       end
     end
 
@@ -187,7 +187,7 @@ RSpec.describe 'Api::FileItems', type: :request do
 
         expect(response).to have_http_status(:internal_server_error)
         json = response.parsed_body
-        expect(json['error']).to eq('An error occurred. Please try again.')
+        expect(json['message']).to eq('An error occurred. Please try again later.')
       end
     end
   end
@@ -332,8 +332,8 @@ RSpec.describe 'Api::FileItems', type: :request do
 
         expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
-        expect(json['typing_progress.row']).to include("can't be blank")
-        expect(json['typing_progress.column']).to include("can't be blank")
+        expect(json['errors']['typing_progress.row']).to include("can't be blank")
+        expect(json['errors']['typing_progress.column']).to include("can't be blank")
 
         # status: typing
         patch api_repository_file_item_path(repository_id: repository.id, id: untyped_file_item.id),
@@ -341,8 +341,8 @@ RSpec.describe 'Api::FileItems', type: :request do
 
         expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
-        expect(json['typing_progress.row']).to include("can't be blank")
-        expect(json['typing_progress.column']).to include("can't be blank")
+        expect(json['errors']['typing_progress.row']).to include("can't be blank")
+        expect(json['errors']['typing_progress.column']).to include("can't be blank")
       end
     end
 
@@ -353,7 +353,7 @@ RSpec.describe 'Api::FileItems', type: :request do
 
         expect(response).to have_http_status(:bad_request)
         json = response.parsed_body
-        expect(json['error']).to eq('Invalid status')
+        expect(json['message']).to eq('Invalid status.')
       end
     end
   end

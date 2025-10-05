@@ -5,8 +5,8 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
 import NewRepositoryPage from '@/app/repositories/new/page';
+import { clickButton, getCheckboxByText } from '../../../helpers/interactions';
 import { mockUseSession } from '../../../mocks/auth';
-import { clickButton, getCheckboxByText } from '../../../utils/testUtils';
 
 describe('NewRepositoryPage', () => {
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;

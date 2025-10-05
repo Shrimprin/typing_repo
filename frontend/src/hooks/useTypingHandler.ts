@@ -1,10 +1,10 @@
-import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 
 import { FileItem, Repository, Stats, TypingStatus, Typo } from '@/types';
 import { axiosPatch } from '@/utils/axios';
+import { extractErrorMessage } from '@/utils/error-handler';
 import { fetcher } from '@/utils/fetcher';
 import { updateFileItemInTree } from '@/utils/file-item';
 import { sortFileItems } from '@/utils/sort';
@@ -91,11 +91,7 @@ export function useTypingHandler({
 
       return fetchedFileItem;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage('An error occurred. Please try again.');
-      }
+      setErrorMessage(extractErrorMessage(error));
       return null;
     }
   };
@@ -130,11 +126,7 @@ export function useTypingHandler({
       setTypingStatus('paused');
       toast.success('Typing paused and progress saved.');
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage('An error occurred. Please try again.');
-      }
+      setErrorMessage(extractErrorMessage(error));
     }
   };
 
@@ -187,11 +179,7 @@ export function useTypingHandler({
 
         setTypingStatus('completed');
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setErrorMessage(error.message);
-        } else {
-          setErrorMessage('An error occurred. Please try again.');
-        }
+        setErrorMessage(extractErrorMessage(error));
       }
     },
     [

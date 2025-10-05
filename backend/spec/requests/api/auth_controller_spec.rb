@@ -63,25 +63,25 @@ RSpec.describe 'Api::Auth', type: :request do
     end
 
     context 'when invalid params' do
-      it 'returns validation error' do
+      it 'returns error message' do
         invalid_params = { auth: { github_id: '12345' } }
         post '/api/auth/callback/github', params: invalid_params
 
         expect(response).to have_http_status(:unprocessable_content)
         json = response.parsed_body
-        expect(json).to have_key('error')
+        expect(json['message']).to eq('Please provide valid user information.')
       end
     end
 
     context 'when unexpected error occurs' do
       it 'returns error message' do
-        allow(User).to receive(:find_or_initialize_by).and_raise(StandardError.new('テストエラー'))
+        allow(User).to receive(:find_or_initialize_by).and_raise(StandardError)
 
         post '/api/auth/callback/github', params: valid_params
 
         expect(response).to have_http_status(:internal_server_error)
         json = response.parsed_body
-        expect(json['error']).to eq('テストエラー')
+        expect(json['message']).to eq('An error occurred during authentication. Please try again later.')
       end
     end
   end

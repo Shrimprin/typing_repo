@@ -19,7 +19,7 @@ module Api
       repository_url = UrlUtils.extract_github_repository_path(url)
 
       if repository_url.nil?
-        render json: { error: 'Invalid URL' }, status: :unprocessable_content
+        render json: { message: 'Invalid URL.' }, status: :unprocessable_content
         return
       end
 
@@ -29,16 +29,16 @@ module Api
       if repository.save_with_file_items(client)
         render json: RepositorySerializer.new(repository), status: :created
       else
-        render json: repository.errors, status: :unprocessable_content
+        render json: { errors: repository.errors }, status: :unprocessable_content
       end
     rescue Octokit::NotFound
-      render json: { error: 'Repository not found' }, status: :not_found
+      render json: { message: 'Repository not found.' }, status: :not_found
     rescue Octokit::TooManyRequests
-      render json: { error: 'Too many requests. Please try again later.' }, status: :too_many_requests
+      render json: { message: 'Too many requests. Please try again later.' }, status: :too_many_requests
     rescue Octokit::Unauthorized
-      render json: { error: 'Invalid access token' }, status: :unauthorized
+      render json: { message: 'Invalid access token.' }, status: :unauthorized
     rescue StandardError
-      render json: { error: 'An error occurred. Please try again.' }, status: :internal_server_error
+      render json: { message: 'An error occurred. Please try again later.' }, status: :internal_server_error
     end
 
     def preview
@@ -46,7 +46,7 @@ module Api
       repository_url = UrlUtils.extract_github_repository_path(url)
 
       if repository_url.nil?
-        render json: { error: 'Invalid URL' }, status: :unprocessable_content
+        render json: { message: 'Invalid URL.' }, status: :unprocessable_content
         return
       end
 
@@ -55,18 +55,18 @@ module Api
 
       render json: repository_preview_data, status: :ok
     rescue Octokit::NotFound
-      render json: { error: 'Repository not found' }, status: :not_found
+      render json: { message: 'Repository not found.' }, status: :not_found
     rescue Octokit::TooManyRequests
-      render json: { error: 'Too many requests. Please try again later.' }, status: :too_many_requests
+      render json: { message: 'Too many requests. Please try again later.' }, status: :too_many_requests
     rescue Octokit::Unauthorized
-      render json: { error: 'Invalid access token' }, status: :unauthorized
+      render json: { message: 'Invalid access token.' }, status: :unauthorized
     rescue StandardError
-      render json: { error: 'An error occurred. Please try again.' }, status: :internal_server_error
+      render json: { message: 'An error occurred. Please try again later.' }, status: :internal_server_error
     end
 
     def destroy
       @repository.destroy
-      render json: { message: 'Repository deleted successfully' }, status: :ok
+      render json: { message: 'Repository deleted successfully.' }, status: :ok
     end
 
     private
@@ -82,7 +82,7 @@ module Api
     def set_repository
       @repository = @current_user.repositories.find(params[:id])
     rescue ActiveRecord::RecordNotFound
-      render json: { error: 'Repository not found' }, status: :not_found
+      render json: { message: 'Repository not found.' }, status: :not_found
     end
 
     def build_repository(client, repository_url)

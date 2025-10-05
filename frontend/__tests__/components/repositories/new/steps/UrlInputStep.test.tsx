@@ -1,12 +1,12 @@
 import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 import UrlInputStep from '@/components/repositories/new/steps/UrlInputStep';
 import { RepositoryPreview } from '@/types/repository-creation';
+import { clickButton } from '../../../../helpers/interactions';
 import { mockUseSession } from '../../../../mocks/auth';
-import { clickButton } from '../../../../utils/testUtils';
 
 describe('UrlInputStep', () => {
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -101,45 +101,24 @@ describe('UrlInputStep', () => {
     it('shows error when url is empty', async () => {
       setup();
       await typeUrlAndSubmit('');
-      expect(screen.getByText('URL is required')).toBeInTheDocument();
+      expect(screen.getByText('URL is required.')).toBeInTheDocument();
     });
 
     it('shows error when url is invalid format', async () => {
       setup();
       await typeUrlAndSubmit('invalid-url');
-      expect(screen.getByText('Enter a valid URL')).toBeInTheDocument();
+      expect(screen.getByText('Enter a valid URL.')).toBeInTheDocument();
     });
 
     it('shows error when url is not a valid GitHub repository URL', async () => {
       setup();
       await typeUrlAndSubmit('https://example.com/user/repo');
-      expect(screen.getByText('Enter a valid GitHub repository URL')).toBeInTheDocument();
+      expect(screen.getByText('Enter a valid GitHub repository URL.')).toBeInTheDocument();
     });
   });
 
-  describe('error handling', () => {
-    it('shows error message when occur axios error', async () => {
-      jest.spyOn(axios, 'get').mockRejectedValueOnce({
-        message: 'Network Error',
-        name: 'AxiosError',
-        code: 'ERR_NETWORK',
-        isAxiosError: true,
-      } as AxiosError);
-
-      const { setIsLoading } = setup();
-
-      await typeUrlAndSubmit('https://github.com/test-username/test-repository');
-
-      expect(setIsLoading).toHaveBeenCalledWith(true);
-
-      await waitFor(() => {
-        expect(screen.getByText('Network Error')).toBeInTheDocument();
-      });
-
-      expect(setIsLoading).toHaveBeenCalledWith(false);
-    });
-
-    it('shows error message when occur server error', async () => {
+  describe('when error occurs', () => {
+    it('shows error message', async () => {
       jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Server error'));
       const { setIsLoading } = setup();
 
@@ -148,7 +127,7 @@ describe('UrlInputStep', () => {
       expect(setIsLoading).toHaveBeenCalledWith(true);
 
       await waitFor(() => {
-        expect(screen.getByText('An error occurred. Please try again.')).toBeInTheDocument();
+        expect(screen.getByText('Server error')).toBeInTheDocument();
       });
 
       expect(setIsLoading).toHaveBeenCalledWith(false);

@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import axios from 'axios';
 import { ChevronRightIcon, LoaderCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
@@ -13,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import type { RepositoryPreview, WizardData } from '@/types';
 import { axiosGet } from '@/utils/axios';
+import { extractErrorMessage } from '@/utils/error-handler';
 
 type FormValues = {
   url: string;
@@ -21,9 +21,9 @@ type FormValues = {
 const schema = z.object({
   url: z
     .string()
-    .nonempty('URL is required')
-    .url('Enter a valid URL')
-    .regex(/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/, 'Enter a valid GitHub repository URL'),
+    .nonempty('URL is required.')
+    .url('Enter a valid URL.')
+    .regex(/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/, 'Enter a valid GitHub repository URL.'),
 });
 
 type UrlInputStepProps = {
@@ -61,11 +61,7 @@ export default function UrlInputStep({ initialUrl, isLoading, setIsLoading, onNe
         selectedExtensions: repositoryPreview.extensions,
       });
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage('An error occurred. Please try again.');
-      }
+      setErrorMessage(extractErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
@@ -88,7 +84,11 @@ export default function UrlInputStep({ initialUrl, isLoading, setIsLoading, onNe
           )}
         />
 
-        {errorMessage && <div className="text-destructive text-sm">{errorMessage}</div>}
+        {errorMessage && (
+          <div className="text-destructive text-sm whitespace-pre-line">
+            <div className="inline-block text-left">{errorMessage}</div>
+          </div>
+        )}
 
         <div className="flex justify-end">
           <Button type="submit" variant="outline" disabled={isLoading}>

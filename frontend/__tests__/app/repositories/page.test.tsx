@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 import RepositoriesPage from '@/app/repositories/page';
 import { mockAuth } from '../../mocks/auth';
@@ -227,19 +227,12 @@ describe('RepositoriesPage', () => {
     expect(repositoryAddButton).toHaveAttribute('href', '/repositories/new');
   });
 
-  describe('error handling', () => {
-    it('shows error message when occur axios error', async () => {
-      jest.spyOn(axios, 'get').mockRejectedValueOnce(new AxiosError('Network Error'));
-      await renderRepositoriesPage();
-
-      expect(screen.getByText('Network Error')).toBeInTheDocument();
-    });
-
-    it('shows error message when occur server error', async () => {
+  describe('when error occurs', () => {
+    it('shows error message', async () => {
       jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Server error'));
       await renderRepositoriesPage();
 
-      expect(screen.getByText('An error occurred. Please try again.')).toBeInTheDocument();
+      expect(screen.getByText('Server error')).toBeInTheDocument();
     });
   });
 });
