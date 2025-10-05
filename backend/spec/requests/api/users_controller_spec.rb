@@ -57,7 +57,7 @@ RSpec.describe Api::UsersController, type: :request do
         expect(response).to have_http_status(:unprocessable_content)
 
         response_body = response.parsed_body
-        expect(response_body['message']).to eq('Failed to delete account')
+        expect(response_body['message']).to eq('Failed to delete account.')
       end
 
       it 'returns internal_server_error when StandardError is raised' do
