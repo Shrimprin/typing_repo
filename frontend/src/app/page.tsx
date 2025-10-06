@@ -3,13 +3,11 @@ import { Github } from 'lucide-react';
 import Image from 'next/image';
 
 import { SignIn } from '@/components/common/AuthButton';
-import Header from '@/components/common/Header';
+import PageLayout from '@/components/common/PageLayout';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-
+    <PageLayout>
       <section className="bg-background relative flex-1 overflow-hidden">
         <div
           className={`
@@ -162,6 +160,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </div>
+    </PageLayout>
   );
 }

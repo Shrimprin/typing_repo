@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 
-import Header from '@/components/common/Header';
+import PageLayout from '@/components/common/PageLayout';
 import RepositoryFooter from '@/components/repositories/index/RepositoryFooter';
 import RepositoryList from '@/components/repositories/index/RepositoryList';
 import { PAGINATION } from '@/constants/pagination';
@@ -38,20 +38,23 @@ export default async function RepositoriesPage({ searchParams }: Props) {
     repositoriesResponse = await repositoriesFetcher(url, accessToken);
   } catch (error) {
     const errorMessage = extractErrorMessage(error);
-    return <div className="flex h-screen items-center justify-center p-8">{errorMessage}</div>;
+    return (
+      <PageLayout title="Repositories">
+        <div className="flex h-screen items-center justify-center p-8">{errorMessage}</div>
+      </PageLayout>
+    );
   }
 
   const sortedRepositories = sortRepositories(repositoriesResponse.repositories);
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header title="Repositories" />
+    <PageLayout title="Repositories">
       <div className="flex-1">
         <div className="flex min-h-full flex-col px-2">
           <RepositoryList repositories={sortedRepositories} pagination={repositoriesResponse.pagination} />
         </div>
       </div>
       <RepositoryFooter />
-    </div>
+    </PageLayout>
   );
 }
