@@ -1,5 +1,5 @@
 import { auth } from '@/auth';
-import Header from '@/components/common/Header';
+import PageLayout from '@/components/common/PageLayout';
 import DeleteRepositoryDialog from '@/components/repositories/DeleteRepositoryDialog';
 import RepositoryDetail from '@/components/repositories/RepositoryDetail';
 import { FileItem, Repository } from '@/types';
@@ -22,7 +22,11 @@ export default async function RepositoryDetailPage({ params }: RepositoryDetailP
     repository = await fetcher(url, accessToken);
   } catch (error) {
     const errorMessage = extractErrorMessage(error);
-    return <div className="flex h-screen items-center justify-center p-8">{errorMessage}</div>;
+    return (
+      <PageLayout title="Repository">
+        <div className="flex h-screen items-center justify-center p-8">{errorMessage}</div>
+      </PageLayout>
+    );
   }
 
   const fileItems: FileItem[] | [] = repository.fileItems;
@@ -30,11 +34,10 @@ export default async function RepositoryDetailPage({ params }: RepositoryDetailP
   const moreComponent = <DeleteRepositoryDialog repository={repository} />;
 
   return (
-    <div className="flex h-screen flex-col">
-      <Header title={repository.name} moreComponent={moreComponent} />
+    <PageLayout title={repository.name} moreComponent={moreComponent} className="flex h-screen flex-col">
       <div className="flex-1 overflow-hidden">
         <RepositoryDetail initialFileItems={sortedFileItems} />
       </div>
-    </div>
+    </PageLayout>
   );
 }
