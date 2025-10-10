@@ -16,9 +16,11 @@ module Api
         expires_at: expires_at.to_i,
         user_id: user.id
       }, status: :ok
-    rescue ActiveRecord::RecordInvalid
+    rescue ActiveRecord::RecordInvalid => e
+      LogUtils.log_warn(e, 'AuthController#login')
       render json: { message: 'Please provide valid user information.' }, status: :unprocessable_content
-    rescue StandardError
+    rescue StandardError => e
+      LogUtils.log_error(e, 'AuthController#login')
       render json: { message: 'An error occurred during authentication. Please try again later.' },
              status: :internal_server_error
     end

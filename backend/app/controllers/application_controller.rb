@@ -17,7 +17,8 @@ class ApplicationController < ActionController::API
     else
       render json: { message: 'Please login.' }, status: :unauthorized
     end
-  rescue ActiveRecord::RecordNotFound, JWT::DecodeError
+  rescue ActiveRecord::RecordNotFound, JWT::DecodeError => e
+    LogUtils.log_warn(e, 'ApplicationController#authenticate_request!')
     render json: { message: 'Please login.' }, status: :unauthorized
   end
 end
