@@ -8,12 +8,24 @@ export default function Footer() {
 
   return (
     <footer className="bg-background border-border mt-auto border-t">
-      <div className="container mx-auto px-8 py-6">
-        <div className="mb-4 flex items-center justify-center gap-8 text-sm">
+      <div
+        className={`
+          container mx-auto px-4 py-4
+          sm:px-6 sm:py-6
+          md:px-8
+        `}
+      >
+        <div
+          className={`
+            mb-3 flex flex-col items-center justify-center gap-3 text-sm
+            sm:mb-4 sm:flex-row sm:gap-6
+            md:gap-8
+          `}
+        >
           <Link
             href="/terms"
             className={`
-              text-muted-foreground decoration-primary/50 underline-offset-4 transition-colors duration-200
+              text-muted-foreground decoration-primary/50 text-center underline-offset-4 transition-colors duration-200
               hover:text-foreground hover:underline
             `}
           >
@@ -22,7 +34,7 @@ export default function Footer() {
           <Link
             href="/privacy"
             className={`
-              text-muted-foreground decoration-primary/50 underline-offset-4 transition-colors duration-200
+              text-muted-foreground decoration-primary/50 text-center underline-offset-4 transition-colors duration-200
               hover:text-foreground hover:underline
             `}
           >
@@ -33,8 +45,8 @@ export default function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             className={`
-              text-muted-foreground decoration-primary/50 flex items-center gap-2 underline-offset-4 transition-colors
-              duration-200
+              text-muted-foreground decoration-primary/50 flex items-center justify-center gap-2 text-center
+              underline-offset-4 transition-colors duration-200
               hover:text-foreground hover:underline
             `}
           >
@@ -44,7 +56,14 @@ export default function Footer() {
         </div>
 
         <div className="text-center">
-          <span className="text-muted-foreground text-sm">{yearRange} TypingRepo. All rights reserved.</span>
+          <span
+            className={`
+              text-muted-foreground text-xs
+              sm:text-sm
+            `}
+          >
+            {yearRange} TypingRepo. All rights reserved.
+          </span>
         </div>
       </div>
     </footer>
