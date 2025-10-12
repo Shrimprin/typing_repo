@@ -3,11 +3,10 @@ import { Github } from 'lucide-react';
 import Image from 'next/image';
 
 import { SignIn } from '@/components/common/AuthButton';
-import PageLayout from '@/components/common/PageLayout';
 
 export default function Home() {
   return (
-    <PageLayout>
+    <>
       <section className="bg-background relative flex-1 overflow-hidden">
         <div
           className={`
@@ -32,6 +31,11 @@ export default function Home() {
 
         <div className="relative z-10 container mx-auto flex min-h-[50vh] items-center justify-center px-6">
           <div className="mx-auto text-center">
+            <div className="mb-8 flex justify-center">
+              <div className="relative">
+                <Image src="/logo.svg" alt="Typing Repo Logo" width={512} height={512} />
+              </div>
+            </div>
             <h1 className="text-foreground mb-6 text-5xl font-bold">
               Practice Typing Through{' '}
               <span className="from-primary to-secondary bg-gradient-to-r bg-clip-text text-transparent">
@@ -160,6 +164,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </PageLayout>
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import { MoreHorizontal } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import UserButton from '@/components/common/UserButton';
@@ -20,7 +21,7 @@ export default function Header({ title = '', moreComponent }: HeaderProps) {
           hover:opacity-80
         `}
       >
-        LOGO
+        <Image src="/logo-icon.svg" alt="Typing Repo Logo" width={40} height={40} />
       </Link>
       {title && <h1 className="mx-3 min-w-0 truncate text-lg font-bold">{title}</h1>}
       {moreComponent && (
