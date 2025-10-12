@@ -21,7 +21,7 @@ export default function Header({ title = '', moreComponent }: HeaderProps) {
           hover:opacity-80
         `}
       >
-        <Image src="/logo-icon.svg" alt="Typing Repo Icon" width={40} height={40} />
+        <Image src="/logo-icon.svg" alt="Typing Repo Logo" width={40} height={40} />
       </Link>
       {title && <h1 className="mx-3 min-w-0 truncate text-lg font-bold">{title}</h1>}
       {moreComponent && (

@@ -33,7 +33,7 @@ export default function Home() {
           <div className="mx-auto text-center">
             <div className="mb-8 flex justify-center">
               <div className="relative">
-                <Image src="/logo.svg" alt="TypingRepo Logo" width={512} height={512} />
+                <Image src="/logo.svg" alt="Typing Repo Logo" width={512} height={512} />
               </div>
             </div>
             <h1 className="text-foreground mb-6 text-5xl font-bold">
