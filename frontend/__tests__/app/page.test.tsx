@@ -18,6 +18,10 @@ describe('Home', () => {
   });
 
   describe('Hero section', () => {
+    it('renders the logo', () => {
+      expect(screen.getByAltText('TypingRepo Logo')).toBeInTheDocument();
+    });
+
     it('renders the main title', () => {
       expect(
         screen.getByRole('heading', {
