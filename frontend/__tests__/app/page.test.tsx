@@ -19,7 +19,7 @@ describe('Home', () => {
 
   describe('Hero section', () => {
     it('renders the logo', () => {
-      expect(screen.getByAltText('TypingRepo Logo')).toBeInTheDocument();
+      expect(screen.getByAltText('Typing Repo Logo')).toBeInTheDocument();
     });
 
     it('renders the main title', () => {
