@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import { Metadata } from 'next';
 
 import PageLayout from '@/components/common/PageLayout';
 import RepositoryFooter from '@/components/repositories/index/RepositoryFooter';
@@ -11,6 +12,12 @@ import { sortRepositories } from '@/utils/sort';
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export const metadata: Metadata = {
+  title: 'Repositories | Typing Repo',
+  description:
+    'This page lists all repositories available for typing practice and you can add any GitHub repository you want to practice with.',
 };
 
 export default async function RepositoriesPage({ searchParams }: Props) {

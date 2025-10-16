@@ -1,3 +1,5 @@
+import { Metadata } from 'next';
+
 import { auth } from '@/auth';
 import PageLayout from '@/components/common/PageLayout';
 import DeleteRepositoryDialog from '@/components/repositories/DeleteRepositoryDialog';
@@ -10,6 +12,25 @@ import { sortFileItems } from '@/utils/sort';
 type RepositoryDetailPageProps = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({ params }: RepositoryDetailPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const session = await auth();
+  const accessToken = session?.user?.accessToken;
+
+  try {
+    const repository: Repository = await fetcher(`/api/repositories/${id}`, accessToken);
+    return {
+      title: `${repository.name} | Typing Repo`,
+      description: 'View a repository and start typing practice.',
+    };
+  } catch {
+    return {
+      title: 'Repository | Typing Repo',
+      description: 'View a repository and start typing practice.',
+    };
+  }
+}
 
 export default async function RepositoryDetailPage({ params }: RepositoryDetailPageProps) {
   const { id } = await params;

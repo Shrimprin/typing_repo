@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import { Play } from 'next/font/google';
 
 import Footer from '@/components/common/Footer';
@@ -13,12 +12,6 @@ const play = Play({
   subsets: ['latin'],
   weight: ['400'],
 });
-
-export const metadata: Metadata = {
-  title: 'TypingRepo - Practice Typing with Real Code',
-  description:
-    'Improve your coding typing accuracy and speed by practicing with real GitHub repositories. A typing game for programming beginners.',
-};
 
 export default function RootLayout({
   children,
