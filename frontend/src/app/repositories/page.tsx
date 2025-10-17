@@ -1,5 +1,5 @@
 import { auth } from '@/auth';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 
 import PageLayout from '@/components/common/PageLayout';
 import RepositoryFooter from '@/components/repositories/index/RepositoryFooter';
