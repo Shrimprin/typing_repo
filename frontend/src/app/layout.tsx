@@ -10,7 +10,7 @@ import './globals.css';
 const TITLE = 'Typing Repo';
 const DESCRIPTION =
   'Free typing game for programmers. You can import any GitHub repository and practice typing through real code.';
-const URL = 'https://typing-repo.com';
+const URL = 'https://www.typingrepo.com';
 
 export const metadata: Metadata = {
   title: {
