@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import PageLayout from '@/components/common/PageLayout';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Typing Repo',
+  title: 'Privacy Policy',
   description: 'This page describes the privacy policy for Typing Repo.',
 };
 

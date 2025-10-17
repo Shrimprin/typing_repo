@@ -1,15 +1,8 @@
 import { IconKeyboard } from '@tabler/icons-react';
 import { Github } from 'lucide-react';
-import { Metadata } from 'next';
 import Image from 'next/image';
 
 import { SignIn } from '@/components/common/AuthButton';
-
-export const metadata: Metadata = {
-  title: 'Typing Repo | Practice Typing with Real Code',
-  description:
-    'TypingRepo is a typing game for programmers to improve coding speed and accuracy. Import any GitHub repository and practice typing through real code.',
-};
 
 export default function Home() {
   return (

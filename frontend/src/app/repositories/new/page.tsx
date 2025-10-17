@@ -4,7 +4,7 @@ import PageLayout from '@/components/common/PageLayout';
 import RepositoryCreationWizard from '@/components/repositories/new/RepositoryCreationWizard';
 
 export const metadata: Metadata = {
-  title: 'New Repository | Typing Repo',
+  title: 'New Repository',
   description: 'This page allows you to import a GitHub repository to start typing practice.',
 };
 

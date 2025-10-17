@@ -17,17 +17,18 @@ export async function generateMetadata({ params }: RepositoryDetailPageProps): P
   const { id } = await params;
   const session = await auth();
   const accessToken = session?.user?.accessToken;
+  const description = 'This page lists all files in the repository and you can start typing practice.';
 
   try {
     const repository: Repository = await fetcher(`/api/repositories/${id}`, accessToken);
     return {
-      title: `${repository.name} | Typing Repo`,
-      description: 'View a repository and start typing practice.',
+      title: `${repository.name}`,
+      description,
     };
   } catch {
     return {
-      title: 'Repository | Typing Repo',
-      description: 'View a repository and start typing practice.',
+      title: 'Repository',
+      description,
     };
   }
 }

@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import PageLayout from '@/components/common/PageLayout';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | Typing Repo',
+  title: 'Terms of Service',
   description: 'This page describes the terms of service for TypingRepo.',
 };
 

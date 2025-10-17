@@ -15,7 +15,7 @@ type Props = {
 };
 
 export const metadata: Metadata = {
-  title: 'Repositories | Typing Repo',
+  title: 'Repositories',
   description:
     'This page lists all repositories available for typing practice and you can add any GitHub repository you want to practice with.',
 };
