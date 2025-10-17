@@ -4,7 +4,7 @@ import PageLayout from '@/components/common/PageLayout';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'This page describes the terms of service for TypingRepo.',
+  description: 'This page describes the terms of service for Typing Repo.',
 };
 
 export default function TermsOfService() {
