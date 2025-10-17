@@ -1,8 +1,15 @@
+import type { Metadata } from 'next';
+
 import PageLayout from '@/components/common/PageLayout';
 
-export default function TermsOfServiceEN() {
+export const metadata: Metadata = {
+  title: 'Terms of Service',
+  description: 'This page describes the terms of service for Typing Repo.',
+};
+
+export default function TermsOfService() {
   return (
-    <PageLayout title="Terms of Use">
+    <PageLayout title="Terms of Service">
       <div className="bg-background min-h-screen py-4">
         <div
           className={`

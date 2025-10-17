@@ -1,6 +1,13 @@
+import type { Metadata } from 'next';
+
 import PageLayout from '@/components/common/PageLayout';
 
-export default function PrivacyPolicyEN() {
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description: 'This page describes the privacy policy for Typing Repo.',
+};
+
+export default function PrivacyPolicy() {
   return (
     <PageLayout title="Privacy Policy">
       <div className="bg-background min-h-screen py-4">

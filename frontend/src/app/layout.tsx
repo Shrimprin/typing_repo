@@ -1,24 +1,53 @@
-import type { Metadata } from 'next';
+import { Metadata } from 'next';
 import { Play } from 'next/font/google';
 
 import Footer from '@/components/common/Footer';
 import ToastListener from '@/components/common/ToastListener';
 import { Toaster } from '@/components/ui/sonner';
 import AuthProvider from '@/providers/Auth';
-
 import './globals.css';
+
+const TITLE = 'Typing Repo';
+const DESCRIPTION =
+  'Free typing game for programmers. You can import any GitHub repository and practice typing through real code.';
+const BASE_URL = 'https://www.typingrepo.com';
+
+export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: `${TITLE} | Practice Typing through Real Code`,
+    template: '%s | Typing Repo',
+  },
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: BASE_URL,
+    images: [
+      {
+        url: '/ogp.png',
+        alt: 'Typing Repo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [
+      {
+        url: '/ogp.png',
+        alt: 'Typing Repo',
+      },
+    ],
+  },
+};
 
 const play = Play({
   variable: '--font-play',
   subsets: ['latin'],
   weight: ['400'],
 });
-
-export const metadata: Metadata = {
-  title: 'TypingRepo - Practice Typing with Real Code',
-  description:
-    'Improve your coding typing accuracy and speed by practicing with real GitHub repositories. A typing game for programming beginners.',
-};
 
 export default function RootLayout({
   children,
