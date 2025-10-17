@@ -1,4 +1,7 @@
-import { Pause, Play, RotateCcw } from 'lucide-react';
+'use client';
+
+import { LoaderCircle, Pause, Play, RotateCcw } from 'lucide-react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import type { TypingStatus } from '@/types';
@@ -20,11 +23,14 @@ export default function TypingHeader({
   resumeTyping,
   resetTyping,
 }: TypingHeaderProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleToggleTyping = () => {
     if (typingStatus === 'ready') {
       startTyping();
     } else if (typingStatus === 'typing') {
-      pauseTyping();
+      setIsLoading(true);
+      Promise.resolve(pauseTyping()).finally(() => setIsLoading(false));
     } else if (typingStatus === 'paused') {
       resumeTyping();
     } else if (typingStatus === 'completed') {
@@ -45,7 +51,10 @@ export default function TypingHeader({
     }
   };
 
-  const getButtonIcon = () => {
+  const getButtonIcon = (isLoading: boolean) => {
+    if (isLoading) {
+      return <LoaderCircle size={16} className="animate-spin" />;
+    }
     switch (typingStatus) {
       case 'typing':
         return <Pause size={16} />;
@@ -56,15 +65,22 @@ export default function TypingHeader({
     }
   };
 
+  const isBusyLoading = typingStatus === 'typing' && isLoading;
+  const buttonIcon = getButtonIcon(isBusyLoading);
   const buttonLabel = getButtonLabel();
-  const buttonIcon = getButtonIcon();
 
   return (
     <div className="flex items-center justify-between border-b px-4 pb-2">
       <div className="truncate">{fileItemName}</div>
       {typingStatus !== 'unsupported' && (
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleToggleTyping} aria-label={buttonLabel}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleToggleTyping}
+            aria-label={buttonLabel}
+            disabled={isBusyLoading}
+          >
             {buttonIcon}
             <span className="ml-1">{buttonLabel}</span>
           </Button>
