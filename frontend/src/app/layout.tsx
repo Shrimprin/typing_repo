@@ -10,9 +10,10 @@ import './globals.css';
 const TITLE = 'Typing Repo';
 const DESCRIPTION =
   'Free typing game for programmers. You can import any GitHub repository and practice typing through real code.';
-const URL = 'https://www.typingrepo.com';
+const BASE_URL = 'https://www.typingrepo.com';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
   title: {
     default: `${TITLE} | Practice Typing through Real Code`,
     template: '%s | Typing Repo',
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
-    url: URL,
+    url: BASE_URL,
     images: [
       {
         url: '/ogp.png',
