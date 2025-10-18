@@ -69,11 +69,11 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
   return (
     <div className="flex h-full flex-col">
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-1/4 min-w-[250px] overflow-y-auto border-r p-2">
+        <aside className="w-1/4 min-w-[250px] overflow-y-auto border-r p-2" aria-label="Files">
           <FileTree fileItems={fileItems} selectedFileItem={selectedFileItem} onSelectFileItem={handleFileSelect} />
-        </div>
+        </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <section className="flex min-w-0 flex-1 flex-col">
           <Card className="mx-4 my-2 flex-1 overflow-hidden">
             {isLoading ? (
               <Loading text="Loading file..." />
@@ -87,7 +87,7 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
               <TypingPanel fileItem={selectedFileItem} typingHandler={typingHandler} />
             )}
           </Card>
-        </div>
+        </section>
       </div>
 
       <CongratulationModal isOpen={showCongratulationModal} onClose={() => setShowCongratulationModal(false)} />

@@ -9,7 +9,7 @@ type FileTreeProps = {
 
 export default function FileTree({ fileItems, selectedFileItem, onSelectFileItem }: FileTreeProps) {
   return (
-    <>
+    <nav aria-label="File tree">
       <div className="text-sm" data-testid="file-tree">
         {fileItems?.map((fileItem) => (
           <FileTreeItem
@@ -21,6 +21,6 @@ export default function FileTree({ fileItems, selectedFileItem, onSelectFileItem
           />
         ))}
       </div>
-    </>
+    </nav>
   );
 }

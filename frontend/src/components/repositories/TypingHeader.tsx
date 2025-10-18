@@ -70,8 +70,8 @@ export default function TypingHeader({
   const buttonLabel = getButtonLabel();
 
   return (
-    <div className="flex items-center justify-between border-b px-4 pb-2">
-      <div className="truncate">{fileItemName}</div>
+    <header className="flex items-center justify-between border-b px-4 pb-2">
+      <h2 className="truncate text-sm font-medium">{fileItemName}</h2>
       {typingStatus !== 'unsupported' && (
         <div className="flex gap-2">
           <Button
@@ -93,6 +93,6 @@ export default function TypingHeader({
           )}
         </div>
       )}
-    </div>
+    </header>
   );
 }

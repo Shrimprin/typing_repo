@@ -13,7 +13,7 @@ type HeaderProps = {
 
 export default function Header({ title = '', moreComponent }: HeaderProps) {
   return (
-    <div className="bg-background flex h-16 w-full flex-shrink-0 items-center overflow-hidden border-b px-8">
+    <header className="bg-background flex h-16 w-full flex-shrink-0 items-center overflow-hidden border-b px-8">
       <Link
         href="/"
         className={`
@@ -37,6 +37,6 @@ export default function Header({ title = '', moreComponent }: HeaderProps) {
       <div className="ml-auto flex flex-shrink-0 gap-3 pl-3">
         <UserButton />
       </div>
-    </div>
+    </header>
   );
 }

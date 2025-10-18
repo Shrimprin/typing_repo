@@ -15,10 +15,14 @@ export default function RepositoryList({ repositories, pagination }: Props) {
   const isPagination = repositories.length > 0 && pagination.totalPages > 1;
 
   return (
-    <div className="container mx-auto flex max-w-4xl flex-grow flex-col py-4">
+    <section className="container mx-auto flex max-w-4xl flex-grow flex-col py-4">
       <div className="flex-grow">
         {repositories.length > 0 ? (
-          repositories.map((repository) => <RepositoryListItem key={repository.id} repository={repository} />)
+          <ul role="list" className="divide-y">
+            {repositories.map((repository) => (
+              <RepositoryListItem key={repository.id} repository={repository} />
+            ))}
+          </ul>
         ) : (
           <div className="py-12 text-center">
             <div className="mb-4">
@@ -37,6 +41,6 @@ export default function RepositoryList({ repositories, pagination }: Props) {
       </div>
 
       {isPagination && <RepositoryPagination pagination={pagination} />}
-    </div>
+    </section>
   );
 }

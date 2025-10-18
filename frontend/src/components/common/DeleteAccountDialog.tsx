@@ -43,17 +43,12 @@ export default function DeleteAccountDialog() {
 
   return (
     <DropdownMenuItem
-      className="text-destructive"
       onSelect={() => {
         handleDelete();
       }}
       disabled={isDeleting}
     >
-      {isDeleting ? (
-        <LoaderCircle className="text-destructive mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <Trash className="text-destructive mr-2 h-4 w-4" />
-      )}
+      {isDeleting ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : <Trash className="mr-2 h-4 w-4" />}
       Delete Account
     </DropdownMenuItem>
   );
