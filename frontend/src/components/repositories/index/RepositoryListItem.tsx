@@ -11,7 +11,7 @@ type Props = {
 
 export default function RepositoryListItem({ repository }: Props) {
   return (
-    <div className="flex items-center justify-between border-b py-6">
+    <li className="flex items-center justify-between py-6">
       <div className="min-w-0 flex-grow">
         <Link href={`/repositories/${repository.id}`} className={`hover:underline`}>
           <h2 className="truncate text-lg font-semibold">{repository.name}</h2>
@@ -34,6 +34,6 @@ export default function RepositoryListItem({ repository }: Props) {
           )}
         </div>
       </div>
-    </div>
+    </li>
   );
 }
