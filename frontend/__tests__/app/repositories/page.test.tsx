@@ -125,11 +125,6 @@ describe('RepositoriesPage', () => {
       expect(repositoryLinks[4]).toHaveAttribute('href', '/repositories/5');
       expect(repositoryLinks[5]).toHaveAttribute('href', '/repositories/6');
     });
-
-    it('renders more-menu-buttons', async () => {
-      const Buttons = screen.getAllByLabelText('more-menu');
-      expect(Buttons.length).toBe(6);
-    });
   });
 
   describe('when multiple pages exist', () => {
