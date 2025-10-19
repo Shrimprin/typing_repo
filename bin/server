@@ -4,7 +4,7 @@ set -e
 
 echo 'Starting backend server...'
 cd backend
-bundle exec rails server &
+bin/rails server &
 
 echo 'Starting frontend server...'
 cd ../frontend
