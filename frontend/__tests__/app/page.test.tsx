@@ -56,21 +56,18 @@ describe('Home', () => {
       expect(screen.getByRole('heading', { level: 3, name: 'Start Typing Practice' })).toBeInTheDocument();
     });
 
-    it('renders step images with correct sources', () => {
-      // サムネイル画像の確認
-      const thumbnail1 = screen.getByAltText('Import GitHub Repository demonstration thumbnail');
-      const thumbnail2 = screen.getByAltText('Typing practice demonstration thumbnail');
+    it('renders step videos with correct sources', () => {
+      const video1 = screen.getByLabelText('Import GitHub Repository demonstration video');
+      const video2 = screen.getByLabelText('Start Typing Practice demonstration video');
 
-      expect(thumbnail1).toHaveAttribute('src', '/videos/step1_thumbnail.png');
-      expect(thumbnail2).toHaveAttribute('src', '/videos/step2_thumbnail.png');
-    });
+      expect(video1).toBeInTheDocument();
+      expect(video2).toBeInTheDocument();
 
-    it('renders GIF images for hover effect', () => {
-      const gif1 = screen.getByAltText('Import GitHub Repository demonstration GIF');
-      const gif2 = screen.getByAltText('Typing practice demonstration GIF');
+      const source1 = video1.querySelector('source');
+      const source2 = video2.querySelector('source');
 
-      expect(gif1).toHaveAttribute('src', '/videos/step1_import-repository.gif');
-      expect(gif2).toHaveAttribute('src', '/videos/step2_typing.gif');
+      expect(source1).toHaveAttribute('src', '/demo/step1_import-repository.mp4');
+      expect(source2).toHaveAttribute('src', '/demo/step2_typing.mp4');
     });
   });
 });
