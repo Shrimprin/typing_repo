@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+echo 'Starting backend server...'
+cd backend
+bin/rails server &
+
+echo 'Starting frontend server...'
+cd ../frontend
+npm run dev &
+
+echo 'Servers are running...'
+echo 'Backend: http://localhost:8000'
+echo 'Frontend: http://localhost:3000'
+echo ''
+echo 'Press Ctrl+C to stop both servers'
+
+wait
