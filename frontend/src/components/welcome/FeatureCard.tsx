@@ -54,7 +54,6 @@ export default function FeatureCard({
           className={`
             ${bgColor}
             flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300
-            group-hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]
           `}
         >
           <span
