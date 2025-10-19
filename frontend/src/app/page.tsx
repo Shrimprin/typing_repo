@@ -3,6 +3,7 @@ import { Github } from 'lucide-react';
 import Image from 'next/image';
 
 import { SignIn } from '@/components/common/AuthButton';
+import FeatureCard from '@/components/welcome/FeatureCard';
 
 export default function Home() {
   return (
@@ -65,102 +66,29 @@ export default function Home() {
               md:grid-cols-2
             `}
           >
-            <div
-              className={`
-                group border-border/50 bg-card/50 flex flex-col rounded-sm border p-8 transition-all duration-300
-                hover:border-primary/50
-              `}
-            >
-              <div className="mb-6 flex items-center gap-4">
-                <div
-                  className={`
-                    bg-primary/20 flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300
-                    group-hover:bg-primary/30 group-hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]
-                  `}
-                >
-                  <span className="text-primary text-xl font-bold">1</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Github className="text-primary h-8 w-8 flex-shrink-0" />
-                  <h3 className="text-foreground text-2xl font-bold">Import GitHub Repository</h3>
-                </div>
-              </div>
-              <p className="text-foreground mb-4">
-                Input a GitHub repository URL you want to practice with. Select the extensions you want to type and
-                import the source code.
-              </p>
-              <div className="group relative mt-auto">
-                <Image
-                  className={`
-                    border-border/20 h-64 w-full rounded-sm border object-cover transition-opacity duration-300
-                    group-hover:opacity-0
-                  `}
-                  src="/videos/step1_thumbnail.png"
-                  alt="Import GitHub Repository demonstration thumbnail"
-                  width={800}
-                  height={256}
-                />
-                <Image
-                  className={`
-                    border-border/20 absolute inset-0 h-64 w-full rounded-sm border object-cover opacity-0
-                    transition-opacity duration-300
-                    group-hover:opacity-100
-                  `}
-                  src="/videos/step1_import-repository.gif"
-                  alt="Import GitHub Repository demonstration GIF"
-                  width={800}
-                  height={256}
-                />
-              </div>
-            </div>
+            <FeatureCard
+              step={1}
+              title="Import GitHub Repository"
+              description="Input a GitHub repository URL you want to practice with. Select the extensions you want to type and import the source code."
+              videoSrc="/demo/step1_import-repository.mp4"
+              thumbnailSrc="/demo/step1_thumbnail.png"
+              icon={<Github className="text-primary h-8 w-8 flex-shrink-0" />}
+              borderColor="hover:border-primary/50"
+              bgColor="bg-primary/20 group-hover:bg-primary/30"
+              textColor="text-primary"
+            />
 
-            <div
-              className={`
-                group border-border/50 bg-card/50 flex flex-col rounded-sm border p-8 transition-all duration-300
-                hover:border-secondary/50
-              `}
-            >
-              <div className="mb-6 flex items-center gap-4">
-                <div
-                  className={`
-                    bg-secondary/20 flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300
-                    group-hover:bg-secondary/30 group-hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]
-                  `}
-                >
-                  <span className="text-secondary text-xl font-bold">2</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <IconKeyboard className="text-secondary h-8 w-8 flex-shrink-0" />
-                  <h3 className="text-foreground text-2xl font-bold">Start Typing Practice</h3>
-                </div>
-              </div>
-              <p className="text-foreground mb-4">
-                Select the file and begin typing. You can track your accuracy and speed in real-time.
-              </p>
-              <div className="group relative mt-auto">
-                <Image
-                  className={`
-                    border-border/20 h-64 w-full rounded-sm border object-cover transition-opacity duration-300
-                    group-hover:opacity-0
-                  `}
-                  src="/videos/step2_thumbnail.png"
-                  alt="Typing practice demonstration thumbnail"
-                  width={800}
-                  height={256}
-                />
-                <Image
-                  className={`
-                    border-border/20 absolute inset-0 h-64 w-full rounded-sm border object-cover opacity-0
-                    transition-opacity duration-300
-                    group-hover:opacity-100
-                  `}
-                  src="/videos/step2_typing.gif"
-                  alt="Typing practice demonstration GIF"
-                  width={800}
-                  height={256}
-                />
-              </div>
-            </div>
+            <FeatureCard
+              step={2}
+              title="Start Typing Practice"
+              description="Select the file and begin typing. You can track your accuracy and speed in real-time."
+              videoSrc="/demo/step2_typing.mp4"
+              thumbnailSrc="/demo/step2_thumbnail.png"
+              icon={<IconKeyboard className="text-secondary h-8 w-8 flex-shrink-0" />}
+              borderColor="hover:border-secondary/50"
+              bgColor="bg-secondary/20 group-hover:bg-secondary/30"
+              textColor="text-secondary"
+            />
           </div>
         </div>
       </section>
