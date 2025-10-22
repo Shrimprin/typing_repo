@@ -1,4 +1,5 @@
 import type { Stats } from '@/types';
+
 import { formatTime } from '@/utils/time';
 
 type TypingStatsProps = {

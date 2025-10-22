@@ -1,8 +1,9 @@
+import type { PaginationInfo, Repository } from '@/types/repository';
+
 import { FolderOpen, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import type { PaginationInfo, Repository } from '@/types/repository';
 import RepositoryListItem from './RepositoryListItem';
 import RepositoryPagination from './RepositoryPagination';
 

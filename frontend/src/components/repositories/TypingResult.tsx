@@ -1,8 +1,9 @@
 'use client';
 
+import type { Stats } from '@/types';
+
 import { useEffect, useMemo } from 'react';
 
-import type { Stats } from '@/types';
 import { formatTime } from '@/utils/time';
 import TypingLine from './TypingLine';
 

@@ -1,12 +1,13 @@
 'use client';
 
+import type { WizardData } from '@/types';
+
 import { CheckCircle, ChevronLeftIcon, File, LoaderCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import type { WizardData } from '@/types';
 import { axiosPost } from '@/utils/axios';
 import { extractErrorMessage } from '@/utils/error-handler';
 import RepositoryCard from '../common/RepositoryCard';

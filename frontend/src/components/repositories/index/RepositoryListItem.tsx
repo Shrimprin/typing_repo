@@ -1,8 +1,9 @@
+import type { Repository } from '@/types/repository';
+
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import Link from 'next/link';
 
-import type { Repository } from '@/types/repository';
 import RepositoryProgress from './RepositoryProgress';
 
 type Props = {

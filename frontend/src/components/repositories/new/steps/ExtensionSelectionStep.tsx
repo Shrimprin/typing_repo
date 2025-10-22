@@ -1,12 +1,13 @@
 'use client';
 
+import type { Extension, RepositoryPreview, WizardData } from '@/types';
+
 import { CheckSquare, ChevronLeftIcon, ChevronRightIcon, File, Square } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import type { Extension, RepositoryPreview, WizardData } from '@/types';
 import RepositoryCard from '../common/RepositoryCard';
 
 type ExtensionSelectionStepProps = {

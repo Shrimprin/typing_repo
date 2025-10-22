@@ -1,9 +1,10 @@
 'use client';
 
+import type { FileItem, TypingStatus } from '@/types';
+
 import { useCallback, useState } from 'react';
 
 import { useTypingHandler } from '@/hooks/useTypingHandler';
-import type { FileItem, TypingStatus } from '@/types';
 import { updateFileItemInTree } from '@/utils/file-item';
 import { Card } from '../ui/card';
 import Loading from '../ui/loading';

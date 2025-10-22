@@ -1,5 +1,6 @@
+import type { RepositoryPreview } from '@/types';
+
 import { Card } from '@/components/ui/card';
-import { RepositoryPreview } from '@/types';
 import { Github } from 'lucide-react';
 
 type RepositoryCardProps = {

@@ -1,5 +1,7 @@
 'use client';
 
+import type { PaginationInfo } from '@/types/repository';
+
 import {
   Pagination,
   PaginationContent,
@@ -10,7 +12,6 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { PAGINATION } from '@/constants/pagination';
-import type { PaginationInfo } from '@/types/repository';
 import { useSearchParams } from 'next/navigation';
 
 type Props = {

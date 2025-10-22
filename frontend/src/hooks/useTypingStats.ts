@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type { Stats } from '@/types';
 
-import { Stats } from '@/types';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useTypingStats() {
   const [stats, setStats] = useState<Stats>({
