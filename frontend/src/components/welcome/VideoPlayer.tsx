@@ -1,11 +1,11 @@
 'use client';
 
-interface VideoPlayerProps {
+type VideoPlayerProps = {
   videoSrc: string;
   thumbnailSrc: string;
   videoRef?: React.RefObject<HTMLVideoElement | null>;
   altText?: string;
-}
+};
 
 export default function VideoPlayer({ videoSrc, thumbnailSrc, videoRef, altText }: VideoPlayerProps) {
   return (
