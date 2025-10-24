@@ -2,7 +2,7 @@ import { IconKeyboard } from '@tabler/icons-react';
 import { Github } from 'lucide-react';
 import Image from 'next/image';
 
-import { SignIn } from '@/components/common/AuthButton';
+import { SignIn } from '@/components/auth/AuthButton';
 import FeatureCard from '@/components/welcome/FeatureCard';
 
 export default function Home() {

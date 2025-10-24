@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 
-import VideoPlayer from '@/components/welcome/VideoPlayer';
+import VideoPlayer from './VideoPlayer';
 
 type FeatureCardProps = {
   step: number;

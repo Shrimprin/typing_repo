@@ -1,6 +1,4 @@
 import { auth } from '@/auth';
-import { SignIn, SignOut } from '@/components/common/AuthButton';
-import DeleteAccountDialog from '@/components/common/DeleteAccountDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,6 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { SignIn, SignOut } from './AuthButton';
+import DeleteAccountDialog from './DeleteAccountDialog';
 
 export default async function UserButton() {
   const session = await auth();

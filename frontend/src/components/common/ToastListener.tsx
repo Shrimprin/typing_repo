@@ -1,10 +1,11 @@
 'use client';
 
+import type { Toast } from '@/types/toast';
+
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { deleteToast, getToast } from '@/actions/toast';
-import type { Toast } from '@/types/toast';
 import { toast } from 'sonner';
 
 export default function ToastListener() {

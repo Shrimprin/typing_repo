@@ -2,8 +2,8 @@ import { auth } from '@/auth';
 import type { Metadata } from 'next';
 
 import PageLayout from '@/components/common/PageLayout';
-import RepositoryFooter from '@/components/repositories/index/RepositoryFooter';
-import RepositoryList from '@/components/repositories/index/RepositoryList';
+import RepositoryFooter from '@/components/repositories/list/RepositoryFooter';
+import RepositoryList from '@/components/repositories/list/RepositoryList';
 import { PAGINATION } from '@/constants/pagination';
 import { RepositoriesResponse } from '@/types/repository';
 import { extractErrorMessage } from '@/utils/error-handler';
