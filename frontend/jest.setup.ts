@@ -16,7 +16,7 @@ jest.mock('@/auth', () => ({
 // jestではサーバコンポーネントがクライアントコンポーネントとして扱われ、
 // 非同期関数が使えないとエラーになるためモックする
 // https://nextjs.org/docs/app/guides/testing/jest
-jest.mock('@/components/common/UserButton', () => {
+jest.mock('@/components/auth/UserButton', () => {
   return function MockUserButton() {
     return;
   };
