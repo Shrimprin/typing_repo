@@ -1,4 +1,4 @@
-import { FileItem } from './file-item';
+import type { FileItem } from './file-item';
 
 export type Repository = {
   id: string;

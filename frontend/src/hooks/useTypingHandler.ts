@@ -1,8 +1,9 @@
+import type { FileItem, Repository, Stats, TypingStatus, Typo } from '@/types';
+
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 
-import { FileItem, Repository, Stats, TypingStatus, Typo } from '@/types';
 import { axiosPatch } from '@/utils/axios';
 import { extractErrorMessage } from '@/utils/error-handler';
 import { fetcher } from '@/utils/fetcher';

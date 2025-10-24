@@ -1,12 +1,13 @@
+import type { RepositoryPreview } from '@/types';
+
 import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 
 import UrlInputStep from '@/components/repositories/new/steps/UrlInputStep';
-import { RepositoryPreview } from '@/types/repository-creation';
-import { clickButton } from '../../../../helpers/interactions';
-import { mockUseSession } from '../../../../mocks/auth';
+import { clickButton } from '@test/helpers/interactions';
+import { mockUseSession } from '@test/mocks/auth';
 
 describe('UrlInputStep', () => {
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;

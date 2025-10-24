@@ -1,9 +1,10 @@
 'use client';
 
+import type { FileItem } from '@/types';
+
 import { AlertTriangle, Check, ChevronDown, ChevronRight, File, Folder } from 'lucide-react';
 import { useState } from 'react';
 
-import type { FileItem } from '@/types';
 import { sortFileItems } from '@/utils/sort';
 
 type FileTreeItemProps = {

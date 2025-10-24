@@ -1,5 +1,7 @@
 'use client';
 
+import type { Repository } from '@/types/repository';
+
 import { LoaderCircle, Trash } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -7,7 +9,6 @@ import { useState } from 'react';
 
 import { setToast } from '@/actions/toast';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import type { Repository } from '@/types/repository';
 import { axiosDelete } from '@/utils/axios';
 
 type Props = {

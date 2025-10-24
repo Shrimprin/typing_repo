@@ -1,4 +1,4 @@
-import { Extension } from './extension';
+import type { Extension } from './extension';
 
 export type RepositoryPreview = {
   name: string;

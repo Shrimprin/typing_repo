@@ -1,5 +1,7 @@
 'use client';
 
+import type { RepositoryPreview, WizardData } from '@/types';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronRightIcon, LoaderCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -10,7 +12,6 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import type { RepositoryPreview, WizardData } from '@/types';
 import { axiosGet } from '@/utils/axios';
 import { extractErrorMessage } from '@/utils/error-handler';
 

@@ -1,15 +1,16 @@
 'use client';
 
+import type { FileItem, TypingStatus } from '@/types';
+
 import { useCallback, useState } from 'react';
 
+import CongratulationModal from '@/components/repositories/dialogs/CongratulationModal';
+import { Card } from '@/components/ui/card';
+import Loading from '@/components/ui/loading';
 import { useTypingHandler } from '@/hooks/useTypingHandler';
-import type { FileItem, TypingStatus } from '@/types';
 import { updateFileItemInTree } from '@/utils/file-item';
-import { Card } from '../ui/card';
-import Loading from '../ui/loading';
-import CongratulationModal from './CongratulationModal';
-import FileTree from './FileTree';
-import TypingPanel from './TypingPanel';
+import FileTree from './file-tree/FileTree';
+import TypingPanel from './typing/TypingPanel';
 
 type RepositoryDetailProps = {
   initialFileItems: FileItem[];

@@ -1,5 +1,4 @@
-import { FileItem } from '@/types';
-import { Repository } from '@/types/repository';
+import type { FileItem, Repository } from '@/types';
 
 export const sortFileItems = (fileItems: FileItem[]) =>
   fileItems.sort((a, b) => {

@@ -1,10 +1,10 @@
+import type { FileItem, TypingStatus } from '@/types';
+
 import { act, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 
 import { useTypingHandler } from '@/hooks/useTypingHandler';
-import { TypingStatus } from '@/types';
-import { FileItem } from '@/types/file-item';
 import { sortFileItems } from '@/utils/sort';
 import { useParams } from 'next/navigation';
 import { mockAuth, mockUseSession } from '../mocks/auth';

@@ -1,6 +1,6 @@
 import { setToast } from '@/actions/toast';
 import { signIn, signOut } from '@/auth';
-import { SignInSubmitButton, SignOutSubmitButton } from '@/components/common/AuthClientButton';
+import { SignInSubmitButton, SignOutSubmitButton } from './AuthClientButton';
 
 export function SignIn({ provider, children }: { provider?: string; children?: React.ReactNode }) {
   return (

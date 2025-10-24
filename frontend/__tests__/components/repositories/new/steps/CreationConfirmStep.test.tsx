@@ -1,11 +1,12 @@
+import type { Extension, RepositoryPreview, WizardData } from '@/types';
+
 import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import axios from 'axios';
 
 import CreationConfirmStep from '@/components/repositories/new/steps/CreationConfirmStep';
-import { Extension, RepositoryPreview, WizardData } from '@/types';
-import { clickButton } from '../../../../helpers/interactions';
-import { mockUseSession } from '../../../../mocks/auth';
+import { clickButton } from '@test/helpers/interactions';
+import { mockUseSession } from '@test/mocks/auth';
 
 describe('CreationConfirmStep', () => {
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;

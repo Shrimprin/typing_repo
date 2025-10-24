@@ -1,4 +1,4 @@
-import { FileItem } from '@/types/file-item';
+import type { FileItem } from '@/types/file-item';
 
 export function updateFileItemInTree(fileItems: FileItem[], updatedFileItem: FileItem): FileItem[] {
   return fileItems.map((fileItem) => {

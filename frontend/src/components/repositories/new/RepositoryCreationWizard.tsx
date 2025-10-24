@@ -1,11 +1,12 @@
 'use client';
 
+import type { WizardData, WizardStep } from '@/types';
+
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import type { WizardData, WizardStep } from '@/types';
 import CreationConfirmStep from './steps/CreationConfirmStep';
 import ExtensionSelectionStep from './steps/ExtensionSelectionStep';
 import UrlInputStep from './steps/UrlInputStep';

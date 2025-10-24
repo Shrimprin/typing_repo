@@ -2,7 +2,7 @@ import { MoreHorizontal } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import UserButton from '@/components/common/UserButton';
+import UserButton from '@/components/auth/UserButton';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 

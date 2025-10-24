@@ -1,7 +1,8 @@
-import { PAGINATION } from '@/constants/pagination';
-import { PaginationInfo, RepositoriesResponse } from '@/types/repository';
-import { axiosGet } from '@/utils/axios';
+import type { PaginationInfo, RepositoriesResponse } from '@/types/repository';
 import type { AxiosError, AxiosResponse } from 'axios';
+
+import { PAGINATION } from '@/constants/pagination';
+import { axiosGet } from '@/utils/axios';
 
 export const fetcher = (url: string, token: string | undefined) =>
   axiosGet(url, token)

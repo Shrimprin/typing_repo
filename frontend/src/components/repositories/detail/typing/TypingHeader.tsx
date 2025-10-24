@@ -1,10 +1,11 @@
 'use client';
 
+import type { TypingStatus } from '@/types';
+
 import { LoaderCircle, Pause, Play, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import type { TypingStatus } from '@/types';
 
 type TypingHeaderProps = {
   fileItemName: string;

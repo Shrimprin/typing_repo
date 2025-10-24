@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 
 import { auth } from '@/auth';
 import PageLayout from '@/components/common/PageLayout';
-import DeleteRepositoryDialog from '@/components/repositories/DeleteRepositoryDialog';
-import RepositoryDetail from '@/components/repositories/RepositoryDetail';
+import RepositoryDetail from '@/components/repositories/detail/RepositoryDetail';
+import DeleteRepositoryDialog from '@/components/repositories/dialogs/DeleteRepositoryDialog';
 import { FileItem, Repository } from '@/types';
 import { extractErrorMessage } from '@/utils/error-handler';
 import { fetcher } from '@/utils/fetcher';
