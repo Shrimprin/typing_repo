@@ -6,8 +6,8 @@ import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 
 import UrlInputStep from '@/components/repositories/new/steps/UrlInputStep';
-import { clickButton } from '../../../../helpers/interactions';
-import { mockUseSession } from '../../../../mocks/auth';
+import { clickButton } from '@test/helpers/interactions';
+import { mockUseSession } from '@test/mocks/auth';
 
 describe('UrlInputStep', () => {
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;

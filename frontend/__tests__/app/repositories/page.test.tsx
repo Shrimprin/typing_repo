@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import axios from 'axios';
 
 import RepositoriesPage from '@/app/repositories/page';
-import { mockAuth } from '../../mocks/auth';
+import { mockAuth } from '@test/mocks/auth';
 
 const mockSearchParams = new URLSearchParams();
 jest.mock('next/navigation', () => ({

@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@test/*": ["./__tests__/*"]
     },
     "types": ["@testing-library/jest-dom"]
   },

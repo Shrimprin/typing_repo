@@ -5,8 +5,8 @@ import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
 
 import RepositoryDetailPage from '@/app/repositories/[id]/page';
-import { clickButton } from '../../../helpers/interactions';
-import { mockAuth, mockUseSession } from '../../../mocks/auth';
+import { clickButton } from '@test/helpers/interactions';
+import { mockAuth, mockUseSession } from '@test/mocks/auth';
 
 jest.mock('@/actions/toast', () => ({
   setToast: jest.fn().mockResolvedValue(undefined),
