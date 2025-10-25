@@ -77,7 +77,10 @@ module Api
 
       update_params = { content: decoded_file_content }
       update_params[:status] = :unsupported if FileItem.contains_non_ascii?(decoded_file_content)
-      @file_item.update(update_params)
+
+      return unless @file_item.update(update_params)
+
+      @file_item.update_parent_status
     end
 
     def typed_file_items_response
