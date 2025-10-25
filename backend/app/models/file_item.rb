@@ -51,8 +51,8 @@ class FileItem < ApplicationRecord
     return true unless parent
 
     children = parent.children
-    is_all_typed = children.all?(&:typed?)
-    return true unless is_all_typed
+    is_all_completed = children.all? { |child| child.typed? || child.unsupported? }
+    return true unless is_all_completed
 
     parent.update(status: :typed) && parent.update_parent_status
   end

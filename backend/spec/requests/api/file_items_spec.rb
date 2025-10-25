@@ -9,7 +9,8 @@ RSpec.describe 'Api::FileItems', type: :request do
 
   describe 'GET /api/repositories/:repository_id/file_items/:id' do
     let(:file_item) { create(:file_item, :typing, repository:) }
-    let(:nil_content_file_item) { create(:file_item, :nil_content, repository:) }
+    let(:parent_dir) { create(:file_item, :directory, repository:) }
+    let(:nil_content_file_item) { create(:file_item, :nil_content, repository:, parent: parent_dir) }
 
     context 'when content exists' do
       let(:typing_progress) do
@@ -123,6 +124,18 @@ RSpec.describe 'Api::FileItems', type: :request do
         nil_content_file_item.reload
         expect(nil_content_file_item.content).to eq('こんにちは、世界！')
         expect(nil_content_file_item.status).to eq('unsupported')
+      end
+
+      it 'updates parent directory status to typed when all siblings are typed or unsupported' do
+        create(:file_item, :typed, repository:, parent: parent_dir)
+        create(:file_item, :unsupported, repository:, parent: parent_dir)
+
+        expect(parent_dir.status).to eq('untyped')
+
+        get api_repository_file_item_path(repository_id: repository.id, id: nil_content_file_item.id), headers: headers
+
+        parent_dir.reload
+        expect(parent_dir.status).to eq('typed')
       end
     end
 

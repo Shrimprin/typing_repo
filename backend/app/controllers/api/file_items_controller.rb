@@ -6,7 +6,7 @@ module Api
     before_action :set_file_item, only: %i[show update]
 
     def show
-      fetch_file_content
+      fetch_file_content_and_update_parent_status
       render json: FileItemSerializer.new(
         @file_item,
         params: { content: true, typing_progress: true, children: true }
@@ -66,18 +66,28 @@ module Api
       render json: { message: 'File not found.' }, status: :not_found
     end
 
-    def fetch_file_content
+    def fetch_file_content_and_update_parent_status
       return if @file_item.content.present? || @file_item.dir?
 
-      client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
-      file_content = client.contents(@repository.url, path: @file_item.path, ref: @repository.commit_hash)[
-        :content
-      ]
-      decoded_file_content = FileItem.decode_file_content(file_content)
+      file_content = fetch_file_content
+      return unless file_content
 
-      update_params = { content: decoded_file_content }
-      update_params[:status] = :unsupported if FileItem.contains_non_ascii?(decoded_file_content)
-      @file_item.update(update_params)
+      decoded_content = FileItem.decode_file_content(file_content)
+      update_file_item_with_parent_status(decoded_content)
+    end
+
+    def fetch_file_content
+      client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
+      client.contents(@repository.url, path: @file_item.path, ref: @repository.commit_hash)[:content]
+    end
+
+    def update_file_item_with_parent_status(decoded_content)
+      update_params = { content: decoded_content }
+      update_params[:status] = :unsupported if FileItem.contains_non_ascii?(decoded_content)
+
+      return unless @file_item.update(update_params)
+
+      @file_item.update_parent_status
     end
 
     def typed_file_items_response
