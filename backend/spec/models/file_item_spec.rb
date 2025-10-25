@@ -254,6 +254,18 @@ RSpec.describe FileItem, type: :model do
         expect(child_dir.status).to eq('typed')
       end
     end
+
+    context 'when all siblings are typed or unsupported' do
+      it 'updates parent status to typed' do
+        create(:file_item, :typed, repository:, parent: parent_dir)
+        create(:file_item, :unsupported, repository:, parent: parent_dir)
+
+        expect(parent_dir.status).to eq('untyped')
+
+        expect(typed_file_item.update_parent_status).to be true
+        expect(parent_dir.status).to eq('typed')
+      end
+    end
   end
 
   describe '#update_with_typing_progress' do
