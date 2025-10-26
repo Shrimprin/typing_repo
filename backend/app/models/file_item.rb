@@ -80,7 +80,12 @@ class FileItem < ApplicationRecord
   def save_typing_progress?(params)
     return false if params[:typing_progress].nil?
 
-    typing_progress&.destroy
+    if typing_progress.present?
+      # typing_progress.destroyだと、typos1つ１つに対してdestroyが呼ばれて処理に時間がかかるため、
+      # typosに対してdelete_allして一括で削除する
+      Typo.where(typing_progress_id: typing_progress.id).delete_all
+      typing_progress.delete
+    end
     new_typing_progress_params = params[:typing_progress].except(:typos_attributes)
     new_typing_progress = build_typing_progress(new_typing_progress_params)
 
