@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function TermsOfService() {
   return (
-    <PageLayout title="Terms of Service">
+    <PageLayout title="Terms of Service" backHref="/">
       <div className="bg-background min-h-screen py-4">
         <div
           className={`
