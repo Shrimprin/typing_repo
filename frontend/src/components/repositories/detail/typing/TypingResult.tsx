@@ -2,6 +2,7 @@
 
 import type { Stats } from '@/types';
 
+import { motion } from 'framer-motion';
 import { useEffect, useMemo } from 'react';
 
 import { formatTime } from '@/utils/time';
@@ -27,56 +28,94 @@ export default function TypingResult({ stats, targetTextLines, typedTextLines }:
     return targetTextLines.reduce((total, line) => total + line.length, 0);
   }, [targetTextLines]);
 
+  const statItems = [
+    { label: 'WPM', value: wpm.toFixed(1) },
+    { label: 'Accuracy', value: `${accuracy} %` },
+    { label: 'Characters', value: totalCharacters.toLocaleString() },
+    { label: 'Typos', value: totalTypoCount },
+    { label: 'Time', value: formatTime(elapsedSeconds) },
+  ];
+
+  const fadeInUp = {
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5, ease: [0.42, 0, 0.58, 1] },
+  };
+
+  const fadeIn = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    transition: { duration: 0.5, ease: [0.42, 0, 0.58, 1] },
+  };
+
   return (
     <div className="h-full overflow-y-auto" id="typing-result-container">
       <div className="flex flex-col gap-4 p-4">
-        <h2 className="text-xl font-bold">Results</h2>
-        <dl
+        <motion.h2 className="text-xl font-bold" {...fadeInUp} transition={{ duration: 0.5, delay: 0.1 }}>
+          Results
+        </motion.h2>
+
+        <motion.dl
           className={`
             grid grid-cols-1 gap-6
             sm:grid-cols-3
             lg:grid-cols-5
           `}
+          initial="initial"
+          animate="animate"
+          variants={{
+            animate: {
+              transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.2,
+              },
+            },
+          }}
         >
-          <div className="text-secondary flex flex-col items-center space-y-2">
-            <dt>WPM</dt>
-            <dd className="text-2xl font-bold">{wpm.toFixed(1)}</dd>
-          </div>
-          <div className="text-secondary flex flex-col items-center space-y-2">
-            <dt>Accuracy</dt>
-            <dd className="text-2xl font-bold">{accuracy} %</dd>
-          </div>
-          <div className="text-secondary flex flex-col items-center space-y-2">
-            <dt>Characters</dt>
-            <dd className="text-2xl font-bold">{totalCharacters.toLocaleString()}</dd>
-          </div>
-          <div className="text-secondary flex flex-col items-center space-y-2">
-            <dt>Typos</dt>
-            <dd className="text-2xl font-bold">{totalTypoCount}</dd>
-          </div>
-          <div className="text-secondary flex flex-col items-center space-y-2">
-            <dt>Time</dt>
-            <dd className="text-2xl font-bold">{formatTime(elapsedSeconds)}</dd>
-          </div>
-        </dl>
-        <div className="border-t" />
-        <h2 className="text-xl font-bold">Typed Code</h2>
-        <div className="bg-muted/20 rounded-lg border">
+          {statItems.map((item, index) => (
+            <motion.div key={index} className="text-secondary flex flex-col items-center space-y-2" variants={fadeInUp}>
+              <dt>{item.label}</dt>
+              <dd className="text-2xl font-bold">{item.value}</dd>
+            </motion.div>
+          ))}
+        </motion.dl>
+
+        <motion.div className="border-t" {...fadeIn} transition={{ duration: 0.5, delay: 0.9 }} />
+
+        <motion.h2 className="text-xl font-bold" {...fadeInUp} transition={{ duration: 0.5, delay: 1.1 }}>
+          Typed Code
+        </motion.h2>
+
+        <motion.div className="bg-muted/20 rounded-lg border" {...fadeInUp} transition={{ duration: 0.5, delay: 1.3 }}>
           <div className="overflow-x-auto p-4">
             <div className="min-w-fit">
-              {targetTextLines.map((targetLine, row) => (
-                <TypingLine
-                  key={row}
-                  cursorColumn={targetLine.length}
-                  isCursorLine={false}
-                  isUntypedLine={false}
-                  targetTextLine={targetLine}
-                  typedText={typedTextLines[row]}
-                />
-              ))}
+              <motion.div
+                initial="initial"
+                animate="animate"
+                variants={{
+                  animate: {
+                    transition: {
+                      staggerChildren: 0.03,
+                      delayChildren: 1.4,
+                    },
+                  },
+                }}
+              >
+                {targetTextLines.map((targetLine, row) => (
+                  <motion.div key={row} variants={fadeIn}>
+                    <TypingLine
+                      cursorColumn={targetLine.length}
+                      isCursorLine={false}
+                      isUntypedLine={false}
+                      targetTextLine={targetLine}
+                      typedText={typedTextLines[row]}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
