@@ -69,6 +69,7 @@ export default function TypingHeader({
   const isBusyLoading = typingStatus === 'typing' && isLoading;
   const buttonIcon = getButtonIcon(isBusyLoading);
   const buttonLabel = getButtonLabel();
+  const buttonVariant = typingStatus === 'ready' || typingStatus === 'paused' ? 'default' : 'outline';
 
   return (
     <header className="flex items-center justify-between border-b px-4 pb-2">
@@ -76,7 +77,7 @@ export default function TypingHeader({
       {typingStatus !== 'unsupported' && (
         <div className="flex gap-2">
           <Button
-            variant="outline"
+            variant={buttonVariant}
             size="sm"
             onClick={handleToggleTyping}
             aria-label={buttonLabel}
