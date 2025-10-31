@@ -72,8 +72,8 @@ export default function TypingHeader({
   const buttonVariant = typingStatus === 'ready' || typingStatus === 'paused' ? 'default' : 'outline';
 
   return (
-    <header className="flex items-center justify-between border-b px-4 pb-2">
-      <h2 className="truncate text-sm font-medium">{fileItemName}</h2>
+    <header className="flex items-center justify-between border-b px-4 py-3">
+      <h2 className="truncate font-medium">{fileItemName}</h2>
       {typingStatus !== 'unsupported' && (
         <div className="flex gap-2">
           <Button
