@@ -38,23 +38,23 @@ export default function TypingResult({ stats, targetTextLines, typedTextLines }:
             lg:grid-cols-5
           `}
         >
-          <div className="flex flex-col items-center space-y-2">
+          <div className="text-secondary flex flex-col items-center space-y-2">
             <dt>WPM</dt>
             <dd className="text-2xl font-bold">{wpm.toFixed(1)}</dd>
           </div>
-          <div className="flex flex-col items-center space-y-2">
+          <div className="text-secondary flex flex-col items-center space-y-2">
             <dt>Accuracy</dt>
             <dd className="text-2xl font-bold">{accuracy} %</dd>
           </div>
-          <div className="flex flex-col items-center space-y-2">
+          <div className="text-secondary flex flex-col items-center space-y-2">
             <dt>Characters</dt>
             <dd className="text-2xl font-bold">{totalCharacters.toLocaleString()}</dd>
           </div>
-          <div className="flex flex-col items-center space-y-2">
+          <div className="text-secondary flex flex-col items-center space-y-2">
             <dt>Typos</dt>
             <dd className="text-2xl font-bold">{totalTypoCount}</dd>
           </div>
-          <div className="flex flex-col items-center space-y-2">
+          <div className="text-secondary flex flex-col items-center space-y-2">
             <dt>Time</dt>
             <dd className="text-2xl font-bold">{formatTime(elapsedSeconds)}</dd>
           </div>
