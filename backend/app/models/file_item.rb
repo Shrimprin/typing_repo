@@ -78,14 +78,27 @@ class FileItem < ApplicationRecord
   private
 
   def save_typing_progress?(params)
-    typing_progress&.destroy
-    new_typing_progress = build_typing_progress(params[:typing_progress])
+    return false if params[:typing_progress].nil?
 
-    return true if new_typing_progress.save
-
-    new_typing_progress.errors.each do |error|
-      errors.add("typing_progress.#{error.attribute}", error.message)
+    if typing_progress.present?
+      # typing_progress.destroyだと、typos1つ１つに対してdestroyが呼ばれて処理に時間がかかるため、
+      # typosに対してdelete_allして一括で削除する
+      Typo.where(typing_progress_id: typing_progress.id).delete_all
+      typing_progress.delete
     end
-    false
+    new_typing_progress_params = params[:typing_progress].except(:typos_attributes)
+    new_typing_progress = build_typing_progress(new_typing_progress_params)
+
+    unless new_typing_progress.save
+      new_typing_progress.errors.each do |error|
+        errors.add("typing_progress.#{error.attribute}", error.message)
+      end
+      return false
+    end
+
+    typos_params = params[:typing_progress][:typos_attributes]
+    new_typing_progress.create_typos(typos_params) if typos_params.present?
+
+    true
   end
 end
