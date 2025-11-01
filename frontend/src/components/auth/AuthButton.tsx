@@ -2,7 +2,15 @@ import { setToast } from '@/actions/toast';
 import { signIn, signOut } from '@/auth';
 import { SignInSubmitButton, SignOutSubmitButton } from './AuthClientButton';
 
-export function SignIn({ provider, children }: { provider?: string; children?: React.ReactNode }) {
+export function SignIn({
+  provider,
+  children,
+  large,
+}: {
+  provider?: string;
+  children?: React.ReactNode;
+  large?: boolean;
+}) {
   return (
     <form
       action={async () => {
@@ -11,7 +19,7 @@ export function SignIn({ provider, children }: { provider?: string; children?: R
         await signIn(provider);
       }}
     >
-      <SignInSubmitButton>{children || 'Sign in'}</SignInSubmitButton>
+      <SignInSubmitButton large={large}>{children || 'Sign in'}</SignInSubmitButton>
     </form>
   );
 }

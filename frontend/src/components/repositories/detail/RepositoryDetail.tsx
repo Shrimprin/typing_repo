@@ -75,7 +75,7 @@ export default function RepositoryDetail({ initialFileItems }: RepositoryDetailP
         </aside>
 
         <section className="flex min-w-0 flex-1 flex-col">
-          <Card className="mx-4 my-2 flex-1 overflow-hidden">
+          <Card className="mx-4 my-2 flex-1 overflow-hidden pt-0">
             {isLoading ? (
               <Loading text="Loading file..." />
             ) : typingHandler.errorMessage ? (

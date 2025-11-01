@@ -56,7 +56,12 @@ export default async function RepositoryDetailPage({ params }: RepositoryDetailP
   const moreComponent = <DeleteRepositoryDialog repository={repository} />;
 
   return (
-    <PageLayout title={repository.name} moreComponent={moreComponent} className="flex h-screen flex-col">
+    <PageLayout
+      title={repository.name}
+      moreComponent={moreComponent}
+      backHref="/repositories"
+      className="flex h-screen flex-col"
+    >
       <div className="flex-1 overflow-hidden">
         <RepositoryDetail initialFileItems={sortedFileItems} />
       </div>

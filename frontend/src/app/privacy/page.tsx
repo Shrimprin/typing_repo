@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicy() {
   return (
-    <PageLayout title="Privacy Policy">
+    <PageLayout title="Privacy Policy" backHref="/">
       <div className="bg-background min-h-screen py-4">
         <div
           className={`
