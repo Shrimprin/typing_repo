@@ -5,15 +5,23 @@ import React from 'react';
 import { useFormStatus } from 'react-dom';
 
 import { Button } from '@/components/ui/button';
+import { cn } from '@/libs/shadcn/utils';
 
-export function SignInSubmitButton({ children }: { children?: React.ReactNode }) {
+export function SignInSubmitButton({ children, large }: { children?: React.ReactNode; large?: boolean }) {
   const { pending } = useFormStatus();
+  const iconSize = large ? 'h-6 w-6' : 'h-5 w-5';
   return (
-    <Button type="submit" variant="primary" size="lg" className="flex items-center gap-2" disabled={pending}>
+    <Button
+      type="submit"
+      variant="primary"
+      size="lg"
+      className={cn('flex items-center gap-2', large && 'h-12 px-8 py-4 text-lg')}
+      disabled={pending}
+    >
       {pending ? (
-        <LoaderCircle className="h-5 w-5 flex-shrink-0 animate-spin" />
+        <LoaderCircle className={cn(iconSize, 'flex-shrink-0 animate-spin')} />
       ) : (
-        <Github className="h-5 w-5 flex-shrink-0" />
+        <Github className={cn(iconSize, 'flex-shrink-0')} />
       )}
       {children || 'Sign in'}
     </Button>

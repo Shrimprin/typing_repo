@@ -45,7 +45,9 @@ export default function Home() {
             </h1>
             <p className="text-foreground mb-8 text-xl">Import code from GitHub repository and practice typing it.</p>
             <div className="flex justify-center">
-              <SignIn provider="github">Sign in with GitHub to Start</SignIn>
+              <SignIn provider="github" large>
+                Sign in with GitHub to Start
+              </SignIn>
             </div>
           </div>
         </div>
