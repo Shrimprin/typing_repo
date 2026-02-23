@@ -88,7 +88,7 @@ GEM
     brakeman (7.1.2)
       racc
     builder (3.3.0)
-    closure_tree (9.5.0)
+    closure_tree (9.6.0)
       activerecord (>= 7.2.0)
       with_advisory_lock (>= 7.5.0)
       zeitwerk (~> 2.7)
@@ -139,7 +139,7 @@ GEM
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    json (2.18.0)
+    json (2.18.1)
     jwt (3.1.2)
       base64
     language_server-protocol (3.17.0.5)
@@ -204,7 +204,7 @@ GEM
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
-    prism (1.8.0)
+    prism (1.9.0)
     psych (5.3.1)
       date
       stringio
@@ -355,7 +355,7 @@ GEM
       activerecord (>= 7.2)
       zeitwerk (>= 2.7)
     yaml (0.4.0)
-    zeitwerk (2.7.4)
+    zeitwerk (2.7.5)
 
 PLATFORMS
   aarch64-linux
